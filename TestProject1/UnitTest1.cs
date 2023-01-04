@@ -1,4 +1,6 @@
 using LightExcel;
+using LightExcel.Attributes;
+using System.Collections;
 
 namespace TestProject1
 {
@@ -9,12 +11,15 @@ namespace TestProject1
         public void TestMethod1()
         {
             var ie = Ge();
-            RenderProvider.GetDataRender(ie.GetType());
+            ExcelHelper excel = new ExcelHelper();
+            excel.WriteExcel("test.xlsx", ie);
         }
 
         class Test01
         {
+            [ExcelColumn(Name = " Ù–‘1")]
             public int Prop1 { get; set; }
+            [ExcelColumn(Name = " Ù–‘2")]
             public int Prop2 { get; set; }
         }
 
