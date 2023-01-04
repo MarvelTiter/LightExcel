@@ -1,5 +1,5 @@
 # LightExcel
-## 提供Excel导出功能
+## 基于OpenXml的Excel导出功能
 ```CSharp
 // 实例化ExcelHelper对象，调用WriteExcel
 void WriteExcel(string path, object data, string sheetName = "sheet", bool appendSheet = true);
@@ -8,3 +8,4 @@ void WriteExcel(string path, object data, string sheetName = "sheet", bool appen
 services.AddLightExcel()
 ```
 ## data参数支持`DataTable`、`DataSet`、`IDataReader`、`IEnumerable<T>`
+## 支持从现有的Excel文件中追加sheet
