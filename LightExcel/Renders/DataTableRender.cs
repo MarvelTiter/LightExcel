@@ -2,19 +2,19 @@
 using DocumentFormat.OpenXml.Spreadsheet;
 using System.Data;
 
-namespace LightExcel
+namespace LightExcel.Renders
 {
-    internal class DataReaderRender : IDataRender
+    internal class DataTableRender : IDataRender
     {
         public IEnumerable<Row> RenderBody(object data)
         {
-            var reader = (IDataReader)data;
-            while (reader.Read())
+            var table = (DataTable)data;
+            foreach (DataRow item in table.Rows)
             {
                 var row = new Row();
-                for (int i = 0; i < reader.FieldCount; i++)
+                foreach (DataColumn column in table.Columns)
                 {
-                    var cell = InternalHelper.CreateTypedCell(reader.GetFieldType(i), reader.GetValue(i));
+                    var cell = InternalHelper.CreateTypedCell(column.DataType, item[column]);
                     row.AppendChild(cell);
                 }
                 yield return row;
@@ -23,13 +23,13 @@ namespace LightExcel
 
         public Row RenderHeader(object data)
         {
-            var reader = (IDataReader)data;
+            var table = (DataTable)data;
             var row = new Row();
-            for (int i = 0; i < reader.FieldCount; i++)
+            foreach (DataColumn col in table.Columns)
             {
                 var cell = new Cell
                 {
-                    CellValue = new CellValue(reader.GetName(i)),
+                    CellValue = new CellValue(col.ColumnName),
                     DataType = new EnumValue<CellValues>(CellValues.String),
                 };
                 row.AppendChild(cell);

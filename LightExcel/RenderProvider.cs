@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using LightExcel.Renders;
+using System.Collections;
 using System.Data;
 
 namespace LightExcel
@@ -6,7 +7,7 @@ namespace LightExcel
     public class RenderProvider
     {
         public static IDataRender GetDataRender(Type dataType)
-        {               
+        {
             if (dataType == typeof(IDataReader))
             {
                 return new DataReaderRender();
@@ -21,8 +22,18 @@ namespace LightExcel
             }
             else if (dataType.FindInterfaces((t, o) => t == typeof(IEnumerable), null).Length > 0)
             {
-                var elementType = dataType.GetInterfaces().Where(t => IsGenericType(t)).SelectMany(t => t.GetGenericArguments()).ToList();
-                return new EnumerableEntityRender(elementType.First());
+                var elementType = dataType.GetInterfaces().Where(t => IsGenericType(t)).SelectMany(t => t.GetGenericArguments()).FirstOrDefault();
+                if (elementType != null)
+                {
+                    if (elementType == typeof(Dictionary<string, object>))
+                    {
+                        return new DictionaryRender();
+                    }
+                    else
+                    {
+                        return new EnumerableEntityRender(elementType);
+                    }
+                }
             }
             throw new NotImplementedException($"not supported data type: {dataType}");
 

@@ -3,7 +3,7 @@ using LightExcel.Attributes;
 using System.Collections;
 using System.Reflection;
 
-namespace LightExcel
+namespace LightExcel.Renders
 {
     internal class EnumerableEntityRender : IDataRender
     {
@@ -12,7 +12,7 @@ namespace LightExcel
         public EnumerableEntityRender(Type elementType)
         {
             this.elementType = elementType;
-            this.properties = elementType.GetProperties();
+            properties = elementType.GetProperties();
         }
         public IEnumerable<Row> RenderBody(object data)
         {

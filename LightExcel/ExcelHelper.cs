@@ -22,6 +22,21 @@ namespace LightExcel
             }
         }
 
+        public IExcelDataReader ReadExcel(string path, string? sheetName = null, int startRow = 2)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<T> QueryExcel<T>(string path, string sheetName, int startRow = 2)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<dynamic> QueryExcel(string path, string sheetName, int startRow = 2)
+        {
+            throw new NotImplementedException();
+        }
+
         private void InternalWriteExcel(string path, object data, string? sheetName)
         {
             using var doc = GetDocument(path);
@@ -164,5 +179,7 @@ namespace LightExcel
                 startIndex++;
             }
         }
+
+       
     }
 }

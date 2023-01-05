@@ -23,11 +23,19 @@ namespace TestProject1
             public int Prop2 { get; set; }
         }
 
-        IEnumerable<Test01> Ge()
+        IEnumerable<Dictionary<string, object>> Ge()
         {
             for (int i = 0; i < 10; i++)
             {
-                yield return new Test01();
+                yield return new Dictionary<string, object>
+                {
+                    ["Column1"] = 222,
+                    ["Column2"] = "≤‚ ‘",
+                    ["Column3"] = 111,
+                    ["Column4"] = "Hello",
+                    ["Column5"] = "World",
+
+                };
             }
         }
     }
