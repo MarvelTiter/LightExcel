@@ -4,6 +4,7 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+		<Authors>MarvelTiter</Authors>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Title>MT.LightExcel</Title>
 		<Description>基于OpenXml的Excel读取与写入</Description>
