@@ -24,15 +24,17 @@ namespace LightExcel
 
         public IExcelDataReader ReadExcel(string path, string? sheetName = null, int startRow = 2)
         {
-            throw new NotImplementedException();
+            configuration.AllowAppendSheet = false;
+            var doc = GetDocument(path);
+            return new ExcelReader(doc, startRow);
         }
 
-        public IEnumerable<T> QueryExcel<T>(string path, string sheetName, int startRow = 2)
+        public IEnumerable<T> QueryExcel<T>(string path, string? sheetName = null, int startRow = 2)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<dynamic> QueryExcel(string path, string sheetName, int startRow = 2)
+        public IEnumerable<dynamic> QueryExcel(string path, string? sheetName = null, int startRow = 2)
         {
             throw new NotImplementedException();
         }
@@ -59,10 +61,10 @@ namespace LightExcel
             SpreadsheetDocument doc = null;
             try
             {
-                if (File.Exists(path) && configuration.AllowAppendSheet)
+                if (File.Exists(path))
                 {
                     // 文件存在并且，允许追加Sheet
-                    doc = SpreadsheetDocument.Open(path, true);
+                    doc = SpreadsheetDocument.Open(path, configuration.AllowAppendSheet);
                 }
                 else
                 {
@@ -180,6 +182,6 @@ namespace LightExcel
             }
         }
 
-       
+
     }
 }

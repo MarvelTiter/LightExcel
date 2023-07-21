@@ -38,5 +38,26 @@ namespace TestProject1
                 };
             }
         }
+
+        [TestMethod]
+        public void TestRead()
+        {
+            ExcelHelper excel = new ExcelHelper();
+            var reader = excel.ReadExcel(@"E:\Statistics\2023 06月 每月统计.xlsx");
+            //reader.NextResult();
+            while (reader.NextResult())
+            {
+                Console.WriteLine($"================={reader.CurrentSheetName}================");
+                while (reader.Read())
+                {
+                    for (int i = 0; i < reader.FieldCount; i++)
+                    {
+                        Console.Write($"{reader[i]}, ");
+                    }
+                    Console.Write(Environment.NewLine);
+                }
+                break;
+            }
+        }
     }
 }
