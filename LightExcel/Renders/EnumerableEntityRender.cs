@@ -22,6 +22,8 @@ namespace LightExcel.Renders
                 var row = new Row();
                 foreach (var prop in properties)
                 {
+                    ExcelColumnAttribute? excelColumnAttribute = prop.GetCustomAttribute<ExcelColumnAttribute>();
+                    if (excelColumnAttribute?.Ignore ?? false) continue;
                     var cell = InternalHelper.CreateTypedCell(prop.PropertyType, prop.GetValue(item));
                     row.AppendChild(cell);
                 }
@@ -35,7 +37,9 @@ namespace LightExcel.Renders
             var row = new Row();
             foreach (var prop in properties)
             {
-                var colName = prop.GetCustomAttribute<ExcelColumnAttribute>()?.Name ?? prop.Name;
+                ExcelColumnAttribute? excelColumnAttribute = prop.GetCustomAttribute<ExcelColumnAttribute>();
+                if (excelColumnAttribute?.Ignore ?? false) continue;
+                var colName = excelColumnAttribute?.Name ?? prop.Name;
                 var cell = new Cell
                 {
                     CellValue = new CellValue(colName),
