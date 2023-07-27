@@ -27,10 +27,12 @@ namespace LightExcel.Renders
             var values = data as IEnumerable;
             foreach (var item in values!)
             {
+                if (item is null) continue;
                 var row = new Row();
                 foreach (var prop in validProp.Values)
                 {
-                    var cell = InternalHelper.CreateTypedCell(prop.PropertyType, prop!.GetValue(item));
+                    var cell = InternalHelper.CreateTypedCell(prop.PropertyType, prop!.GetValue(item) ?? "");
+                    //cell.C
                     row.AppendChild(cell);
                 }
                 yield return row;

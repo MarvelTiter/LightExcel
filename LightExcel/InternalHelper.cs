@@ -8,7 +8,7 @@ internal static class InternalHelper
         var cell = new Cell();
         if (type == typeof(bool))
         {
-            cell.CellValue = new CellValue();
+            cell.CellValue = new CellValue((bool)value);
             cell.DataType = new EnumValue<CellValues>(CellValues.Boolean);
         }
         else if (type == typeof(DateTime))
@@ -44,7 +44,7 @@ internal static class InternalHelper
 
         return cell;
     }
-    internal static bool IsNumeric<T>(this object obj, out object value) where T : struct
+    internal static bool IsNumeric<T>(this object? obj, out object value) where T : struct
     {
         value = null;
         if (obj == null)

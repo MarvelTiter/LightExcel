@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using LightExcel.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -13,13 +14,12 @@ namespace LightExcel
     internal class ExcelReader : IExcelDataReader
     {
         private bool disposedValue;
-        private readonly IEnumerable<WorksheetPart> sheetParts;
+        //private readonly IEnumerable<WorksheetPart> sheetParts;
         private readonly IEnumerable<Sheet> sheets;
         private readonly SpreadsheetDocument document;
-        public string? this[int i] => ElementAt(i)?.Text;
-        public string? this[string name] => throw new NotImplementedException();
+        public string? this[int i] => CellAt(i)?.GetCellValue(document.WorkbookPart);
+        public string? this[string name] => CellAt(GetOrdinal(name))?.GetCellValue(document.WorkbookPart);
 
-        SheetData? currentSheet;
         Row[] rows = Array.Empty<Row>();
 
         public string CurrentSheetName => sheets.ElementAt(currentSheetIndex)?.Name?.ToString() ?? "";
@@ -28,22 +28,26 @@ namespace LightExcel
 
         Cell[] cells = Array.Empty<Cell>();
         string[] heads = Array.Empty<string>();
-        int currentSheetIndex = -1;
-        int currentRowIndex = -1;
-        int headerRowIndex = 0;
-        public ExcelReader(SpreadsheetDocument document, int start)
+        int currentSheetIndex = 0;
+        int currentRowIndex = 0;
+        int startRowIndex = 0;
+        public ExcelReader(SpreadsheetDocument document)
         {
             this.document = document;
-            sheetParts = document.WorkbookPart?.WorksheetParts ?? Enumerable.Empty<WorksheetPart>();
-            sheets = document.WorkbookPart?.Workbook.Sheets?.Elements<Sheet>() ?? Enumerable.Empty<Sheet>();
-            currentRowIndex += start;
-            headerRowIndex = start - 2;
+            //sheetParts = document.WorkbookPart?.WorksheetParts ?? Enumerable.Empty<WorksheetPart>();
+            sheets = document.WorkbookPart?.Workbook.Descendants<Sheet>() ?? Enumerable.Empty<Sheet>();
         }
 
         private CellValue? ElementAt(int i)
         {
             if (i > cells.Length) return null;
             return cells[i].CellValue;
+        }
+
+        private Cell? CellAt(int i)
+        {
+            if (i > cells.Length) return null;
+            return cells[i];
         }
 
         public void Close()
@@ -111,23 +115,36 @@ namespace LightExcel
         {
             currentSheetIndex++;
             //currentSheet = sheetParts?.Skip(currentSheetIndex).FirstOrDefault()?.Worksheet.Descendants<SheetData>().First();
-            rows = sheetParts.ElementAt(currentSheetIndex).Worksheet.Descendants<Row>().ToArray();
-            if (headerRowIndex < rows.Length)
+            //rows = sheetParts.ElementAt(currentSheetIndex).Worksheet.Descendants<Row>().ToArray();
+            if (currentSheetIndex >= sheets.Count()) return false;
+            var sheet = sheets.ElementAt(currentSheetIndex);
+            var current = (WorksheetPart)document.WorkbookPart?.GetPartById(sheet!.Id!)!;
+            rows = current.Worksheet.Descendants<Row>().ToArray();
+            if (rows.Length > 0)
             {
-                heads = rows[headerRowIndex].Elements<Cell>().Select(c => c.CellValue?.Text ?? "").ToArray();
+                heads = rows[0].Descendants<Cell>().Select(c => c.GetCellValue(document.WorkbookPart) ?? "").ToArray();
             }
-            return currentSheet != null;
+            currentRowIndex = 0;
+            return rows.Length > 0;
         }
 
         public bool Read()
         {
             if (currentRowIndex < rows.Length)
             {
-                cells = rows[currentRowIndex].Descendants<Cell>().ToArray();
+                cells = GetCells(rows[currentRowIndex]).ToArray();
                 currentRowIndex++;
                 return true;
             }
             return false;
+        }
+
+        IEnumerable<Cell> GetCells(Row row)
+        {
+            foreach (Cell item in row)
+            {
+                yield return item;
+            }
         }
 
         protected virtual void Dispose(bool disposing)

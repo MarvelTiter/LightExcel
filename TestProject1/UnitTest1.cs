@@ -44,7 +44,7 @@ namespace TestProject1
         {
             ExcelHelper excel = new ExcelHelper();
             var reader = excel.ReadExcel(@"E:\Statistics\2023 06月 每月统计.xlsx");
-            //reader.NextResult();
+            reader.NextResult();
             while (reader.NextResult())
             {
                 Console.WriteLine($"================={reader.CurrentSheetName}================");
@@ -58,6 +58,14 @@ namespace TestProject1
                 }
                 break;
             }
+        }
+
+        [TestMethod]
+        public void TemplateTest()
+        {
+            ExcelHelper excel = new ExcelHelper();
+            var ie = Ge();
+            excel.WriteExcel("test.xlsx", @"E:\Documents\Downloads\路檢報表格式.xlsx", ie);
         }
     }
 }

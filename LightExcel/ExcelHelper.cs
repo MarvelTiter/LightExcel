@@ -5,7 +5,49 @@ using DocumentFormat.OpenXml;
 
 namespace LightExcel
 {
-    public class ExcelHelper : IExcelHelper
+    public partial class ExcelHelper
+    {
+        void InternalWriteExcelWithTemplate(string path, string template, object data)
+        {
+            var doc = GetDocument(template);
+
+            // 获取WorkbookPart（工作簿）
+            var workBookPart = doc.WorkbookPart;
+            var sheets = workBookPart?.Workbook.Descendants<Sheet>().ToArray() ?? Array.Empty<Sheet>();
+            var dataType = data.GetType();
+            var render = RenderProvider.GetDataRender(dataType);
+            if (dataType == typeof(DataSet))
+            {
+                if (data is DataSet ds)
+                {
+                    for (int i = 0; i < ds.Tables.Count; i++)
+                    {
+                        if (i > sheets.Length) break;
+                        var sheet = sheets[i];
+                        AppendData(workBookPart!, sheet);
+                    }
+                }
+            }
+            else
+            {
+                var sheet = sheets.First();
+                AppendData(workBookPart!, sheet);
+            }
+            doc.SaveAs(path);
+
+            void AppendData(WorkbookPart bookPart, Sheet sheet)
+            {
+                var sheetPart = (WorksheetPart)bookPart.GetPartById(sheet!.Id!);
+                var headRows = sheetPart.Worksheet.Descendants<Row>().Count();
+                //创建内容数据
+                CreateBody(sheetPart, data, render, (uint)headRows);
+
+                sheetPart.Worksheet.Save();
+                bookPart.Workbook.Save();
+            }
+        }
+    }
+    public partial class ExcelHelper : IExcelHelper
     {
         private readonly ExcelHelperConfiguration configuration = new ExcelHelperConfiguration();
         const string DEFAULT_SHEETNAME = "sheet";
@@ -22,15 +64,43 @@ namespace LightExcel
             }
         }
 
-        public IExcelDataReader ReadExcel(string path, string? sheetName = null, int startRow = 2)
+        public void WriteExcel(string path, string template, object data)
+        {
+            try
+            {
+                configuration.AllowAppendSheet = true;
+                InternalWriteExcelWithTemplate(path, template, data);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public IExcelDataReader ReadExcel(string path)
         {
             configuration.AllowAppendSheet = false;
             var doc = GetDocument(path);
-            return new ExcelReader(doc, startRow);
+            return new ExcelReader(doc);
         }
 
         public IEnumerable<T> QueryExcel<T>(string path, string? sheetName = null, int startRow = 2)
         {
+            var reader = ReadExcel(path);
+            while (reader.NextResult())
+            {
+                if (sheetName != null && reader.CurrentSheetName == sheetName)
+                {
+                    while (reader.Read())
+                    {
+                        //
+                    }
+                }
+                else
+                {
+
+                }
+            }
             throw new NotImplementedException();
         }
 
@@ -164,7 +234,7 @@ namespace LightExcel
             sheetData!.AppendChild(row);
         }
 
-        private void CreateBody(WorksheetPart worksheetPart, object data, IDataRender render)
+        private void CreateBody(WorksheetPart worksheetPart, object data, IDataRender render, uint rowIndex = 2)
         {
             //获取Worksheet对象
             var worksheet = worksheetPart.Worksheet;
@@ -173,7 +243,7 @@ namespace LightExcel
             var sheetData = worksheet.GetFirstChild<SheetData>();
 
             var rows = render.RenderBody(data);
-            uint startIndex = 2;
+            uint startIndex = rowIndex;
             foreach (var r in rows)
             {
                 r.RowIndex = startIndex;
