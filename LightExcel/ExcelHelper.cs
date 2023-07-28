@@ -33,7 +33,8 @@ namespace LightExcel
                 var sheet = sheets.First();
                 AppendData(workBookPart!, sheet);
             }
-            doc.SaveAs(path);
+            doc?.SaveAs(path);
+            doc?.Dispose();
 
             void AppendData(WorkbookPart bookPart, Sheet sheet)
             {
@@ -134,7 +135,10 @@ namespace LightExcel
                 if (File.Exists(path))
                 {
                     // 文件存在并且，允许追加Sheet
-                    doc = SpreadsheetDocument.Open(path, configuration.AllowAppendSheet);
+                    using var fs = File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
+                    MemoryStream ms = new MemoryStream();
+                    fs.CopyTo(ms);
+                    doc = SpreadsheetDocument.Open(ms, configuration.AllowAppendSheet);
                 }
                 else
                 {

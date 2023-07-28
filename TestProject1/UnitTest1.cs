@@ -65,7 +65,8 @@ namespace TestProject1
         {
             ExcelHelper excel = new ExcelHelper();
             var ie = Ge();
-            excel.WriteExcel("test.xlsx", @"E:\Documents\Downloads\路檢報表格式.xlsx", ie);
+            excel.WriteExcel("E:\\Documents\\Downloads\\test1.xlsx", @"E:\Documents\Downloads\路檢報表格式.xlsx", ie);
+            excel.WriteExcel("E:\\Documents\\Downloads\\test2.xlsx", @"E:\Documents\Downloads\路檢報表格式.xlsx", ie);
         }
     }
 }
