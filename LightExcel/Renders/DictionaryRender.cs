@@ -12,14 +12,17 @@ namespace LightExcel.Renders
         public IEnumerable<Row> RenderBody(object data)
         {
             var values = (IEnumerable<Dictionary<string, object>>)data;
+            int rowValueIndex = 0;
             foreach (var dic in values)
             {
                 var row = new Row();
-                foreach (var v in dic.Values)
+                foreach (var kv in dic)
                 {
-                    var cell = InternalHelper.CreateTypedCell(v.GetType(), v);
+                    var cell = InternalHelper.CreateTypedCell(kv.Value.GetType(), kv.Value);
+                    cell.CellReference = $"{kv.Key}{rowValueIndex}";
                     row.AppendChild(cell);
                 }
+                rowValueIndex++;
                 yield return row;
             }
         }
@@ -34,6 +37,7 @@ namespace LightExcel.Renders
                 {
                     CellValue = new CellValue(item),
                     DataType = new DocumentFormat.OpenXml.EnumValue<CellValues>(CellValues.String),
+                    CellReference = $"Header{item}"
                 };
                 row.AppendChild(cell);
             }

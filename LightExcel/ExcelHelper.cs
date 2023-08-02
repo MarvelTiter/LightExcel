@@ -33,7 +33,7 @@ namespace LightExcel
                 var sheet = sheets.First();
                 AppendData(workBookPart!, sheet);
             }
-            doc?.SaveAs(path);
+            doc?.SaveAs(path).Close();
             doc?.Dispose();
 
             void AppendData(WorkbookPart bookPart, Sheet sheet)
@@ -125,6 +125,8 @@ namespace LightExcel
             }
             else
                 WriteSheet(doc, data, render, sheetName);
+
+            doc.Save();
         }
 
         private SpreadsheetDocument GetDocument(string path)
@@ -232,7 +234,6 @@ namespace LightExcel
 
             //获取表格的数据对象，SheetData
             var sheetData = worksheet.GetFirstChild<SheetData>();
-
             var row = render.RenderHeader(data);
             row.RowIndex = 1;
             sheetData!.AppendChild(row);
@@ -242,7 +243,6 @@ namespace LightExcel
         {
             //获取Worksheet对象
             var worksheet = worksheetPart.Worksheet;
-
             //获取表格的数据对象，SheetData
             var sheetData = worksheet.GetFirstChild<SheetData>();
 

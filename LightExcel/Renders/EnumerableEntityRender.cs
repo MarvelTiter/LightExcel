@@ -25,16 +25,19 @@ namespace LightExcel.Renders
         public IEnumerable<Row> RenderBody(object data)
         {
             var values = data as IEnumerable;
+            int rowValueIndex = 0;
             foreach (var item in values!)
             {
                 if (item is null) continue;
                 var row = new Row();
-                foreach (var prop in validProp.Values)
+                foreach (var kv in validProp)
                 {
+                    var prop = kv.Value;
                     var cell = InternalHelper.CreateTypedCell(prop.PropertyType, prop!.GetValue(item) ?? "");
-                    //cell.C
+                    cell.CellReference = $"{kv.Key}{rowValueIndex}";
                     row.AppendChild(cell);
                 }
+                rowValueIndex++;
                 yield return row;
             }
 
@@ -49,6 +52,7 @@ namespace LightExcel.Renders
                 {
                     CellValue = new CellValue(kv.Key),
                     DataType = new DocumentFormat.OpenXml.EnumValue<CellValues>(CellValues.String),
+                    CellReference = $"Header{kv.Key}"
                 };
                 row.AppendChild(cell);
             }
