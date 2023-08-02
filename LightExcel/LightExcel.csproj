@@ -8,11 +8,11 @@
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Title>MT.LightExcel</Title>
 		<Description>基于OpenXml的Excel读取与写入</Description>
-		<Version>1.0.0.2</Version>
-		<AssemblyVersion>1.0.0.2</AssemblyVersion>
+		<Version>1.0.0.3</Version>
+		<AssemblyVersion>1.0.0.3</AssemblyVersion>
 		<RepositoryUrl>https://github.com/MarvelTiter/LightExcel.git</RepositoryUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<FileVersion>1.0.0.2</FileVersion>
+		<FileVersion>1.0.0.3</FileVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
