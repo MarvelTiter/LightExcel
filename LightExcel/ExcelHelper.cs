@@ -33,7 +33,7 @@ namespace LightExcel
                 var sheet = sheets.First();
                 AppendData(workBookPart!, sheet);
             }
-            doc?.SaveAs(path);
+            doc?.SaveAs(path).Close();
             doc?.Dispose();
 
             void AppendData(WorkbookPart bookPart, Sheet sheet)
