@@ -33,13 +33,13 @@ namespace LightExcel
                 var sheet = sheets.First();
                 AppendData(workBookPart!, sheet);
             }
-            doc?.SaveAs(path).Close();
+            doc?.SaveAs(path);
             doc?.Dispose();
 
             void AppendData(WorkbookPart bookPart, Sheet sheet)
             {
                 var sheetPart = (WorksheetPart)bookPart.GetPartById(sheet!.Id!);
-                var headRows = sheetPart.Worksheet.Descendants<Row>().Count();
+                var headRows = sheetPart.Worksheet.Descendants<Row>().Count() + 1;
                 //创建内容数据
                 CreateBody(sheetPart, data, render, (uint)headRows);
 

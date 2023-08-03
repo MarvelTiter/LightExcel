@@ -69,9 +69,11 @@ namespace TestProject1
         public void TemplateTest()
         {
             ExcelHelper excel = new ExcelHelper();
+            const string Path1 = "E:\\Documents\\Downloads\\test.xlsx";
             var ie = Ge();
+            if (File.Exists(Path1))
+                File.Delete(Path1);
             excel.WriteExcel("E:\\Documents\\Downloads\\test.xlsx", @"E:\Documents\Downloads\路檢報表格式.xlsx", ie);
-            var fs = File.Open("E:\\Documents\\Downloads\\test.xlsx", FileMode.Open);
         }
 
         private static void Valid(string path)
