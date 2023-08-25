@@ -28,7 +28,7 @@ namespace LightExcel
 
         Cell[] cells = Array.Empty<Cell>();
         string[] heads = Array.Empty<string>();
-        int currentSheetIndex = 0;
+        int currentSheetIndex = -1;
         int currentRowIndex = 0;
         int startRowIndex = 0;
         public ExcelReader(SpreadsheetDocument document)

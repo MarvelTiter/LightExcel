@@ -48,8 +48,7 @@ namespace TestProject1
         public void TestRead()
         {
             ExcelHelper excel = new ExcelHelper();
-            var reader = excel.ReadExcel(@"E:\Statistics\2023 06月 每月统计.xlsx");
-            reader.NextResult();
+            var reader = excel.ReadExcel(@"E:\Documents\Desktop\导出流水\整备质量数据表 (润通).xlsx");
             while (reader.NextResult())
             {
                 Console.WriteLine($"================={reader.CurrentSheetName}================");
