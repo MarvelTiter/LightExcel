@@ -1,4 +1,5 @@
-﻿using LightExcel.Renders;
+﻿using DocumentFormat.OpenXml.Packaging;
+using LightExcel.Renders;
 using System.Collections;
 using System.Data;
 
@@ -6,19 +7,15 @@ namespace LightExcel
 {
     public class RenderProvider
     {
-        public static IDataRender GetDataRender(Type dataType)
+        public static IDataRender GetDataRender(Type dataType, WorkbookPart workbookPart, ExcelConfiguration configuration)
         {
             if (dataType == typeof(IDataReader))
             {
-                return new DataReaderRender();
+                return new DataReaderRender(workbookPart, configuration);
             }
             else if (dataType == typeof(DataTable))
             {
-                return new DataTableRender();
-            }
-            else if (dataType == typeof(DataSet))
-            {
-                return new DataSetRender();
+                return new DataTableRender(workbookPart, configuration);
             }
             else if (dataType.FindInterfaces((t, o) => t == typeof(IEnumerable), null).Length > 0)
             {
@@ -27,11 +24,11 @@ namespace LightExcel
                 {
                     if (elementType == typeof(Dictionary<string, object>))
                     {
-                        return new DictionaryRender();
+                        return new DictionaryRender(workbookPart, configuration);
                     }
                     else
                     {
-                        return new EnumerableEntityRender(elementType);
+                        return new EnumerableEntityRender(elementType, workbookPart, configuration);
                     }
                 }
             }

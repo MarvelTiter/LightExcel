@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
+﻿using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
 using LightExcel.Attributes;
 using System.Collections;
 using System.Reflection;
@@ -8,11 +9,15 @@ namespace LightExcel.Renders
     internal class EnumerableEntityRender : IDataRender
     {
         private readonly Type elementType;
+        private readonly WorkbookPart workbookPart;
+        private readonly ExcelConfiguration configuration;
         private readonly PropertyInfo[] properties;
         private readonly Dictionary<string, PropertyInfo> validProp;
-        public EnumerableEntityRender(Type elementType)
+        public EnumerableEntityRender(Type elementType, WorkbookPart workbookPart, ExcelConfiguration configuration)
         {
             this.elementType = elementType;
+            this.workbookPart = workbookPart;
+            this.configuration = configuration;
             properties = elementType.GetProperties();
             validProp = new Dictionary<string, PropertyInfo>();
             foreach (var prop in properties)
@@ -32,7 +37,12 @@ namespace LightExcel.Renders
                 foreach (var kv in validProp)
                 {
                     var prop = kv.Value;
+                    var value = prop!.GetValue(item);
                     var cell = InternalHelper.CreateTypedCell(prop.PropertyType, prop!.GetValue(item) ?? "");
+                    if (configuration.HasStyle(kv.Key, value))
+                    {
+                        cell.StyleIndex = configuration.GetStyleIndex(kv.Key, workbookPart);
+                    }
                     row.AppendChild(cell);
                 }
                 yield return row;

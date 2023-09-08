@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
+﻿using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,15 @@ namespace LightExcel.Renders
 {
     internal class DictionaryRender : IDataRender
     {
+        private readonly WorkbookPart workbookPart;
+        private readonly ExcelConfiguration configuration;
+
+        public DictionaryRender(WorkbookPart workbookPart, ExcelConfiguration configuration)
+        {
+            this.workbookPart = workbookPart;
+            this.configuration = configuration;
+        }
+
         public IEnumerable<Row> RenderBody(object data)
         {
             var values = (IEnumerable<Dictionary<string, object>>)data;
@@ -18,6 +28,14 @@ namespace LightExcel.Renders
                 foreach (var kv in dic)
                 {
                     var cell = InternalHelper.CreateTypedCell(kv.Value.GetType(), kv.Value);
+                    if (configuration.HasStyle(kv.Key, kv.Value))
+                    {
+                        cell.StyleIndex = configuration.GetStyleIndex(kv.Key, workbookPart);
+                    }
+                    else
+                    {
+                        cell.StyleIndex = null;
+                    }
                     row.AppendChild(cell);
                 }
                 yield return row;

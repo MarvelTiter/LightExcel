@@ -2,12 +2,17 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Validation;
 using LightExcel;
 using LightExcel.Attributes;
+using LightExcel.Enums;
 using System.Collections;
 using System.Diagnostics;
 using System.Text;
 
 namespace TestProject1
 {
+    public class ExportExcelTestModel
+    {
+
+    }
     [TestClass]
     public class UnitTest1
     {
@@ -16,7 +21,10 @@ namespace TestProject1
         {
             var ie = Ge();
             ExcelHelper excel = new ExcelHelper();
-            excel.WriteExcel($"{Guid.NewGuid():N}.xlsx", ie);
+            excel.WriteExcel($"{Guid.NewGuid():N}.xlsx", ie, option =>
+            {
+                option.AddNumberFormat("Column3", NumberFormat.Percent2);
+            });
             Process.Start("powershell", $"start {AppDomain.CurrentDomain.BaseDirectory}");
         }
 
@@ -36,7 +44,7 @@ namespace TestProject1
                 {
                     ["Column1"] = 222,
                     ["Column2"] = "≤‚ ‘",
-                    ["Column3"] = 111,
+                    ["Column3"] = 0.2222,
                     ["Column4"] = "Hello",
                     ["Column5"] = "World",
 

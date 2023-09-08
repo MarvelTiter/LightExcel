@@ -11,7 +11,7 @@ namespace LightExcel
     {
         public static IServiceCollection AddLightExcel(this IServiceCollection services)
         {
-            services.AddSingleton<IExcelHelper, ExcelHelper>();
+            services.AddTransient<IExcelHelper, ExcelHelper>();
             return services;
         }
     }

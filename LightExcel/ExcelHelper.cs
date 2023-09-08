@@ -2,6 +2,7 @@
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.EMMA;
 
 namespace LightExcel
 {
@@ -15,7 +16,7 @@ namespace LightExcel
             var workBookPart = doc.WorkbookPart;
             var sheets = workBookPart?.Workbook.Descendants<Sheet>().ToArray() ?? Array.Empty<Sheet>();
             var dataType = data.GetType();
-            var render = RenderProvider.GetDataRender(dataType);
+            var render = RenderProvider.GetDataRender(dataType, doc.WorkbookPart!, configuration);
             if (dataType == typeof(DataSet))
             {
                 if (data is DataSet ds)
@@ -48,9 +49,10 @@ namespace LightExcel
             }
         }
     }
-    public partial class ExcelHelper : IExcelHelper
+    public partial class ExcelHelper : IExcelHelper, IDisposable
     {
-        private readonly ExcelHelperConfiguration configuration = new ExcelHelperConfiguration();
+        private readonly ExcelConfiguration configuration = new();
+        private bool disposedValue;
         const string DEFAULT_SHEETNAME = "sheet";
         public void WriteExcel(string path, object data, string? sheetName = "sheet", bool appendSheet = true)
         {
@@ -71,6 +73,19 @@ namespace LightExcel
             {
                 configuration.AllowAppendSheet = true;
                 InternalWriteExcelWithTemplate(path, template, data);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public void WriteExcel(string path, object data, Action<ExcelConfiguration> config)
+        {
+            try
+            {
+                config.Invoke(configuration);
+                InternalWriteExcel(path, data, configuration.SheetName);
             }
             catch (Exception)
             {
@@ -114,18 +129,8 @@ namespace LightExcel
         {
             using var doc = GetDocument(path);
             var dataType = data.GetType();
-            var render = RenderProvider.GetDataRender(dataType);
-            if (dataType == typeof(DataSet))
-            {
-                configuration.AllowAppendSheet = true;
-                foreach (DataTable dataTable in (data as DataSet ?? new DataSet()).Tables)
-                {
-                    WriteSheet(doc, data, render, dataTable.TableName);
-                }
-            }
-            else
-                WriteSheet(doc, data, render, sheetName);
-
+            var render = RenderProvider.GetDataRender(dataType, doc.WorkbookPart!, configuration);
+            WriteSheet(doc, data, render, sheetName);
             doc.Save();
         }
 
@@ -138,7 +143,7 @@ namespace LightExcel
                 {
                     // 文件存在并且，允许追加Sheet
                     using var fs = File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
-                    MemoryStream ms = new MemoryStream();
+                    MemoryStream ms = new();
                     fs.CopyTo(ms);
                     doc = SpreadsheetDocument.Open(ms, configuration.AllowAppendSheet);
                 }
@@ -156,6 +161,7 @@ namespace LightExcel
                     var shareStringPart = workbookPart.AddNewPart<SharedStringTablePart>();
                     //创建共享字符串表
                     shareStringPart.SharedStringTable = new SharedStringTable();
+                                       
                     workbookPart.Workbook.Save();
                 }
             }
@@ -254,6 +260,26 @@ namespace LightExcel
                 sheetData!.AppendChild(r);
                 startIndex++;
             }
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // 不要更改此代码。请将清理代码放入“Dispose(bool disposing)”方法中
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
 
 

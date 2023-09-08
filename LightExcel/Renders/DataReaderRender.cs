@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System.Data;
 
@@ -6,6 +7,15 @@ namespace LightExcel.Renders
 {
     internal class DataReaderRender : IDataRender
     {
+        private readonly WorkbookPart workbookPart;
+        private readonly ExcelConfiguration configuration;
+
+        public DataReaderRender(WorkbookPart workbookPart, ExcelConfiguration configuration)
+        {
+            this.workbookPart = workbookPart;
+            this.configuration = configuration;
+        }
+
         public IEnumerable<Row> RenderBody(object data)
         {
             var reader = (IDataReader)data;
@@ -15,8 +25,13 @@ namespace LightExcel.Renders
                 var row = new Row();
                 for (int i = 0; i < reader.FieldCount; i++)
                 {
-                    var cell = InternalHelper.CreateTypedCell(reader.GetFieldType(i), reader.GetValue(i));
-                    //cell.CellReference = $"{reader.GetName(i)}{rowValueIndex}";
+                    var field = reader.GetName(i);
+                    var value = reader.GetValue(i);
+                    var cell = InternalHelper.CreateTypedCell(reader.GetFieldType(i), value);
+                    if (configuration.HasStyle(field, value))
+                    {
+                        cell.StyleIndex = configuration.GetStyleIndex(field, workbookPart);
+                    }
                     row.AppendChild(cell);
                 }
                 //rowValueIndex++;

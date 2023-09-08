@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System.Data;
 
@@ -6,6 +7,15 @@ namespace LightExcel.Renders
 {
     internal class DataTableRender : IDataRender
     {
+        private readonly WorkbookPart workbookPart;
+        private readonly ExcelConfiguration configuration;
+
+        public DataTableRender(WorkbookPart workbookPart, ExcelConfiguration configuration)
+        {
+            this.workbookPart = workbookPart;
+            this.configuration = configuration;
+        }
+
         public IEnumerable<Row> RenderBody(object data)
         {
             var table = (DataTable)data;
@@ -14,7 +24,12 @@ namespace LightExcel.Renders
                 var row = new Row();
                 foreach (DataColumn column in table.Columns)
                 {
-                    var cell = InternalHelper.CreateTypedCell(column.DataType, item[column]);
+                    object value = item[column];
+                    var cell = InternalHelper.CreateTypedCell(column.DataType, value);
+                    if (configuration.HasStyle(column.ColumnName, value))
+                    {
+                        cell.StyleIndex = configuration.GetStyleIndex(column.ColumnName, workbookPart);
+                    }
                     row.AppendChild(cell);
                 }
                 yield return row;
