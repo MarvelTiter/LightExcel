@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Spreadsheet;
+﻿using LightExcel.OpenXml;
 using System.Data;
 
 namespace LightExcel.Renders
@@ -13,12 +12,12 @@ namespace LightExcel.Renders
             while (reader.Read())
             {
                 var row = new Row();
-                for (int i = 0; i < reader.FieldCount; i++)
-                {
-                    var cell = InternalHelper.CreateTypedCell(reader.GetFieldType(i), reader.GetValue(i));
-                    //cell.CellReference = $"{reader.GetName(i)}{rowValueIndex}";
-                    row.AppendChild(cell);
-                }
+                //for (int i = 0; i < reader.FieldCount; i++)
+                //{
+                //    var cell = InternalHelper.CreateTypedCell(reader.GetFieldType(i), reader.GetValue(i));
+                //    //cell.CellReference = $"{reader.GetName(i)}{rowValueIndex}";
+                //    row.AppendChild(cell);
+                //}
                 //rowValueIndex++;
                 yield return row;
             }
@@ -30,13 +29,13 @@ namespace LightExcel.Renders
             var row = new Row();
             for (int i = 0; i < reader.FieldCount; i++)
             {
-                var cell = new Cell
-                {
-                    CellValue = new CellValue(reader.GetName(i)),
-                    DataType = new EnumValue<CellValues>(CellValues.String),
-                    //CellReference = $"Header{i}"
-                };
-                row.AppendChild(cell);
+                //var cell = new Cell
+                //{
+                //    CellValue = new CellValue(reader.GetName(i)),
+                //    DataType = new EnumValue<CellValues>(CellValues.String),
+                //    //CellReference = $"Header{i}"
+                //};
+                //row.AppendChild(cell);
             }
             return row;
         }

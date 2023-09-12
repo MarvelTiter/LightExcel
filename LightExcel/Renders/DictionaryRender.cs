@@ -1,9 +1,5 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using LightExcel.OpenXml;
 
 namespace LightExcel.Renders
 {
@@ -15,11 +11,11 @@ namespace LightExcel.Renders
             foreach (var dic in values)
             {
                 var row = new Row();
-                foreach (var kv in dic)
-                {
-                    var cell = InternalHelper.CreateTypedCell(kv.Value.GetType(), kv.Value);
-                    row.AppendChild(cell);
-                }
+                //foreach (var kv in dic)
+                //{
+                //    var cell = InternalHelper.CreateTypedCell(kv.Value.GetType(), kv.Value);
+                //    row.AppendChild(cell);
+                //}
                 yield return row;
             }
         }
@@ -30,12 +26,12 @@ namespace LightExcel.Renders
             var row = new Row();
             foreach (var item in values.First().Keys)
             {
-                var cell = new Cell
-                {
-                    CellValue = new CellValue(item),
-                    DataType = new DocumentFormat.OpenXml.EnumValue<CellValues>(CellValues.String),
-                };
-                row.AppendChild(cell);
+                //var cell = new Cell
+                //{
+                //    CellValue = new CellValue(item),
+                //    DataType = new DocumentFormat.OpenXml.EnumValue<CellValues>(CellValues.String),
+                //};
+                //row.AppendChild(cell);
             }
             return row;
         }

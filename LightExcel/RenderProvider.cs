@@ -6,7 +6,7 @@ namespace LightExcel
 {
     public class RenderProvider
     {
-        public static IDataRender GetDataRender(Type dataType)
+        internal static IDataRender GetDataRender(Type dataType)
         {
             if (dataType == typeof(IDataReader))
             {

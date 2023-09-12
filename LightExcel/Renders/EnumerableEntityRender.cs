@@ -1,5 +1,5 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using LightExcel.Attributes;
+﻿using LightExcel.Attributes;
+using LightExcel.OpenXml;
 using System.Collections;
 using System.Reflection;
 
@@ -29,12 +29,12 @@ namespace LightExcel.Renders
             {
                 if (item is null) continue;
                 var row = new Row();
-                foreach (var kv in validProp)
-                {
-                    var prop = kv.Value;
-                    var cell = InternalHelper.CreateTypedCell(prop.PropertyType, prop!.GetValue(item) ?? "");
-                    row.AppendChild(cell);
-                }
+                //foreach (var kv in validProp)
+                //{
+                //    var prop = kv.Value;
+                //    var cell = InternalHelper.CreateTypedCell(prop.PropertyType, prop!.GetValue(item) ?? "");
+                //    row.AppendChild(cell);
+                //}
                 yield return row;
             }
 
@@ -45,12 +45,12 @@ namespace LightExcel.Renders
             var row = new Row();
             foreach (var kv in validProp)
             {
-                var cell = new Cell
-                {
-                    CellValue = new CellValue(kv.Key),
-                    DataType = new DocumentFormat.OpenXml.EnumValue<CellValues>(CellValues.String),
-                };
-                row.AppendChild(cell);
+                //var cell = new Cell
+                //{
+                //    CellValue = new CellValue(kv.Key),
+                //    DataType = new DocumentFormat.OpenXml.EnumValue<CellValues>(CellValues.String),
+                //};
+                //row.AppendChild(cell);
             }
             return row;
         }

@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Spreadsheet;
+﻿using LightExcel.OpenXml;
 using System.Data;
 
 namespace LightExcel.Renders
@@ -12,11 +11,11 @@ namespace LightExcel.Renders
             foreach (DataRow item in table.Rows)
             {
                 var row = new Row();
-                foreach (DataColumn column in table.Columns)
-                {
-                    var cell = InternalHelper.CreateTypedCell(column.DataType, item[column]);
-                    row.AppendChild(cell);
-                }
+                //foreach (DataColumn column in table.Columns)
+                //{
+                //    var cell = InternalHelper.CreateTypedCell(column.DataType, item[column]);
+                //    row.AppendChild(cell);
+                //}
                 yield return row;
             }
         }
@@ -27,12 +26,12 @@ namespace LightExcel.Renders
             var row = new Row();
             foreach (DataColumn col in table.Columns)
             {
-                var cell = new Cell
-                {
-                    CellValue = new CellValue(col.ColumnName),
-                    DataType = new EnumValue<CellValues>(CellValues.String),
-                };
-                row.AppendChild(cell);
+                //var cell = new Cell
+                //{
+                //    CellValue = new CellValue(col.ColumnName),
+                //    DataType = new EnumValue<CellValues>(CellValues.String),
+                //};
+                //row.AppendChild(cell);
             }
             return row;
         }

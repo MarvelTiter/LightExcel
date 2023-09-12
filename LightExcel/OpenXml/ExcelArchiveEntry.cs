@@ -1,6 +1,7 @@
 ﻿using DocumentFormat.OpenXml.Vml.Office;
 using System.IO.Compression;
 using System.Text;
+using System.Xml.Linq;
 
 namespace LightExcel.OpenXml
 {
@@ -8,18 +9,23 @@ namespace LightExcel.OpenXml
     {
         readonly ZipArchive archive;
         private readonly Stream stream;
+        private readonly ExcelHelperConfiguration configuration;
         private bool disposedValue;
         internal readonly static UTF8Encoding Utf8WithBom = new(true);
+        internal readonly static XNamespace Main_Xmlns = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
+        internal readonly static XNamespace Relationships = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
 
-        public ExcelArchiveEntry(Stream stream, Action<ExcelArchiveEntry>? initital = null)
+        public ExcelArchiveEntry(Stream stream, ExcelHelperConfiguration configuration)
         {
             this.stream = stream;
+            this.configuration = configuration;
             archive = new ZipArchive(stream, ZipArchiveMode.Update, true, Utf8WithBom);
-            initital?.Invoke(this);
+            WorkBook = new WorkBook(archive, configuration);
+            ContentTypes = new ContentTypes(archive);
         }
-        internal WorkBook? WorkBook { get; set; }
-        internal Relationship? Relationship { get; set; }
-        internal ContentTypes? ContentTypes { get; set; }
+        internal WorkBook WorkBook { get; set; }
+        //internal RelationshipCollection Relationship { get; set; } = new RelationshipCollection();
+        internal ContentTypes ContentTypes { get; set; }
 
         internal void AddEntry(string path, string contentType, string content)
         {
@@ -28,9 +34,50 @@ namespace LightExcel.OpenXml
             using var writer = new LightExcelStreamWriter(entryStream, Utf8WithBom, 1024 * 512);
             writer.Write(content);
             if (!string.IsNullOrEmpty(contentType))
-                ContentTypes.Add(path, new ZipPackageInfo(entry, contentType));
+                ContentTypes.AppendChild(new Override(path, contentType));
         }
 
+        internal void LoadEntry()
+        {
+
+            ContentTypes.LoadStream("[Content_Types].xml");
+            //foreach (var item in ContentTypes)
+            //{
+            //    Console.WriteLine(item.ToXmlString());
+            //}
+            WorkBook.WorkSheets.LoadStream(("xl/workbook.xml"));
+            foreach (var item in WorkBook.WorkSheets)
+            {
+                Console.WriteLine(item.Name);
+                foreach (var row in item.SheetDatas)
+                {
+                    Console.WriteLine($"\trow====================");
+                    foreach (var cell in row.RowDatas)
+                    {
+                        Console.Write($"{cell.Value}|");
+                    }
+                    Console.WriteLine();
+                }
+            }
+            WorkBook.Relationships.LoadStream(("xl/_rels/workbook.xml.rels"));
+            //foreach (var item in WorkBook.Relationships)
+            //{
+            //    Console.WriteLine(item.ToXmlString());
+            //}
+            WorkBook.SharedStrings?.LoadStream(("xl/sharedStrings.xml"));
+        }
+
+        internal void Save()
+        {
+            WorkBook.Save();
+            ContentTypes.Save();
+        }
+
+        private Stream? GetEntryStream(string path)
+        {
+            var entry = archive.GetEntry(path);
+            return entry?.Open();
+        }
 
         protected virtual void Dispose(bool disposing)
         {
@@ -38,7 +85,6 @@ namespace LightExcel.OpenXml
             {
                 if (disposing)
                 {
-                    // TODO: 释放托管状态(托管对象)
                     archive?.Dispose();
                     stream?.Dispose();
                 }
