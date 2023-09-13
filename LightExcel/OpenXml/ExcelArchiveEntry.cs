@@ -73,18 +73,13 @@ namespace LightExcel.OpenXml
             ContentTypes.Save();
         }
 
-        private Stream? GetEntryStream(string path)
-        {
-            var entry = archive.GetEntry(path);
-            return entry?.Open();
-        }
-
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
                 if (disposing)
                 {
+                    Save();
                     archive?.Dispose();
                     stream?.Dispose();
                 }

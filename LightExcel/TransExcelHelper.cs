@@ -26,7 +26,9 @@ namespace LightExcel
         }
         public void WriteExcel(object data, string? sheetName = null)
         {
-            
+            var sheet = excelArchive?.WorkBook.AddNewSheet(sheetName);
+            var render = RenderProvider.GetDataRender(data.GetType());
+            render.RenderHeader()
         }
         public void Save()
         {
@@ -51,6 +53,6 @@ namespace LightExcel
             GC.SuppressFinalize(this);
         }
 
-       
+
     }
 }

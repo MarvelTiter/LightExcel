@@ -73,9 +73,10 @@ namespace LightExcel.OpenXml
             Relationships.Children!.Add(new Relationship($"{Guid.NewGuid():N}", "styles", "styles.xml"));
         }
 
-        internal Sheet AddNewSheet(string sheetName)
+        internal Sheet AddNewSheet(string? sheetName = null)
         {
             var c = WorkSheets.Children!.Count;
+            sheetName ??= $"sheet{c + 1}";
             var sheet = new Sheet(archive!, sheetName, c + 1);
             WorkSheets.Children.Add(sheet);
             Relationships.Children!.Add(new Relationship(sheet.Id, "worksheet", sheet.RelPath));

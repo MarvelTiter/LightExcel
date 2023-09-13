@@ -11,7 +11,6 @@ namespace LightExcel
     public interface ITransactionExcelHelper : IDisposable
     {
         void WriteExcel(object data, string? sheetName = null);
-        void Save();
     }
     public interface IExcelHelper
     {

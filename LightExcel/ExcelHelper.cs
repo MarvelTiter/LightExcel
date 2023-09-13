@@ -14,18 +14,18 @@ namespace LightExcel
     {
         private readonly ExcelHelperConfiguration configuration = new ExcelHelperConfiguration();
         const string DEFAULT_SHEETNAME = "sheet";
-        public void WriteExcel(string path, object data, string? sheetName = "sheet", bool appendSheet = true)
-        {
-            try
-            {
-                configuration.AllowAppendSheet = appendSheet;
-                InternalWriteExcel(path, data, sheetName);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
+        //public void WriteExcel(string path, object data, string? sheetName = "sheet", bool appendSheet = true)
+        //{
+        //    try
+        //    {
+        //        configuration.AllowAppendSheet = appendSheet;
+        //        InternalWriteExcel(path, data, sheetName);
+        //    }
+        //    catch (Exception)
+        //    {
+        //        throw;
+        //    }
+        //}
 
         public void WriteExcel(string path, string template, object data)
         {

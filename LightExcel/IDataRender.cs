@@ -1,11 +1,10 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using LightExcel.OpenXml;
+﻿using LightExcel.OpenXml;
 
 namespace LightExcel
 {
     internal interface IDataRender
     {
-        OpenXml.Row RenderHeader(object data);
-        IEnumerable<OpenXml.Row> RenderBody(object data);
+        Row RenderHeader(Sheet sheet, ExcelHelperConfiguration configuration);
+        IEnumerable<Row> RenderBody(object data, Sheet sheet, ExcelHelperConfiguration configuration);
     }
 }

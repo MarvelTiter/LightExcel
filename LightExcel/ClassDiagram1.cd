@@ -1,0 +1,321 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="LightExcel.Attributes.ExcelColumnAttribute" Collapsed="true">
+    <Position X="26.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAACAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Attributes\ExcelColumn.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LightExcel.Extensions.CellExtension" Collapsed="true">
+    <Position X="26.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Extensions\CellExtension.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LightExcel.ServiceExtension" Collapsed="true">
+    <Position X="28.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Extensions\ServiceExtension.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LightExcel.ExcelHelper" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="30.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgABAAAAAAEAAAEAAAAAAACAAAgEAAgAEAABAAE=</HashCode>
+      <FileName>ExcelHelper.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="LightExcel.ExcelHelperConfiguration" Collapsed="true">
+    <Position X="21.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ExcelHelperConfiguration.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LightExcel.ExcelReader" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="23.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAwAQAgASgAAAAACABABCAmAAIEgQAUIBAEAgCAJAA=</HashCode>
+      <FileName>ExcelReader.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="LightExcel.RenderProvider" Collapsed="true">
+    <Position X="25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAA=</HashCode>
+      <FileName>RenderProvider.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LightExcel.TransExcelHelper" BaseTypeListCollapsed="true">
+    <Position X="26.75" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAoAAACAAAAAAAAAAAABAAAAAAAAAAAAAAgAAAAA=</HashCode>
+      <FileName>TransExcelHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LightExcel.OpenXml.Styles.BorderCollection" Collapsed="true">
+    <Position X="21.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>OpenXml\Styles\BorderCollection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LightExcel.OpenXml.Styles.CellFormatCollection" Collapsed="true">
+    <Position X="28.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>OpenXml\Styles\CellFormatCollection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LightExcel.OpenXml.Styles.FillCollection" Collapsed="true">
+    <Position X="25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>OpenXml\Styles\FillCollection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LightExcel.OpenXml.Styles.FontCollection" Collapsed="true">
+    <Position X="28.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>OpenXml\Styles\FontCollection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LightExcel.OpenXml.Styles.Font" Collapsed="true">
+    <Position X="26.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>OpenXml\Styles\FontCollection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LightExcel.OpenXml.Styles.NumberingFormatCollection" Collapsed="true">
+    <Position X="23.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>OpenXml\Styles\NumberingFormatCollection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LightExcel.OpenXml.Cell" Collapsed="true">
+    <Position X="23.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAAAAAAAAAAAAAAAAAAAAAAAAQAQAgAAAAAAA=</HashCode>
+      <FileName>OpenXml\CellCollection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LightExcel.OpenXml.CellCollection" Collapsed="true">
+    <Position X="25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>OpenXml\CellCollection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LightExcel.OpenXml.Node" Collapsed="true">
+    <Position X="9.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>OpenXml\ContentTypes.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LightExcel.OpenXml.Override" Collapsed="true">
+    <Position X="7.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAQAAAAgAA=</HashCode>
+      <FileName>OpenXml\ContentTypes.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LightExcel.OpenXml.Default" Collapsed="true">
+    <Position X="12" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAACAAAAAAAQAAAAAQAAAAAAA=</HashCode>
+      <FileName>OpenXml\ContentTypes.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LightExcel.OpenXml.ContentTypes" Collapsed="true">
+    <Position X="5.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAAAAAAAAAAAAAACAAAAAAQAAAAAAAAAIAAAA=</HashCode>
+      <FileName>OpenXml\ContentTypes.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LightExcel.OpenXml.ExcelArchiveEntry" BaseTypeListCollapsed="true">
+    <Position X="18.75" Y="2.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAgIAAACAAAADAAAAAAAAAAACAAAAACABQAiIAIAA=</HashCode>
+      <FileName>OpenXml\ExcelArchiveEntry.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="LightExcel.OpenXml.ExcelDocument" Collapsed="true">
+    <Position X="28.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAIAAAAAAAEAAAAAAABEAAAAAAAAAAAAA=</HashCode>
+      <FileName>OpenXml\ExcelDocument.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LightExcel.OpenXml.LightExcelStreamWriter" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="21.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAAACAAAAAIAAAAAAAAAAAAAoAACAAAAgEAAAA=</HashCode>
+      <FileName>OpenXml\LightExcelStreamWriter.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="LightExcel.OpenXml.RelationshipCollection" Collapsed="true">
+    <Position X="12.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAA=</HashCode>
+      <FileName>OpenXml\RelationshipCollection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LightExcel.OpenXml.Relationship" Collapsed="true">
+    <Position X="9.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAACAAAAAgAAAAAQAAAAAAAAA=</HashCode>
+      <FileName>OpenXml\RelationshipCollection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LightExcel.OpenXml.Row" Collapsed="true">
+    <Position X="26.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgABAAAAAAAA=</HashCode>
+      <FileName>OpenXml\RowCollection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LightExcel.OpenXml.RowCollection" Collapsed="true">
+    <Position X="8" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAAAAAAAAAAAACAAAAAAAAQAAAAAAAAAAAAAA=</HashCode>
+      <FileName>OpenXml\RowCollection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LightExcel.OpenXml.Sheet">
+    <Position X="17" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAACAIAAAAAAAAIAABAAAAQAAAAAAgBAAAAAAAQAAAA=</HashCode>
+      <FileName>OpenXml\SheetCollection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LightExcel.OpenXml.SheetCollection" Collapsed="true">
+    <Position X="10.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAAAAAAAAACAAAAAAAAACAQAAAAAAAAAAAAAA=</HashCode>
+      <FileName>OpenXml\SheetCollection.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LightExcel.OpenXml.StyleSheet" Collapsed="true">
+    <Position X="30.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAIAAAgAAAAAAAAAAAAAAAAAAAAAAAAAABAAQAA=</HashCode>
+      <FileName>OpenXml\StyleSheet.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LightExcel.OpenXml.SharedStringTable" Collapsed="true">
+    <Position X="14.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAAAAAAAAAAAAAAAAAAAAAQAAABAAAAAAAAAA=</HashCode>
+      <FileName>OpenXml\WorkBook.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LightExcel.OpenXml.WorkBook">
+    <Position X="14.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAIAAAIIAAAGIAAAAAAAAAACAAAAAABAAAAIAAAA=</HashCode>
+      <FileName>OpenXml\WorkBook.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LightExcel.OpenXml.XmlPart" Collapsed="true">
+    <Position X="13.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAACAAAACAAAAAAAAAAAAIAAAABQAAAgAQAAA=</HashCode>
+      <FileName>OpenXml\XmlPart.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="LightExcel.OpenXml.XmlPart&lt;T&gt;" Collapsed="true">
+    <Position X="10.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAABAAAAAEAAAAAAAAQQAEBAAAAAAAAAA=</HashCode>
+      <FileName>OpenXml\XmlPart.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="LightExcel.Renders.DataReaderRender" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="30.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Renders\DataReaderRender.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="LightExcel.Renders.DataSetRender" Collapsed="true">
+    <Position X="7.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Renders\DataSetRender.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LightExcel.Renders.DataTableRender" Collapsed="true">
+    <Position X="7.25" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Renders\DataTableRender.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="LightExcel.Renders.DictionaryRender" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="21.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Renders\DictionaryRender.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="LightExcel.Renders.EnumerableEntityRender" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="23.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAQAAAAQAAAAAAAAAAAAAAAQAAAAAAAAAAAAgAAA=</HashCode>
+      <FileName>Renders\EnumerableEntityRender.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="InternalHelper" Collapsed="true">
+    <Position X="30.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAg=</HashCode>
+      <FileName>InternalHelper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="LightExcel.IDataRender">
+    <Position X="21.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IDataRender.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="LightExcel.IExcelDataReader">
+    <Position X="23.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAQAgAAAAAAAACAAABCAgAAAEAAAQIBAAAACAJAA=</HashCode>
+      <FileName>IExcelDataReader.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="LightExcel.ITransactionExcelHelper">
+    <Position X="26.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IExcelHelper.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="LightExcel.IExcelHelper">
+    <Position X="25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgABAAAAAAEAAAAAAAAAAAAAAAAAAAAAEAAAAAA=</HashCode>
+      <FileName>IExcelHelper.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Microsoft YaHei UI" Size="9" />
+</ClassDiagram>

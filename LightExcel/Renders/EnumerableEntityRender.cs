@@ -22,7 +22,7 @@ namespace LightExcel.Renders
                 validProp.Add(excelColumnAttribute?.Name ?? prop.Name, prop);
             }
         }
-        public IEnumerable<Row> RenderBody(object data)
+        public IEnumerable<Row> RenderBody(object data, Sheet sheet, ExcelHelperConfiguration configuration)
         {
             var values = data as IEnumerable;
             foreach (var item in values!)
@@ -40,17 +40,15 @@ namespace LightExcel.Renders
 
         }
 
-        public Row RenderHeader(object data)
+        public Row RenderHeader(Sheet sheet, ExcelHelperConfiguration configuration)
         {
-            var row = new Row();
+            var row = new Row() { RowIndex = 1 };
             foreach (var kv in validProp)
             {
-                //var cell = new Cell
-                //{
-                //    CellValue = new CellValue(kv.Key),
-                //    DataType = new DocumentFormat.OpenXml.EnumValue<CellValues>(CellValues.String),
-                //};
-                //row.AppendChild(cell);
+                row.RowDatas.Add(new Cell
+                {
+                    Reference = 
+                });
             }
             return row;
         }
