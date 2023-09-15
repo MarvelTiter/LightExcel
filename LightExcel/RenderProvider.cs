@@ -10,15 +10,15 @@ namespace LightExcel
         {
             if (dataType == typeof(IDataReader))
             {
-                return new DataReaderRender();
+                //return new DataReaderRender();
             }
             else if (dataType == typeof(DataTable))
             {
-                return new DataTableRender();
+                //return new DataTableRender();
             }
             else if (dataType == typeof(DataSet))
             {
-                return new DataSetRender();
+                //return new DataSetRender();
             }
             else if (dataType.FindInterfaces((t, o) => t == typeof(IEnumerable), null).Length > 0)
             {
@@ -27,7 +27,7 @@ namespace LightExcel
                 {
                     if (elementType == typeof(Dictionary<string, object>))
                     {
-                        return new DictionaryRender();
+                        //return new DictionaryRender();
                     }
                     else
                     {

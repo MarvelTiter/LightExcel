@@ -3,7 +3,7 @@ using System.Data;
 
 namespace LightExcel.Renders
 {
-    internal class DataTableRender : IDataRender
+    internal class DataTableRender //: IDataRender
     {
         public IEnumerable<Row> RenderBody(object data)
         {

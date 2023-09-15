@@ -109,20 +109,20 @@ namespace LightExcel
         /// <param name="worksheetPart">WorksheetPart 对象</param>
         private void CreateHeader(Sheet sheet, object data, IDataRender render)
         {
-            var heads = render.RenderHeader(data);
+            //var heads = render.RenderHeader(data);
             //sheet.AppendChild(heads);
         }
 
         private void CreateBody(Sheet sheet, object data, IDataRender render, int rowIndex = 2)
         {
-            var rows = render.RenderBody(data);
+            //var rows = render.RenderBody(data);
             int startIndex = rowIndex;
-            foreach (var r in rows)
-            {
-                r.RowIndex = startIndex;
-                //sheet.AppendChild(r);
-                startIndex++;
-            }
+            //foreach (var r in rows)
+            //{
+            //    r.RowIndex = startIndex;
+            //    //sheet.AppendChild(r);
+            //    startIndex++;
+            //}
         }
 
         public void WriteExcel(string path, object data, string sheetName = "sheet", Action<ExcelHelperConfiguration>? action = null)

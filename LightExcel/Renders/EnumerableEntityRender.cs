@@ -1,5 +1,6 @@
 ﻿using LightExcel.Attributes;
 using LightExcel.OpenXml;
+using LightExcel.Utils;
 using System.Collections;
 using System.Reflection;
 
@@ -43,11 +44,12 @@ namespace LightExcel.Renders
         public Row RenderHeader(Sheet sheet, ExcelHelperConfiguration configuration)
         {
             var row = new Row() { RowIndex = 1 };
+            var index = 0;
             foreach (var kv in validProp)
             {
                 row.RowDatas.Add(new Cell
                 {
-                    Reference = 
+                    Reference = ReferenceHelper.ConvertXyToCellReference(++index, 1)
                 });
             }
             return row;

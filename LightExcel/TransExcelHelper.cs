@@ -12,6 +12,7 @@ namespace LightExcel
     {
         private bool disposedValue;
         private ExcelArchiveEntry? excelArchive;
+        private readonly ExcelHelperConfiguration configuration;
 
         public TransExcelHelper(string path, ExcelHelperConfiguration configuration)
         {
@@ -23,12 +24,14 @@ namespace LightExcel
             {
                 excelArchive = ExcelDocument.Create(path, configuration);
             }
+
+            this.configuration = configuration;
         }
         public void WriteExcel(object data, string? sheetName = null)
         {
             var sheet = excelArchive?.WorkBook.AddNewSheet(sheetName);
             var render = RenderProvider.GetDataRender(data.GetType());
-            render.RenderHeader()
+            render.RenderHeader(sheet!, configuration);
         }
         public void Save()
         {

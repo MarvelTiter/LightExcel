@@ -3,7 +3,7 @@ using LightExcel.OpenXml;
 
 namespace LightExcel.Renders
 {
-    internal class DictionaryRender : IDataRender
+    internal class DictionaryRender //: IDataRender
     {
         public IEnumerable<Row> RenderBody(object data)
         {
