@@ -39,16 +39,25 @@ namespace LightExcel.OpenXml
         /// xl/_rels/workbook.xml.rels
         /// </summary>
         internal RelationshipCollection Relationships { get; set; }
-
-        internal void AddSharedStringTable()
+        internal void InitSharedStringTable()
         {
             SharedStrings = new SharedStringTable(archive);
+        }
+        internal void AddSharedStringTable()
+        {
+            InitSharedStringTable();
             Relationships.AppendChild(new Relationship($"R{Guid.NewGuid():N}", "sharedStrings", "sharedStrings.xml"));
+            doc.ContentTypes.AppendChild(new Override("xl/sharedStrings.xml", "application/vnd.openxmlformats-package.relationships+xml"));
+        }
+
+        internal void InitStyleSheet()
+        {
+            StyleSheet = new StyleSheet();
         }
 
         internal void AddStyleSheet()
         {
-            StyleSheet = new StyleSheet();
+            InitStyleSheet();
             Relationships.AppendChild(new Relationship($"R{Guid.NewGuid():N}", "styles", "styles.xml"));
         }
 

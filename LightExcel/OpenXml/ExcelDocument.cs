@@ -12,13 +12,13 @@ namespace LightExcel.OpenXml
 <Relationships xmlns=""http://schemas.openxmlformats.org/package/2006/relationships"">
     <Relationship Type=""http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument"" Target=""xl/workbook.xml"" Id=""Rfc2254092b6248a9"" />
 </Relationships>";
-        private static readonly string defaultSharedString = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\" ?><sst xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" count=\"0\" uniqueCount=\"0\"></sst>";
         public static ExcelArchiveEntry Open(string path, ExcelHelperConfiguration configuration)
         {
             var fs = File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
             var zip = new ExcelArchiveEntry(fs, configuration);
             //TODO: 打开操作
-            zip.LoadEntry();
+            //zip.WorkBook.InitStyleSheet();
+            zip.WorkBook.InitSharedStringTable();
             return zip;
         }
 
@@ -29,10 +29,20 @@ namespace LightExcel.OpenXml
             var zip = new ExcelArchiveEntry(fs, configuration);
             //TODO: 创建初始化操作
             zip.AddEntry("_rels/.rels", "application/vnd.openxmlformats-package.relationships+xml", defaultRels);
-            zip.AddEntry("xl/sharedStrings.xml", "application/vnd.openxmlformats-package.relationships+xml", defaultSharedString);
             zip.AddWorkBook();
-            zip.WorkBook!.AddSharedStringTable();
+            zip.WorkBook.AddSharedStringTable();
             //zip.WorkBook.AddStyleSheet();
+            return zip;
+        }
+
+        public static ExcelArchiveEntry CreateByTemplate(string path, string template, ExcelHelperConfiguration configuration)
+        {
+            using var templateStream = File.Open(template, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
+            var fs = File.Create(path, 1024 * 512);
+            templateStream.CopyTo(fs);
+            var zip = new ExcelArchiveEntry(fs, configuration);
+            //zip.SetTemplate(templateStream);
+            zip.WorkBook.InitSharedStringTable();
             return zip;
         }
     }

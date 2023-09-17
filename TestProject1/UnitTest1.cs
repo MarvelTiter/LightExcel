@@ -72,7 +72,7 @@ namespace TestProject1
             var ie = Ge();
             if (File.Exists(Path1))
                 File.Delete(Path1);
-            excel.WriteExcel("E:\\Documents\\Downloads\\test.xlsx", @"E:\Documents\Downloads\路檢報表格式.xlsx", ie);
+            //excel.WriteExcel("E:\\Documents\\Downloads\\test.xlsx", @"E:\Documents\Downloads\路檢報表格式.xlsx", ie);
         }
 
         private static void Valid(string path)

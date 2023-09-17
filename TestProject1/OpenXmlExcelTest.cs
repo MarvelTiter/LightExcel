@@ -31,26 +31,21 @@ namespace TestProject1
         {
             var ie = Ge();
             ExcelHelper excel = new ExcelHelper();
-            using var trans = excel.BeginTransaction($"{Guid.NewGuid():N}.xlsx");
+            using var trans = excel.BeginTransaction("test.xlsx", config =>
+            {
+            });
             trans.WriteExcel(ie, "sheet1");
             Process.Start("powershell", $"start {AppDomain.CurrentDomain.BaseDirectory}");
         }
 
+       
         [TestMethod]
-        public void ExcelCheck()
+        public void TemplateTest()
         {
-            var validator = new OpenXmlValidator();
-            int count = 0;
-            var doc = SpreadsheetDocument.Open(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "43a8586e75114b8f8d7555be6d3ef8bb.xlsx"), true);
-            StringBuilder sb = new StringBuilder();
-            foreach (ValidationErrorInfo error in validator.Validate(doc))
-            {
-                sb.AppendLine("Error Count : " + count);
-                sb.AppendLine("Description : " + error.Description);
-                sb.AppendLine("Path: " + error.Path?.XPath);
-                sb.AppendLine("Part: " + error.Part?.Uri);
-            }
-            Console.WriteLine(sb.ToString());
+            var ie = Ge();
+            ExcelHelper excel = new ExcelHelper();
+            excel.WriteExcelByTemplate("test1.xlsx", "test.xlsx", ie);
+
         }
     }
 }

@@ -20,14 +20,14 @@ namespace LightExcel.OpenXml
             this.stream = stream;
             this.configuration = configuration;
             archive = new ZipArchive(stream, ZipArchiveMode.Update, true, Utf8WithBom);
+            WorkBook = new WorkBook(archive, this, configuration);
             ContentTypes = new ContentTypes(archive);
         }
-        internal WorkBook? WorkBook { get; set; }
+        internal WorkBook WorkBook { get; set; }
         //internal RelationshipCollection Relationship { get; set; } = new RelationshipCollection();
         internal ContentTypes ContentTypes { get; set; }
         internal void AddWorkBook()
         {
-            WorkBook = new WorkBook(archive, this, configuration);
             ContentTypes.AppendChild(new Override("/xl/workbook.xml", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"));
         }
         internal void AddEntry(string path, string contentType, string content)
@@ -39,21 +39,11 @@ namespace LightExcel.OpenXml
             if (!string.IsNullOrEmpty(contentType))
                 ContentTypes.AppendChild(new Override(path, contentType));
         }
-
-        internal void SetTemplate(Stream templateStream)
-        {
-            templateStream.Seek(0, SeekOrigin.Begin);
-            templateStream.CopyTo(stream);
-            templateStream.Dispose();
-        }
-
-        internal void LoadEntry()
-        {
-        }
+              
 
         internal void Save()
         {
-            WorkBook?.Save();
+            WorkBook.Save();
             ContentTypes.Write();
         }
 

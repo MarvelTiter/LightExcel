@@ -3,41 +3,21 @@ using System.Data;
 
 namespace LightExcel.Renders
 {
-    internal class DataReaderRender //: IDataRender
+    internal class DataReaderRender : IDataRender
     {
-        public IEnumerable<Row> RenderBody(object data)
+        public void CollectExcelColumnInfo(object data, ExcelHelperConfiguration configuration)
         {
-            var reader = (IDataReader)data;
-            //int rowValueIndex = 0;
-            while (reader.Read())
-            {
-                var row = new Row();
-                //for (int i = 0; i < reader.FieldCount; i++)
-                //{
-                //    var cell = InternalHelper.CreateTypedCell(reader.GetFieldType(i), reader.GetValue(i));
-                //    //cell.CellReference = $"{reader.GetName(i)}{rowValueIndex}";
-                //    row.AppendChild(cell);
-                //}
-                //rowValueIndex++;
-                yield return row;
-            }
+            throw new NotImplementedException();
         }
 
-        public Row RenderHeader(object data)
+        public IEnumerable<Row> RenderBody(object data, Sheet sheet, ExcelHelperConfiguration configuration)
         {
-            var reader = (IDataReader)data;
-            var row = new Row();
-            for (int i = 0; i < reader.FieldCount; i++)
-            {
-                //var cell = new Cell
-                //{
-                //    CellValue = new CellValue(reader.GetName(i)),
-                //    DataType = new EnumValue<CellValues>(CellValues.String),
-                //    //CellReference = $"Header{i}"
-                //};
-                //row.AppendChild(cell);
-            }
-            return row;
+            throw new NotImplementedException();
+        }
+
+        public Row RenderHeader(ExcelHelperConfiguration configuration)
+        {
+            throw new NotImplementedException();
         }
     }
 }

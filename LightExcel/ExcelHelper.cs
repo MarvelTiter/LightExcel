@@ -3,41 +3,11 @@ using LightExcel.OpenXml;
 
 namespace LightExcel
 {
-    public partial class ExcelHelper
-    {
-        void InternalWriteExcelWithTemplate(string path, string template, object data)
-        {
 
-        }
-    }
-    public partial class ExcelHelper : IExcelHelper
+    public class ExcelHelper : IExcelHelper
     {
         private readonly ExcelHelperConfiguration configuration = new ExcelHelperConfiguration();
-        const string DEFAULT_SHEETNAME = "sheet";
-        //public void WriteExcel(string path, object data, string? sheetName = "sheet", bool appendSheet = true)
-        //{
-        //    try
-        //    {
-        //        configuration.AllowAppendSheet = appendSheet;
-        //        InternalWriteExcel(path, data, sheetName);
-        //    }
-        //    catch (Exception)
-        //    {
-        //        throw;
-        //    }
-        //}
-
-        public void WriteExcel(string path, string template, object data)
-        {
-            try
-            {
-                InternalWriteExcelWithTemplate(path, template, data);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
+        
 
         public IExcelDataReader ReadExcel(string path)
         {
@@ -54,85 +24,35 @@ namespace LightExcel
             throw new NotImplementedException();
         }
 
-        private void InternalWriteExcel(string path, object data, string? sheetName)
+
+        public void WriteExcel(string path, object data, string sheetName = "sheet1", Action<ExcelHelperConfiguration>? config = null)
         {
-            using var doc = GetDocument(path);
-            var dataType = data.GetType();
-            var render = RenderProvider.GetDataRender(dataType);
-
-            WriteSheet(doc, data, render, sheetName);
-
-            doc.Save();
+            if (File.Exists(path)) File.Delete(path);
+            config?.Invoke(configuration);
+            using var trans = new TransExcelHelper(path, configuration);
+            trans.WriteExcel(data, sheetName);
         }
-
-        private ExcelArchiveEntry GetDocument(string path)
+        public void WriteExcelByTemplate(string path, string template, object data, string sheetName = "sheet1", Action<ExcelHelperConfiguration>? config = null)
         {
-            ExcelArchiveEntry? doc = null;
-            try
+            config?.Invoke(configuration);
+            using var doc = ExcelDocument.CreateByTemplate(path, template, configuration);
+            foreach (var item in doc.WorkBook!.WorkSheets.First())
             {
-                if (File.Exists(path))
-                {
-                    // 文件存在并且，允许追加Sheet
-                    doc = ExcelDocument.Open(path, configuration);
 
-                }
-                else
-                {
-                    File.Delete(path);
-                    doc = ExcelDocument.Create(path, configuration);
-                }
             }
-            catch (Exception)
+            foreach (var item in doc.WorkBook.SharedStrings)
             {
-                throw;
+
             }
-            return doc;
-        }
-
-        private void WriteSheet(ExcelArchiveEntry doc, object data, IDataRender render, string? sheetName)
-        {
-            sheetName = DEFAULT_SHEETNAME ?? string.Empty;
-            var sheet = doc.WorkBook!.AddNewSheet(sheetName);
-
-            //创建表头
-            CreateHeader(sheet, data, render);
-
-            //创建内容数据
-            CreateBody(sheet, data, render);
-
-        }
-
-        /// <summary>
-        /// 创建表头
-        /// </summary>
-        /// <param name="worksheetPart">WorksheetPart 对象</param>
-        private void CreateHeader(Sheet sheet, object data, IDataRender render)
-        {
-            //var heads = render.RenderHeader(data);
-            //sheet.AppendChild(heads);
-        }
-
-        private void CreateBody(Sheet sheet, object data, IDataRender render, int rowIndex = 2)
-        {
-            //var rows = render.RenderBody(data);
-            int startIndex = rowIndex;
-            //foreach (var r in rows)
-            //{
-            //    r.RowIndex = startIndex;
-            //    //sheet.AppendChild(r);
-            //    startIndex++;
-            //}
-        }
-
-        public void WriteExcel(string path, object data, string sheetName = "sheet", Action<ExcelHelperConfiguration>? action = null)
-        {
-            throw new NotImplementedException();
         }
 
         public ITransactionExcelHelper BeginTransaction(string path, Action<ExcelHelperConfiguration>? config = null)
         {
+            if (File.Exists(path)) File.Delete(path);
             config?.Invoke(configuration);
             return new TransExcelHelper(path, configuration);
         }
+
+       
     }
 }

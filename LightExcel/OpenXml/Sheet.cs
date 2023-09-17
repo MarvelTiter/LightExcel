@@ -79,6 +79,9 @@ namespace LightExcel.OpenXml
                             reader.Read();
                             c.Value = reader.ReadInnerXml();
                             row.RowDatas.Add(c);
+                        }
+                        else if (reader.Name == "row")
+                        {
                             break;
                         }
                     }

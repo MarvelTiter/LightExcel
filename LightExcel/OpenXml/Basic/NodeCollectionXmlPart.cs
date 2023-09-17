@@ -21,9 +21,16 @@ namespace LightExcel.OpenXml
         }
         public override void Write()
         {
-            if (cached == null) return;
             using var writer = archive!.GetWriter(Path);
-            WriteImpl(writer, cached.Cast<INode>());
+            WriteImpl(writer, cached?.Cast<INode>() ?? Enumerable.Empty<INode>());
+        }
+
+        private IEnumerable<T> CollectSelfValues()
+        {
+            foreach (var item in this)
+            {
+                yield return item;
+            }
         }
     }
 }
