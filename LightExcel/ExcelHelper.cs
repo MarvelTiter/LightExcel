@@ -31,7 +31,6 @@ namespace LightExcel
         {
             try
             {
-                configuration.AllowAppendSheet = true;
                 InternalWriteExcelWithTemplate(path, template, data);
             }
             catch (Exception)

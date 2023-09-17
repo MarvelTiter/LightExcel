@@ -4,45 +4,24 @@ using System.Xml.Linq;
 
 namespace LightExcel.OpenXml
 {
-    /// <summary>
-    /// xl/sharedStrings.xml
-    /// </summary>
-    internal class SharedStringTable : XmlPart<string>
-    {
-        public SharedStringTable(ZipArchive archive) : base(archive)
-        {
-
-        }
-
-        internal override void LoadStream(string path)
-        {
-            base.LoadStream("xl/sharedStrings.xml");
-        }
-        protected override IEnumerable<string> GetChildren()
-        {
-            throw new NotImplementedException();
-        }
-
-        internal override void Save()
-        {
-            throw new NotImplementedException();
-        }
-    }
     internal class WorkBook
     {
         private readonly ZipArchive archive;
+        private readonly ExcelArchiveEntry doc;
         private readonly ExcelHelperConfiguration configuration;
-        public WorkBook(ZipArchive archive, ExcelHelperConfiguration configuration)
+        public WorkBook(ZipArchive archive, ExcelArchiveEntry doc, ExcelHelperConfiguration configuration)
         {
             this.archive = archive;
+            this.doc = doc;
             this.configuration = configuration;
             WorkSheets = new SheetCollection(archive, configuration);
             Relationships = new RelationshipCollection(archive);
         }
         internal void Save()
         {
-            WorkSheets.Save();
-            Relationships?.Save();
+            Relationships.Write();
+            WorkSheets.Write();
+            SharedStrings?.Write();
         }
         /// <summary>
         /// xl/workbook.xml
@@ -64,22 +43,23 @@ namespace LightExcel.OpenXml
         internal void AddSharedStringTable()
         {
             SharedStrings = new SharedStringTable(archive);
-            Relationships.Children!.Add(new Relationship($"{Guid.NewGuid():N}", "sharedStrings", "sharedStrings.xml"));
+            Relationships.AppendChild(new Relationship($"R{Guid.NewGuid():N}", "sharedStrings", "sharedStrings.xml"));
         }
 
         internal void AddStyleSheet()
         {
             StyleSheet = new StyleSheet();
-            Relationships.Children!.Add(new Relationship($"{Guid.NewGuid():N}", "styles", "styles.xml"));
+            Relationships.AppendChild(new Relationship($"R{Guid.NewGuid():N}", "styles", "styles.xml"));
         }
 
         internal Sheet AddNewSheet(string? sheetName = null)
         {
-            var c = WorkSheets.Children!.Count;
+            var c = WorkSheets.Count;
             sheetName ??= $"sheet{c + 1}";
             var sheet = new Sheet(archive!, sheetName, c + 1);
-            WorkSheets.Children.Add(sheet);
-            Relationships.Children!.Add(new Relationship(sheet.Id, "worksheet", sheet.RelPath));
+            WorkSheets.AppendChild(sheet);
+            Relationships.AppendChild(new Relationship(sheet.Id, "worksheet", sheet.RelPath));
+            doc.ContentTypes.AppendChild(new Override(sheetName, "application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"));
             return sheet;
         }
     }

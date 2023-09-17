@@ -30,10 +30,10 @@ namespace LightExcel.OpenXml
             //TODO: 创建初始化操作
             zip.AddEntry("_rels/.rels", "application/vnd.openxmlformats-package.relationships+xml", defaultRels);
             zip.AddEntry("xl/sharedStrings.xml", "application/vnd.openxmlformats-package.relationships+xml", defaultSharedString);
-            zip.WorkBook.AddSharedStringTable();
-            zip.WorkBook.AddStyleSheet();
+            zip.AddWorkBook();
+            zip.WorkBook!.AddSharedStringTable();
+            //zip.WorkBook.AddStyleSheet();
             return zip;
         }
-
     }
 }

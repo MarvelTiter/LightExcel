@@ -1,37 +1,62 @@
 ﻿
 using LightExcel.OpenXml;
+using LightExcel.Utils;
 
 namespace LightExcel.Renders
 {
-    internal class DictionaryRender //: IDataRender
+    internal class DictionaryRender : RenderBase, IDataRender
     {
-        public IEnumerable<Row> RenderBody(object data)
+        public void CollectExcelColumnInfo(object data, ExcelHelperConfiguration configuration)
         {
-            var values = (IEnumerable<Dictionary<string, object>>)data;
-            foreach (var dic in values)
+            if (data is IEnumerable<Dictionary<string, object>> d)
             {
-                var row = new Row();
-                //foreach (var kv in dic)
-                //{
-                //    var cell = InternalHelper.CreateTypedCell(kv.Value.GetType(), kv.Value);
-                //    row.AppendChild(cell);
-                //}
-                yield return row;
+                foreach (var item in d.First().Keys)
+                {
+                    Columns.Add(new ExcelColumnInfo(item));
+                }
             }
         }
 
-        public Row RenderHeader(object data)
+        public IEnumerable<Row> RenderBody(object data, Sheet sheet, ExcelHelperConfiguration configuration)
         {
-            var values = (IEnumerable<Dictionary<string, object>>)data;
-            var row = new Row();
-            foreach (var item in values.First().Keys)
+            var values = data as IEnumerable<Dictionary<string, object>>;
+            var rowIndex = configuration.UseHeader ? 1 : 0;
+            var maxColumnIndex = 0;
+            foreach (var item in values!)
             {
-                //var cell = new Cell
-                //{
-                //    CellValue = new CellValue(item),
-                //    DataType = new DocumentFormat.OpenXml.EnumValue<CellValues>(CellValues.String),
-                //};
-                //row.AppendChild(cell);
+                if (item is null) continue;
+                var row = new Row() { RowIndex = ++rowIndex };
+                var cellIndex = 0;
+                foreach (var col in Columns)
+                {
+                    if (col.Ignore) continue;
+                    var cell = new Cell();
+                    var value = item[col.Name];
+                    cell.Reference = ReferenceHelper.ConvertXyToCellReference(++cellIndex, rowIndex);
+                    cell.Type = CellHelper.ConvertCellType(value?.GetType());
+                    cell.Value = CellHelper.GetCellValue(col, value, configuration);
+                    row.AppendChild(cell);
+                }
+                maxColumnIndex = Math.Max(maxColumnIndex, cellIndex);
+                yield return row;
+            }
+            sheet.MaxColumnIndex = maxColumnIndex;
+            sheet.MaxRowIndex = rowIndex;
+        }
+
+        public Row RenderHeader(ExcelHelperConfiguration configuration)
+        {
+            var row = new Row() { RowIndex = 1 };
+            var index = 0;
+            foreach (var col in Columns)
+            {
+                var cell = new Cell
+                {
+                    Reference = ReferenceHelper.ConvertXyToCellReference(++index, 1),
+                    Type = "str",
+                    Value = col.Name
+                };
+                row.AppendChild(cell);
             }
             return row;
         }

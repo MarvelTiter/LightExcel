@@ -1,21 +1,21 @@
-﻿using System.Collections;
+﻿using LightExcel.OpenXml.Interfaces;
+using LightExcel.Utils;
+using System.Collections;
 using System.IO.Compression;
 using System.Text;
+using System.Xml;
 
 namespace LightExcel.OpenXml
 {
-    internal class RelationshipCollection : XmlPart<Relationship>
+    internal class RelationshipCollection : NodeCollectionXmlPart<Relationship>
     {
-        public RelationshipCollection(ZipArchive archive) : base(archive)
+        public RelationshipCollection(ZipArchive archive) : base(archive, "xl/_rels/workbook.xml.rels")
         {
 
         }
-        protected override IEnumerable<Relationship> GetChildren()
+
+        protected override IEnumerable<Relationship> GetChildrenImpl(XmlReader reader)
         {
-            if (reader == null)
-            {
-                yield break;
-            }
             while (reader.Read())
             {
                 if (reader.LocalName == "Relationship")
@@ -24,36 +24,21 @@ namespace LightExcel.OpenXml
                     var type = reader["Type"] ?? throw new Exception("Excel Xml Relationship Error (without type)");
                     var target = reader["Target"] ?? throw new Exception("Excel Xml Relationship Error (without target)");
                     var rel = new Relationship(id, type, target);
-                    Children.Add(rel);
                     yield return rel;
                 }
             }
         }
 
-        internal override void Save()
+        protected override void WriteImpl(LightExcelStreamWriter writer, IEnumerable<INode> children)
         {
-            throw new NotImplementedException();
+            writer.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+            writer.Write("<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\">");
+            foreach (var child in children)
+            {
+                child.WriteToXml(writer);
+            }
+            writer.Write("</Relationships>");
         }
-    }
 
-    internal class Relationship : Node
-    {
-        const string TYPE_PREFIX = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/";
-        public string Id { get; set; }
-        /// <summary>
-        /// worksheet / sharedStrings / styles
-        /// </summary>
-        public string Type { get; set; }
-        public string Target { get; set; }
-        public Relationship(string id, string type, string target)
-        {
-            Id = id;
-            Type = type;
-            Target = target;
-        }
-        internal override string ToXmlString()
-        {
-            return $"<Relationship Id=\"{Id}\" Type=\"{TYPE_PREFIX}{Type}\" Target=\"{Target}\" />";
-        }
     }
 }

@@ -2,7 +2,6 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Validation;
 using LightExcel;
 using LightExcel.Attributes;
-using MiniExcelLibs;
 using System.Collections;
 using System.Diagnostics;
 using System.Text;
@@ -18,7 +17,6 @@ namespace TestProject1
             var ie = Ge();
             ExcelHelper excel = new ExcelHelper();
             //excel.WriteExcel($"{Guid.NewGuid():N}.xlsx", ie);
-            MiniExcel.SaveAs($"{Guid.NewGuid():N}.xlsx", ie);
             Process.Start("powershell", $"start {AppDomain.CurrentDomain.BaseDirectory}");
         }
 

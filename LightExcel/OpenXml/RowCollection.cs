@@ -1,57 +1,31 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
+using LightExcel.OpenXml.Interfaces;
 using System.IO.Compression;
 using System.Text;
 using System.Xml;
 
 namespace LightExcel.OpenXml
 {
-    internal class Row
+    internal class Row : INodeCollection<Cell>, INode
     {
         public int RowIndex { get; set; }
-        public List<Cell> RowDatas { get; set; } = new List<Cell> ();
-    }
-    internal class RowCollection : XmlPart<Row>
-    {
-        private readonly string path;
+        public List<Cell> RowDatas { get; set; } = new List<Cell>();
 
-        public RowCollection(ZipArchive archive, string path) : base(archive)
+        public int Count => RowDatas.Count;
+
+        public void AppendChild(Cell child)
         {
-            this.path = path;
-            LoadStream(path);
+            RowDatas.Add(child);
         }
 
-        protected override IEnumerable<Row> GetChildren()
+        public void WriteToXml(LightExcelStreamWriter writer)
         {
-            if (reader == null) { yield break; }
-            while (reader.Read())
+            writer.Write($"<row r=\"{RowIndex}\">");
+            foreach (Cell cell in RowDatas)
             {
-                if (reader.Name == "row")
-                {
-                    var row = new Row();
-                    while (reader.Read())
-                    {
-                        if (reader.Name == "c")
-                        {
-                            var c = new Cell
-                            {
-                                Reference = reader["r"],
-                                Type = reader["t"],
-                                StyleIndex = reader["s"],
-                            };
-                            reader.Read();
-                            c.Value = reader.ReadInnerXml();
-                            row.RowDatas.Add(c);
-                        }
-                        else if (reader.Name == "row") { break; }
-                    }
-                    yield return row;
-                }
+                cell.WriteToXml(writer);
             }
-        }
-
-        internal override void Save()
-        {
-            throw new NotImplementedException();
+            writer.Write("</row>");
         }
     }
 }

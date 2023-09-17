@@ -1,65 +1,24 @@
-﻿using System.IO.Compression;
+﻿using LightExcel.OpenXml.Interfaces;
+using LightExcel.Utils;
+using System.IO.Compression;
 using System.Text;
 using System.Xml;
 
 namespace LightExcel.OpenXml
 {
-    internal abstract class Node
-    {
-        internal abstract string ToXmlString();
-    }
-    internal class Override : Node
-    {
-        public Override(string? PartName, string? ContentType)
-        {
-            this.PartName = PartName;
-            this.ContentType = ContentType;
-        }
-
-        public string? PartName { get; }
-        public string? ContentType { get; }
-        internal override string ToXmlString()
-        {
-            return ($"<Override PartName=\"{PartName}\" /> ContentType=\"{ContentType}\" />");
-        }
-    }
-    internal class Default : Node
-    {
-        public Default(string? extension, string? contentType)
-        {
-            Extension = extension;
-            ContentType = contentType;
-        }
-
-        public string? Extension { get; }
-        public string? ContentType { get; }
-
-        internal override string ToXmlString()
-        {
-            return $"<Default Extension=\"{Extension}\" ContentType=\"{ContentType}\" />";
-        }
-    }
     /// <summary>
     /// [Content_Types].xml
     /// </summary>
-    internal class ContentTypes : XmlPart<Node>
+    internal class ContentTypes : NodeCollectionXmlPart<INode>
     {
-        public ContentTypes(ZipArchive archive) : base(archive)
+        public ContentTypes(ZipArchive archive) : base(archive, "[Content_Types].xml")
         {
 
         }
 
-        internal void AppendChild(Node child)
-        {
-            Children!.Add(child);
-        }
 
-        protected override IEnumerable<Node> GetChildren()
+        protected override IEnumerable<INode> GetChildrenImpl(XmlReader reader)
         {
-            if (reader == null)
-            {
-                yield break;
-            }
             while (reader.Read())
             {
                 if (reader.LocalName == "Default")
@@ -67,7 +26,6 @@ namespace LightExcel.OpenXml
                     var ext = reader["Extension"];
                     var ct = reader["ContentType"];
                     var def = new Default(ext, ct);
-                    Children.Add(def);
                     yield return def;
                 }
                 else if (reader.LocalName == "Override")
@@ -75,28 +33,22 @@ namespace LightExcel.OpenXml
                     var pn = reader["PartName"];
                     var ct = reader["ContentType"];
                     var ov = new Override(pn, ct);
-                    Children.Add(ov);
                     yield return ov;
                 }
             }
         }
 
-        internal void ToXmlString(StringBuilder builder)
+        protected override void WriteImpl(LightExcelStreamWriter writer, IEnumerable<INode> children)
         {
-            //builder.Append("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
-            //builder.Append("<Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\">");
-            //builder.Append("<Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\" />");
-            //builder.Append("<Default Extension=\"xml\" ContentType=\"application/xml\" />");
-            //foreach (Node node in children)
-            //{
-            //    node.ToXmlString();
-            //}
-            //builder.Append("</Types>");
-        }
-
-        internal override void Save()
-        {
-            throw new NotImplementedException();
+            writer.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+            writer.Write("<Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\">");
+            writer.Write("<Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\" />");
+            writer.Write("<Default Extension=\"xml\" ContentType=\"application/xml\" />");
+            foreach (var node in children)
+            {
+                node.WriteToXml(writer);
+            }
+            writer.Write("</Types>");
         }
     }
 }

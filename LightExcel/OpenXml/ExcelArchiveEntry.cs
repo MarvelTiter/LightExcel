@@ -20,13 +20,16 @@ namespace LightExcel.OpenXml
             this.stream = stream;
             this.configuration = configuration;
             archive = new ZipArchive(stream, ZipArchiveMode.Update, true, Utf8WithBom);
-            WorkBook = new WorkBook(archive, configuration);
             ContentTypes = new ContentTypes(archive);
         }
-        internal WorkBook WorkBook { get; set; }
+        internal WorkBook? WorkBook { get; set; }
         //internal RelationshipCollection Relationship { get; set; } = new RelationshipCollection();
         internal ContentTypes ContentTypes { get; set; }
-
+        internal void AddWorkBook()
+        {
+            WorkBook = new WorkBook(archive, this, configuration);
+            ContentTypes.AppendChild(new Override("/xl/workbook.xml", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"));
+        }
         internal void AddEntry(string path, string contentType, string content)
         {
             var zipEntry = archive.CreateEntry(path, CompressionLevel.Fastest);
@@ -37,40 +40,21 @@ namespace LightExcel.OpenXml
                 ContentTypes.AppendChild(new Override(path, contentType));
         }
 
+        internal void SetTemplate(Stream templateStream)
+        {
+            templateStream.Seek(0, SeekOrigin.Begin);
+            templateStream.CopyTo(stream);
+            templateStream.Dispose();
+        }
+
         internal void LoadEntry()
         {
-
-            ContentTypes.LoadStream("[Content_Types].xml");
-            //foreach (var item in ContentTypes)
-            //{
-            //    Console.WriteLine(item.ToXmlString());
-            //}
-            WorkBook.WorkSheets.LoadStream(("xl/workbook.xml"));
-            foreach (var item in WorkBook.WorkSheets)
-            {
-                Console.WriteLine(item.Name);
-                foreach (var row in item.SheetDatas)
-                {
-                    Console.WriteLine($"\trow====================");
-                    foreach (var cell in row.RowDatas)
-                    {
-                        Console.Write($"{cell.Value}|");
-                    }
-                    Console.WriteLine();
-                }
-            }
-            WorkBook.Relationships.LoadStream(("xl/_rels/workbook.xml.rels"));
-            //foreach (var item in WorkBook.Relationships)
-            //{
-            //    Console.WriteLine(item.ToXmlString());
-            //}
-            WorkBook.SharedStrings?.LoadStream(("xl/sharedStrings.xml"));
         }
 
         internal void Save()
         {
-            WorkBook.Save();
-            ContentTypes.Save();
+            WorkBook?.Save();
+            ContentTypes.Write();
         }
 
         protected virtual void Dispose(bool disposing)
@@ -79,7 +63,6 @@ namespace LightExcel.OpenXml
             {
                 if (disposing)
                 {
-                    Save();
                     archive?.Dispose();
                     stream?.Dispose();
                 }

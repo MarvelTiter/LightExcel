@@ -29,13 +29,25 @@ namespace LightExcel
         }
         public void WriteExcel(object data, string? sheetName = null)
         {
-            var sheet = excelArchive?.WorkBook.AddNewSheet(sheetName);
+            var sheet = excelArchive!.WorkBook.AddNewSheet(sheetName);
             var render = RenderProvider.GetDataRender(data.GetType());
-            render.RenderHeader(sheet!, configuration);
+            render.CollectExcelColumnInfo(data, configuration);
+            var all = NeedToReaderRows(render, sheet, data);
+            sheet!.Write(all);
         }
-        public void Save()
+
+        private IEnumerable<Row> NeedToReaderRows(IDataRender render, Sheet sheet, object data)
         {
-            excelArchive?.Save();
+            if (configuration.UseHeader)
+            {
+                var header = render.RenderHeader(configuration);
+                yield return header;
+            }
+            var datas = render.RenderBody(data, sheet, configuration);
+            foreach (var row in datas)
+            {
+                yield return row;
+            }
         }
 
         protected virtual void Dispose(bool disposing)
@@ -44,9 +56,10 @@ namespace LightExcel
             {
                 if (disposing)
                 {
+                    excelArchive?.Save();
                     excelArchive?.Dispose();
+                    excelArchive = null;
                 }
-                excelArchive = null;
                 disposedValue = true;
             }
         }

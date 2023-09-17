@@ -27,7 +27,7 @@ namespace LightExcel
                 {
                     if (elementType == typeof(Dictionary<string, object>))
                     {
-                        //return new DictionaryRender();
+                        return new DictionaryRender();
                     }
                     else
                     {
