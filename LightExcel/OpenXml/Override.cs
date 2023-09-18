@@ -15,7 +15,7 @@ namespace LightExcel.OpenXml
 
         public void WriteToXml(LightExcelStreamWriter writer)
         {
-            writer.Write($"<Override PartName=\"{PartName}\" ContentType=\"{ContentType}\" />");
+            writer.Write($"<Override PartName=\"/{PartName}\" ContentType=\"{ContentType}\" />");
         }
     }
 }

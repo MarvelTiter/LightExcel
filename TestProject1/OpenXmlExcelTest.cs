@@ -31,7 +31,7 @@ namespace TestProject1
         {
             var ie = Ge();
             ExcelHelper excel = new ExcelHelper();
-            using var trans = excel.BeginTransaction("test.xlsx", config =>
+            using var trans = excel.BeginTransaction("1test.xlsx", config =>
             {
             });
             trans.WriteExcel(ie, "sheet1");
@@ -44,7 +44,7 @@ namespace TestProject1
         {
             var ie = Ge();
             ExcelHelper excel = new ExcelHelper();
-            excel.WriteExcelByTemplate("test1.xlsx", "test.xlsx", ie);
+            excel.WriteExcelByTemplate("12test.xlsx", "1test.xlsx", ie);
 
         }
     }

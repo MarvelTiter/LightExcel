@@ -28,7 +28,7 @@ namespace LightExcel.OpenXml
         internal ContentTypes ContentTypes { get; set; }
         internal void AddWorkBook()
         {
-            ContentTypes.AppendChild(new Override("/xl/workbook.xml", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"));
+            ContentTypes.AppendChild(new Override("xl/workbook.xml", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"));
         }
         internal void AddEntry(string path, string contentType, string content)
         {
@@ -39,10 +39,11 @@ namespace LightExcel.OpenXml
             if (!string.IsNullOrEmpty(contentType))
                 ContentTypes.AppendChild(new Override(path, contentType));
         }
-              
+
 
         internal void Save()
         {
+            if (configuration.Readonly) return;
             WorkBook.Save();
             ContentTypes.Write();
         }

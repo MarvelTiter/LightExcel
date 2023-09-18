@@ -22,6 +22,7 @@ namespace LightExcel.OpenXml
             Relationships.Write();
             WorkSheets.Write();
             SharedStrings?.Write();
+            StyleSheet?.Write();
         }
         /// <summary>
         /// xl/workbook.xml
@@ -52,13 +53,14 @@ namespace LightExcel.OpenXml
 
         internal void InitStyleSheet()
         {
-            StyleSheet = new StyleSheet();
+            StyleSheet = new StyleSheet(archive);
         }
 
         internal void AddStyleSheet()
         {
             InitStyleSheet();
             Relationships.AppendChild(new Relationship($"R{Guid.NewGuid():N}", "styles", "styles.xml"));
+            doc.ContentTypes.AppendChild(new Override("xl/styles.xml", "application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"));
         }
 
         internal Sheet AddNewSheet(string? sheetName = null)
@@ -68,7 +70,7 @@ namespace LightExcel.OpenXml
             var sheet = new Sheet(archive!, sheetName, c + 1);
             WorkSheets.AppendChild(sheet);
             Relationships.AppendChild(new Relationship(sheet.Id, "worksheet", sheet.RelPath));
-            doc.ContentTypes.AppendChild(new Override(sheetName, "application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"));
+            doc.ContentTypes.AppendChild(new Override(sheet.Path, "application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"));
             return sheet;
         }
     }

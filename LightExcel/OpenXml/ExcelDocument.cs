@@ -17,7 +17,7 @@ namespace LightExcel.OpenXml
             var fs = File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
             var zip = new ExcelArchiveEntry(fs, configuration);
             //TODO: 打开操作
-            //zip.WorkBook.InitStyleSheet();
+            zip.WorkBook.InitStyleSheet();
             zip.WorkBook.InitSharedStringTable();
             return zip;
         }
@@ -31,7 +31,7 @@ namespace LightExcel.OpenXml
             zip.AddEntry("_rels/.rels", "application/vnd.openxmlformats-package.relationships+xml", defaultRels);
             zip.AddWorkBook();
             zip.WorkBook.AddSharedStringTable();
-            //zip.WorkBook.AddStyleSheet();
+            zip.WorkBook.AddStyleSheet();
             return zip;
         }
 
@@ -43,6 +43,7 @@ namespace LightExcel.OpenXml
             var zip = new ExcelArchiveEntry(fs, configuration);
             //zip.SetTemplate(templateStream);
             zip.WorkBook.InitSharedStringTable();
+            zip.WorkBook.InitStyleSheet();
             return zip;
         }
     }
