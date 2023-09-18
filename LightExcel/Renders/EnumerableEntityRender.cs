@@ -16,7 +16,7 @@ namespace LightExcel.Renders
             this.elementType = elementType;
         }
 
-        public void CollectExcelColumnInfo(object data, ExcelHelperConfiguration configuration)
+        public void CollectExcelColumnInfo(object data, ExcelConfiguration configuration)
         {
             var properties = elementType.GetProperties();
             foreach (var prop in properties)
@@ -29,7 +29,7 @@ namespace LightExcel.Renders
             }
         }
 
-        public IEnumerable<Row> RenderBody(object data, Sheet sheet, ExcelHelperConfiguration configuration)
+        public IEnumerable<Row> RenderBody(object data, Sheet sheet, ExcelConfiguration configuration)
         {
             var values = data as IEnumerable;
             var rowIndex = configuration.UseHeader ? 1 : 0;
@@ -53,7 +53,7 @@ namespace LightExcel.Renders
 
         }
 
-        public Row RenderHeader(ExcelHelperConfiguration configuration)
+        public Row RenderHeader(ExcelConfiguration configuration)
         {
             var row = new Row() { RowIndex = 1 };
             var index = 0;

@@ -16,8 +16,8 @@ namespace LightExcel.OpenXml
     /// </summary>
     internal partial class SheetCollection : NodeCollectionXmlPart<Sheet>
     {
-        private readonly ExcelHelperConfiguration configuration;
-        public SheetCollection(ZipArchive archive, ExcelHelperConfiguration configuration)
+        private readonly ExcelConfiguration configuration;
+        public SheetCollection(ZipArchive archive, ExcelConfiguration configuration)
             : base(archive, "xl/workbook.xml")
         {
             this.configuration = configuration;

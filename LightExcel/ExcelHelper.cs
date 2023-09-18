@@ -6,7 +6,7 @@ namespace LightExcel
 
     public class ExcelHelper : IExcelHelper
     {
-        private readonly ExcelHelperConfiguration configuration = new ExcelHelperConfiguration();
+        private readonly ExcelConfiguration configuration = new ExcelConfiguration();
         
 
         public IExcelDataReader ReadExcel(string path)
@@ -25,14 +25,14 @@ namespace LightExcel
         }
 
 
-        public void WriteExcel(string path, object data, string sheetName = "sheet1", Action<ExcelHelperConfiguration>? config = null)
+        public void WriteExcel(string path, object data, string sheetName = "sheet1", Action<ExcelConfiguration>? config = null)
         {
             if (File.Exists(path)) File.Delete(path);
             config?.Invoke(configuration);
             using var trans = new TransExcelHelper(path, configuration);
             trans.WriteExcel(data, sheetName);
         }
-        public void WriteExcelByTemplate(string path, string template, object data, string sheetName = "sheet1", Action<ExcelHelperConfiguration>? config = null)
+        public void WriteExcelByTemplate(string path, string template, object data, string sheetName = "sheet1", Action<ExcelConfiguration>? config = null)
         {
             config?.Invoke(configuration);
             using var doc = ExcelDocument.CreateByTemplate(path, template, configuration);
@@ -46,7 +46,7 @@ namespace LightExcel
             }
         }
 
-        public ITransactionExcelHelper BeginTransaction(string path, Action<ExcelHelperConfiguration>? config = null)
+        public ITransactionExcelHelper BeginTransaction(string path, Action<ExcelConfiguration>? config = null)
         {
             if (File.Exists(path)) File.Delete(path);
             config?.Invoke(configuration);

@@ -5,4 +5,8 @@
         //string ToXmlString();
         void WriteToXml(LightExcelStreamWriter writer);
     }
+    internal interface IStyleNode : INode
+    {
+        int Id { get; }
+    }
 }

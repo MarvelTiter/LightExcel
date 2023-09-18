@@ -14,9 +14,8 @@ namespace LightExcel
     }
     public interface IExcelHelper
     {
-        void WriteExcel(string path, object data, string sheetName = "sheet1", Action<ExcelHelperConfiguration>? config = null);
-        void WriteExcelByTemplate(string path, string template, object data, string sheetName = "sheet1", Action<ExcelHelperConfiguration>? config = null);
-        ITransactionExcelHelper BeginTransaction(string path, Action<ExcelHelperConfiguration>? config = null);
+        void WriteExcel(string path, object data, string sheetName = "sheet", Action<ExcelConfiguration>? config = null);
+        ITransactionExcelHelper BeginTransaction(string path, Action<ExcelConfiguration>? config = null);
         IExcelDataReader ReadExcel(string path);
         IEnumerable<T> QueryExcel<T>(string path, string? sheetName = null, int startRow = 2);
         IEnumerable<dynamic> QueryExcel(string path, string? sheetName = null, int startRow = 2);

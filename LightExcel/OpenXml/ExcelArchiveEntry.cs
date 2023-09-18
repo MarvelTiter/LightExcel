@@ -9,13 +9,13 @@ namespace LightExcel.OpenXml
     {
         readonly ZipArchive archive;
         private readonly Stream stream;
-        private readonly ExcelHelperConfiguration configuration;
+        private readonly ExcelConfiguration configuration;
         private bool disposedValue;
         internal readonly static UTF8Encoding Utf8WithBom = new(true);
         internal readonly static XNamespace Main_Xmlns = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
         internal readonly static XNamespace Relationships = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
 
-        public ExcelArchiveEntry(Stream stream, ExcelHelperConfiguration configuration)
+        public ExcelArchiveEntry(Stream stream, ExcelConfiguration configuration)
         {
             this.stream = stream;
             this.configuration = configuration;

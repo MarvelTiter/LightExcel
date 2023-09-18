@@ -28,7 +28,7 @@ namespace LightExcel.Utils
 
         internal static Cell EmptyCell(string cr) => new() { Reference = cr, Type = "str" };
 
-        internal static string? GetCellValue(ExcelColumnInfo col, object? value, ExcelHelperConfiguration configuration)
+        internal static string? GetCellValue(ExcelColumnInfo col, object? value, ExcelConfiguration configuration)
         {
             if (value == null) return null;
             var type = value.GetType();

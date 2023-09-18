@@ -18,7 +18,7 @@ namespace TestProject1
                 yield return new Dictionary<string, object>
                 {
                     ["Column1"] = 222,
-                    ["Column2"] = "测试",
+                    ["Column2"] = 0.222,
                     ["Column3"] = 111,
                     ["Column4"] = "Hello",
                     ["Column5"] = "World",
@@ -33,6 +33,7 @@ namespace TestProject1
             ExcelHelper excel = new ExcelHelper();
             using var trans = excel.BeginTransaction("1test.xlsx", config =>
             {
+                config.AddNumberFormat("Column2");
             });
             trans.WriteExcel(ie, "sheet1");
             Process.Start("powershell", $"start {AppDomain.CurrentDomain.BaseDirectory}");

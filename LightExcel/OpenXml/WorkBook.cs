@@ -8,8 +8,8 @@ namespace LightExcel.OpenXml
     {
         private readonly ZipArchive archive;
         private readonly ExcelArchiveEntry doc;
-        private readonly ExcelHelperConfiguration configuration;
-        public WorkBook(ZipArchive archive, ExcelArchiveEntry doc, ExcelHelperConfiguration configuration)
+        private readonly ExcelConfiguration configuration;
+        public WorkBook(ZipArchive archive, ExcelArchiveEntry doc, ExcelConfiguration configuration)
         {
             this.archive = archive;
             this.doc = doc;

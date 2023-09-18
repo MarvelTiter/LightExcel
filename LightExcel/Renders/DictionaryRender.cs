@@ -6,18 +6,20 @@ namespace LightExcel.Renders
 {
     internal class DictionaryRender : RenderBase, IDataRender
     {
-        public void CollectExcelColumnInfo(object data, ExcelHelperConfiguration configuration)
+        public void CollectExcelColumnInfo(object data, ExcelConfiguration configuration)
         {
             if (data is IEnumerable<Dictionary<string, object>> d)
             {
                 foreach (var item in d.First().Keys)
                 {
-                    Columns.Add(new ExcelColumnInfo(item));
+                    var col = new ExcelColumnInfo(item);
+                    col.NumberFormat = configuration.CheckCellNumberFormat(item);
+                    Columns.Add(col);
                 }
             }
         }
 
-        public IEnumerable<Row> RenderBody(object data, Sheet sheet, ExcelHelperConfiguration configuration)
+        public IEnumerable<Row> RenderBody(object data, Sheet sheet, ExcelConfiguration configuration)
         {
             var values = data as IEnumerable<Dictionary<string, object>>;
             var rowIndex = configuration.UseHeader ? 1 : 0;
@@ -35,6 +37,7 @@ namespace LightExcel.Renders
                     cell.Reference = ReferenceHelper.ConvertXyToCellReference(++cellIndex, rowIndex);
                     cell.Type = CellHelper.ConvertCellType(value?.GetType());
                     cell.Value = CellHelper.GetCellValue(col, value, configuration);
+                    cell.StyleIndex = col.NumberFormat ? "1" : null;
                     row.AppendChild(cell);
                 }
                 maxColumnIndex = Math.Max(maxColumnIndex, cellIndex);
@@ -44,7 +47,7 @@ namespace LightExcel.Renders
             sheet.MaxRowIndex = rowIndex;
         }
 
-        public Row RenderHeader(ExcelHelperConfiguration configuration)
+        public Row RenderHeader(ExcelConfiguration configuration)
         {
             var row = new Row() { RowIndex = 1 };
             var index = 0;

@@ -12,9 +12,9 @@ namespace LightExcel
     {
         private bool disposedValue;
         private ExcelArchiveEntry? excelArchive;
-        private readonly ExcelHelperConfiguration configuration;
+        private readonly ExcelConfiguration configuration;
 
-        public TransExcelHelper(string path, ExcelHelperConfiguration configuration)
+        public TransExcelHelper(string path, ExcelConfiguration configuration)
         {
             if (File.Exists(path))
             {

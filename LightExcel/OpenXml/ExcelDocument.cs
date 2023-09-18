@@ -12,7 +12,7 @@ namespace LightExcel.OpenXml
 <Relationships xmlns=""http://schemas.openxmlformats.org/package/2006/relationships"">
     <Relationship Type=""http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument"" Target=""xl/workbook.xml"" Id=""Rfc2254092b6248a9"" />
 </Relationships>";
-        public static ExcelArchiveEntry Open(string path, ExcelHelperConfiguration configuration)
+        public static ExcelArchiveEntry Open(string path, ExcelConfiguration configuration)
         {
             var fs = File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
             var zip = new ExcelArchiveEntry(fs, configuration);
@@ -22,7 +22,7 @@ namespace LightExcel.OpenXml
             return zip;
         }
 
-        public static ExcelArchiveEntry Create(string path, ExcelHelperConfiguration configuration)
+        public static ExcelArchiveEntry Create(string path, ExcelConfiguration configuration)
         {
             //TODO: buffer size of create file
             var fs = File.Create(path, 1024 * 512);
@@ -35,7 +35,7 @@ namespace LightExcel.OpenXml
             return zip;
         }
 
-        public static ExcelArchiveEntry CreateByTemplate(string path, string template, ExcelHelperConfiguration configuration)
+        public static ExcelArchiveEntry CreateByTemplate(string path, string template, ExcelConfiguration configuration)
         {
             using var templateStream = File.Open(template, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
             var fs = File.Create(path, 1024 * 512);
