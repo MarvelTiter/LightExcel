@@ -5,7 +5,6 @@ namespace LightExcel
 {
     public interface IExcelDataReader : IDisposable
     {
-        void Close();
         bool Read();
         bool NextResult();
 
@@ -28,6 +27,6 @@ namespace LightExcel
         int GetOrdinal(string name);
        
         string GetValue(int i);
-       
+        bool IsNullOrEmpty(int i);
     }
 }

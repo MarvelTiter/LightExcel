@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using System.Text.RegularExpressions;
 using LightExcel.OpenXml;
+using LightExcel.TypedDeserializer;
 using LightExcel.Utils;
 
 namespace LightExcel
@@ -27,14 +28,24 @@ namespace LightExcel
             {
                 while (reader.Read())
                 {
-                    yield return default(T);
+                    yield return ExpressionDeserialize<T>.Deserialize(reader);
                 }
             }
         }
 
         public IEnumerable<dynamic> QueryExcel(string path, string sheetName = "sheet1", Action<ExcelConfiguration>? config = null)
         {
-            return QueryExcel<object>(path, sheetName, config);
+            configuration.StartCell = null;
+            using var reader = ReadExcel(path, sheetName, config);
+            Func<IExcelDataReader, object>? deserializer = null;
+            while (reader.NextResult())
+            {
+                while (reader.Read())
+                {
+                    deserializer ??= DynamicDeserialize.GetMapperRowDeserializer(reader);
+                    yield return deserializer.Invoke(reader);
+                }
+            }
         }
 
         public void WriteExcel(string path, object data, string sheetName = "sheet1", Action<ExcelConfiguration>? config = null)

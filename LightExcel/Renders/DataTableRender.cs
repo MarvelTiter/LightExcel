@@ -1,39 +1,53 @@
 ﻿using LightExcel.OpenXml;
+using LightExcel.Utils;
 using System.Data;
 
 namespace LightExcel.Renders
 {
-    internal class DataTableRender //: IDataRender
+    internal class DataTableRender : RenderBase
     {
-        public IEnumerable<Row> RenderBody(object data)
+        public override IEnumerable<ExcelColumnInfo> CollectExcelColumnInfo(object data, ExcelConfiguration configuration)
         {
-            var table = (DataTable)data;
-            foreach (DataRow item in table.Rows)
+            if (data is DataTable dt)
             {
-                var row = new Row();
-                //foreach (DataColumn column in table.Columns)
-                //{
-                //    var cell = InternalHelper.CreateTypedCell(column.DataType, item[column]);
-                //    row.AppendChild(cell);
-                //}
-                yield return row;
+                foreach (DataColumn column in dt.Columns)
+                {
+                    var col = new ExcelColumnInfo(column.ColumnName);
+                    col.NumberFormat = configuration.CheckCellNumberFormat(column.ColumnName);
+                    col.Type = column.DataType;
+                    yield return col;
+                }
             }
         }
 
-        public Row RenderHeader(object data)
+        public override IEnumerable<Row> RenderBody(object data, Sheet sheet, IEnumerable<ExcelColumnInfo> columns, ExcelConfiguration configuration)
         {
-            var table = (DataTable)data;
-            var row = new Row();
-            foreach (DataColumn col in table.Columns)
+            var values = data as DataTable;
+            var rowIndex = configuration.StartRowIndex;
+            var maxColumnIndex = 0;
+            foreach (DataRow item in values!.Rows)
             {
-                //var cell = new Cell
-                //{
-                //    CellValue = new CellValue(col.ColumnName),
-                //    DataType = new EnumValue<CellValues>(CellValues.String),
-                //};
-                //row.AppendChild(cell);
+                if (item is null) continue;
+                var row = new Row() { RowIndex = ++rowIndex };
+                var cellIndex = 1;
+                foreach (var col in columns)
+                {
+                    if (col.Ignore) continue;
+                    var cell = new Cell();
+                    var value = item[col.Name];
+                    cellIndex = col.ColumnIndex ?? cellIndex;
+                    cell.Reference = ReferenceHelper.ConvertXyToCellReference(cellIndex, rowIndex);
+                    cell.Type = CellHelper.ConvertCellType(col.Type);
+                    cell.Value = CellHelper.GetCellValue(col, value, configuration);
+                    cell.StyleIndex = col.NumberFormat ? "1" : null;
+                    row.AppendChild(cell);
+                    cellIndex++;
+                }
+                maxColumnIndex = Math.Max(maxColumnIndex, cellIndex);
+                yield return row;
             }
-            return row;
+            sheet.MaxColumnIndex = maxColumnIndex;
+            sheet.MaxRowIndex = rowIndex;
         }
     }
 }

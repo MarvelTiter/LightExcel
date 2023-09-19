@@ -13,5 +13,6 @@ namespace LightExcel.Attributes
         public bool Ignore { get; set; }
         public bool NumberFormat { get; set; }
         public int? ColumnIndex { get; set; }
+        public string? Format { get; set; }
     }
 }

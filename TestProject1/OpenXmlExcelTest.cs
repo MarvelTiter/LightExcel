@@ -8,10 +8,15 @@ using System.Xml.Linq;
 
 namespace TestProject1
 {
-    [TestClass]
-    public class OpenXmlExcelTest
+    public class M
     {
-        IEnumerable<Dictionary<string, object>> Ge()
+        public int Index { get; set; }
+        public string? Name { get; set; }
+        public DateTime Birthday { get; set; }
+    }
+    public class Datas
+    {
+        public static IEnumerable<Dictionary<string, object>> DictionarySource()
         {
             for (int i = 0; i < 10; i++)
             {
@@ -25,10 +30,28 @@ namespace TestProject1
                 };
             }
         }
-        [TestMethod]
-        public void CreateExcel()
+
+        public static IEnumerable<M> GetEntities()
         {
-            var ie = Ge();
+            for (int i = 0; i < 10; i++)
+            {
+                yield return new M
+                {
+                    Index = i + 1,
+                    Birthday = DateTime.Now,
+                    Name = "Hello"
+                };
+            }
+        }
+    }
+    [TestClass]
+    public class OpenXmlExcelTest
+    {
+
+        [TestMethod]
+        public void CreateExcelDictionary()
+        {
+            var ie = Datas.DictionarySource();
             ExcelHelper excel = new ExcelHelper();
             using var trans = excel.BeginTransaction("1test.xlsx", config =>
             {
@@ -38,11 +61,19 @@ namespace TestProject1
             Process.Start("powershell", $"start {AppDomain.CurrentDomain.BaseDirectory}");
         }
 
-       
+        [TestMethod]
+        public void CreateExcelEntity()
+        {
+            ExcelHelper excel = new ExcelHelper();
+            excel.WriteExcel("etest.xlsx", Datas.GetEntities());
+            Process.Start("powershell", $"start {AppDomain.CurrentDomain.BaseDirectory}");
+        }
+
+
         [TestMethod]
         public void TemplateTest()
         {
-            var ie = Ge();
+            var ie = Datas.DictionarySource();
             ExcelHelper excel = new ExcelHelper();
             excel.WriteExcelByTemplate("12test.xlsx", "路檢報表格式.xlsx", ie, config: config =>
             {

@@ -11,27 +11,22 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MDbContext.SqlExecutor
+namespace LightExcel.TypedDeserializer
 {
     /// <summary>
     /// 从LightOrm中移植修改
     /// </summary>
-    internal class ExpressionBuilder
+    internal static class ExpressionDeserialize<T>
     {
-        private static readonly MethodInfo DataRecord_GetInt16 = typeof(IDataRecord).GetMethod("GetInt16", new Type[] { typeof(int) })!;
-        private static readonly MethodInfo DataRecord_GetInt32 = typeof(IDataRecord).GetMethod("GetInt32", new Type[] { typeof(int) })!;
-        private static readonly MethodInfo DataRecord_GetInt64 = typeof(IDataRecord).GetMethod("GetInt64", new Type[] { typeof(int) })!;
-        private static readonly MethodInfo DataRecord_GetFloat = typeof(IDataRecord).GetMethod("GetFloat", new Type[] { typeof(int) })!;
-        private static readonly MethodInfo DataRecord_GetDouble = typeof(IDataRecord).GetMethod("GetDouble", new Type[] { typeof(int) })!;
-        private static readonly MethodInfo DataRecord_GetDecimal = typeof(IDataRecord).GetMethod("GetDecimal", new Type[] { typeof(int) })!;
-        private static readonly MethodInfo DataRecord_GetBoolean = typeof(IDataRecord).GetMethod("GetBoolean", new Type[] { typeof(int) })!;
-        private static readonly MethodInfo DataRecord_GetString = typeof(IDataRecord).GetMethod("GetString", new Type[] { typeof(int) })!;
-        private static readonly MethodInfo DataRecord_GetChar = typeof(IDataRecord).GetMethod("GetChar", new Type[] { typeof(int) })!;
-        private static readonly MethodInfo DataRecord_GetGuid = typeof(IDataRecord).GetMethod("GetGuid", new Type[] { typeof(int) })!;
-        private static readonly MethodInfo DataRecord_GetDateTime = typeof(IDataRecord).GetMethod("GetDateTime", new Type[] { typeof(int) })!;
-
-        private static readonly MethodInfo DataRecord_GetValue = typeof(IDataRecord).GetMethod("GetValue", new Type[] { typeof(int) })!;
-
+        private static readonly MethodInfo DataRecord_GetInt16 = typeof(IExcelDataReader).GetMethod("GetInt16", new Type[] { typeof(int) })!;
+        private static readonly MethodInfo DataRecord_GetInt32 = typeof(IExcelDataReader).GetMethod("GetInt32", new Type[] { typeof(int) })!;
+        private static readonly MethodInfo DataRecord_GetInt64 = typeof(IExcelDataReader).GetMethod("GetInt64", new Type[] { typeof(int) })!;
+        private static readonly MethodInfo DataRecord_GetDouble = typeof(IExcelDataReader).GetMethod("GetDouble", new Type[] { typeof(int) })!;
+        private static readonly MethodInfo DataRecord_GetDecimal = typeof(IExcelDataReader).GetMethod("GetDecimal", new Type[] { typeof(int) })!;
+        private static readonly MethodInfo DataRecord_GetBoolean = typeof(IExcelDataReader).GetMethod("GetBoolean", new Type[] { typeof(int) })!;
+        private static readonly MethodInfo DataRecord_GetDateTime = typeof(IExcelDataReader).GetMethod("GetDateTime", new Type[] { typeof(int) })!;
+        private static readonly MethodInfo DataRecord_GetValue = typeof(IExcelDataReader).GetMethod("GetValue", new Type[] { typeof(int) })!;
+        private static readonly MethodInfo IsNullOrEmpty = typeof(IExcelDataReader).GetMethod("IsNullOrEmpty", new Type[] { typeof(int) })!;
         readonly static Dictionary<Type, MethodInfo> typeMapMethod = new Dictionary<Type, MethodInfo>(37)
         {
             [typeof(short)] = DataRecord_GetInt16,
@@ -40,19 +35,19 @@ namespace MDbContext.SqlExecutor
             [typeof(uint)] = DataRecord_GetInt32,
             [typeof(long)] = DataRecord_GetInt64,
             [typeof(ulong)] = DataRecord_GetInt64,
-            [typeof(float)] = DataRecord_GetFloat,
             [typeof(double)] = DataRecord_GetDouble,
             [typeof(decimal)] = DataRecord_GetDecimal,
             [typeof(bool)] = DataRecord_GetBoolean,
-            [typeof(string)] = DataRecord_GetString,
-            [typeof(char)] = DataRecord_GetChar,
-            [typeof(Guid)] = DataRecord_GetGuid,
             [typeof(DateTime)] = DataRecord_GetDateTime,
         };
 
-        public Func<IExcelDataReader, object> BuildDeserializer<T>(IExcelDataReader reader)
+        static Func<IExcelDataReader, object>? handler;
+
+
+        public static T Deserialize(IExcelDataReader reader)
         {
-            return BuildFunc<T>(reader, CultureInfo.CurrentCulture, false);
+            handler ??= BuildFunc<T>(reader, CultureInfo.CurrentCulture, false);
+            return (T)handler.Invoke(reader);
         }
 
         /// <summary>
@@ -71,14 +66,14 @@ namespace MDbContext.SqlExecutor
         /// <param name="Culture"></param>
         /// <param name="MustMapAllProperties"></param>
         /// <returns></returns>
-        private Func<IExcelDataReader, object> BuildFunc<Target>(IExcelDataReader RecordInstance, CultureInfo Culture, bool MustMapAllProperties)
+        private static Func<IExcelDataReader, object> BuildFunc<Target>(IExcelDataReader RecordInstance, CultureInfo Culture, bool MustMapAllProperties)
         {
             ParameterExpression recordInstanceExp = Expression.Parameter(typeof(IExcelDataReader), "Record");
             Type TargetType = typeof(Target);
-            Expression Body = default(Expression);
+            Expression? Body = default;
 
             // 元组处理
-            if (TargetType.FullName.StartsWith("System.Tuple`"))
+            if (TargetType.FullName?.StartsWith("System.Tuple`") ?? false)
             {
                 ConstructorInfo[] Constructors = TargetType.GetConstructors();
                 if (Constructors.Count() != 1)
@@ -154,7 +149,7 @@ namespace MDbContext.SqlExecutor
                         //If we reach this code the targetmember did not get mapped
                         if (MustMapAllProperties)
                         {
-                            throw new ArgumentException(String.Format("TargetField {0} is not matched by any field in the DataReader", TargetMember.Name));
+                            throw new ArgumentException(string.Format("TargetField {0} is not matched by any field in the DataReader", TargetMember.Name));
                         }
                     };
                     work();
@@ -231,26 +226,16 @@ namespace MDbContext.SqlExecutor
             int Ordinal,
             Type TargetMemberType)
         {
-            Type RecordFieldType = RecordInstance.GetFieldType(Ordinal);
-            bool AllowDBNull = columnAllowDbNull == DBNull.Value || columnAllowDbNull == null ? false : Convert.ToBoolean(columnAllowDbNull);
-            Expression RecordFieldExpression = GetRecordFieldExpression(recordInstanceExp, Ordinal, RecordFieldType);
-            Expression ConvertedRecordFieldExpression = GetConversionExpression(RecordFieldType, RecordFieldExpression, TargetMemberType, Culture);
+            Expression RecordFieldExpression = GetRecordFieldExpression(recordInstanceExp, Ordinal, typeof(string));
+            Expression ConvertedRecordFieldExpression = GetConversionExpression(typeof(string), RecordFieldExpression, TargetMemberType, Culture);
             MethodCallExpression NullCheckExpression = GetNullCheckExpression(recordInstanceExp, Ordinal);
 
-            Expression TargetValueExpression;
-            if (AllowDBNull)
-            {
-                TargetValueExpression = Expression.Condition(
-                NullCheckExpression,
-                Expression.Default(TargetMemberType),
-                ConvertedRecordFieldExpression,
-                TargetMemberType
-                );
-            }
-            else
-            {
-                TargetValueExpression = ConvertedRecordFieldExpression;
-            }
+            Expression TargetValueExpression = Expression.Condition(
+            NullCheckExpression,
+            Expression.Default(TargetMemberType),
+            ConvertedRecordFieldExpression,
+            TargetMemberType
+            );
             return TargetValueExpression;
         }
 
@@ -261,21 +246,14 @@ namespace MDbContext.SqlExecutor
             if (GetValueMethod == null)
                 GetValueMethod = DataRecord_GetValue;
 
-            Expression RecordFieldExpression;
-            if (object.ReferenceEquals(RecordFieldType, typeof(byte[])))
-            {
-                RecordFieldExpression = Expression.Call(GetValueMethod, new Expression[] { recordInstanceExp, Expression.Constant(Ordinal, typeof(int)) });
-            }
-            else
-            {
-                RecordFieldExpression = Expression.Call(recordInstanceExp, GetValueMethod, Expression.Constant(Ordinal, typeof(int)));
-            }
+            Expression RecordFieldExpression = Expression.Call(recordInstanceExp, GetValueMethod, Expression.Constant(Ordinal, typeof(int)));
+
             return RecordFieldExpression;
         }
 
         private static MethodCallExpression GetNullCheckExpression(ParameterExpression RecordInstance, int Ordinal)
         {
-            MethodCallExpression NullCheckExpression = Expression.Call(RecordInstance, DataRecord_IsDBNull, Expression.Constant(Ordinal, typeof(int)));
+            MethodCallExpression NullCheckExpression = Expression.Call(RecordInstance, IsNullOrEmpty, Expression.Constant(Ordinal, typeof(int)));
             return NullCheckExpression;
         }
 
@@ -292,14 +270,14 @@ namespace MDbContext.SqlExecutor
             }
             else if (ReferenceEquals(TargetType, typeof(string)))
             {
-                TargetExpression = Expression.Call(SourceExpression, SourceType.GetMethod("ToString", Type.EmptyTypes));
+                TargetExpression = Expression.Call(SourceExpression, SourceType.GetMethod("ToString", Type.EmptyTypes)!);
             }
             else if (ReferenceEquals(TargetType, typeof(bool)))
             {
-                MethodInfo ToBooleanMethod = typeof(Convert).GetMethod("ToBoolean", new[] { SourceType });
+                MethodInfo ToBooleanMethod = typeof(Convert).GetMethod("ToBoolean", new[] { SourceType })!;
                 TargetExpression = Expression.Call(ToBooleanMethod, SourceExpression);
             }
-            else if (ReferenceEquals(SourceType, typeof(Byte[])))
+            else if (ReferenceEquals(SourceType, typeof(byte[])))
             {
                 throw new NotSupportedException();
             }
@@ -310,7 +288,7 @@ namespace MDbContext.SqlExecutor
             return TargetExpression;
         }
 
-        
+
         private static Expression GetParseExpression(Expression SourceExpression, Type TargetType, CultureInfo Culture)
         {
             Type UnderlyingType = GetUnderlyingType(TargetType);
@@ -322,7 +300,7 @@ namespace MDbContext.SqlExecutor
             }
             else
             {
-                Expression ParseExpression = default(Expression);
+                Expression? ParseExpression = default;
                 switch (UnderlyingType.FullName)
                 {
                     case "System.Byte":
@@ -359,13 +337,13 @@ namespace MDbContext.SqlExecutor
             }
             Expression GetGenericParseExpression(Expression sourceExpression, Type type)
             {
-                MethodInfo ParseMetod = type.GetMethod("Parse", new[] { typeof(string) });
+                MethodInfo ParseMetod = type.GetMethod("Parse", new[] { typeof(string) })!;
                 MethodCallExpression CallExpression = Expression.Call(ParseMetod, new[] { sourceExpression });
                 return CallExpression;
             }
             Expression GetDateTimeParseExpression(Expression sourceExpression, Type type, CultureInfo culture)
             {
-                MethodInfo ParseMetod = type.GetMethod("Parse", new[] { typeof(string), typeof(DateTimeFormatInfo) });
+                MethodInfo ParseMetod = type.GetMethod("Parse", new[] { typeof(string), typeof(DateTimeFormatInfo) })!;
                 ConstantExpression ProviderExpression = Expression.Constant(culture.DateTimeFormat, typeof(DateTimeFormatInfo));
                 MethodCallExpression CallExpression = Expression.Call(ParseMetod, new[] { sourceExpression, ProviderExpression });
                 return CallExpression;
@@ -374,7 +352,7 @@ namespace MDbContext.SqlExecutor
             MethodCallExpression GetEnumParseExpression(Expression sourceExpression, Type type)
             {
                 //Get the MethodInfo for parsing an Enum
-                MethodInfo EnumParseMethod = typeof(Enum).GetMethod("Parse", new[] { typeof(Type), typeof(string), typeof(bool) });
+                MethodInfo EnumParseMethod = typeof(Enum).GetMethod("Parse", new[] { typeof(Type), typeof(string), typeof(bool) })!;
                 ConstantExpression TargetMemberTypeExpression = Expression.Constant(type);
                 ConstantExpression IgnoreCase = Expression.Constant(true, typeof(bool));
                 //Create an expression the calls the Parse method
@@ -384,7 +362,7 @@ namespace MDbContext.SqlExecutor
 
             MethodCallExpression GetNumberParseExpression(Expression sourceExpression, Type type, CultureInfo culture)
             {
-                MethodInfo ParseMetod = type.GetMethod("Parse", new[] { typeof(string), typeof(NumberFormatInfo) });
+                MethodInfo ParseMetod = type.GetMethod("Parse", new[] { typeof(string), typeof(NumberFormatInfo) })!;
                 ConstantExpression ProviderExpression = Expression.Constant(culture.NumberFormat, typeof(NumberFormatInfo));
                 MethodCallExpression CallExpression = Expression.Call(ParseMetod, new[] { sourceExpression, ProviderExpression });
                 return CallExpression;

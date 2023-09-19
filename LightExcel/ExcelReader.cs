@@ -94,6 +94,11 @@ namespace LightExcel
             return ret;
         }
 
+        public bool IsNullOrEmpty(int i)
+        {
+            return string.IsNullOrEmpty(ElementAt(i)?.Value);
+        }
+
 
         public string GetName(int i)
         {

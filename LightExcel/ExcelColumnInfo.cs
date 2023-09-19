@@ -13,6 +13,7 @@ namespace LightExcel
         public bool Ignore { get; set; }
         public Property? Property { get; set; }
         public string? Format { get; set; }
+        public Type? Type { get; set; }
         public bool NumberFormat { get; set; }
         internal int? ColumnIndex {  get; set; }
         public ExcelColumnInfo(string name)

@@ -26,5 +26,23 @@ namespace TestProject1
                 }
             }
         }
+
+        [TestMethod]
+        public void ExcelReaderTestEntity()
+        {
+            ExcelHelper excel = new ExcelHelper();
+            var result = excel.QueryExcel<M>("etest.xlsx");
+        }
+        [TestMethod]
+        public void ExcelReaderTestDynamic()
+        {
+            ExcelHelper excel = new ExcelHelper();
+            var result = excel.QueryExcel("etest.xlsx");
+            foreach (var field in result)
+            {
+                Console.WriteLine($"A: {field.A}, B: {field.B}, C: {field.C}");
+            }
+        }
+
     }
 }

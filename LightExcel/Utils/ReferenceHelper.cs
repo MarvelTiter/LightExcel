@@ -21,6 +21,11 @@ namespace LightExcel.Utils
         /// <returns></returns>
         public static string ConvertXyToCellReference(int x, int y)
         {
+            return $"{ConvertX(x)}{y}";
+        }
+
+        public static string ConvertX(int x)
+        {
             /**
              * 坐标转换 CellRef (A1,B2,..
              * A=>1, B=>2, C=>3 ....  AA=>27
@@ -35,7 +40,7 @@ namespace LightExcel.Utils
                 xName = AZ[mod] + xName;
                 x = (x - mod) / 26;
             }
-            return $"{xName}{y}";
+            return xName;
         }
 
         public static (int? X, int? Y) ConvertCellReferenceToXY(string? cellref)

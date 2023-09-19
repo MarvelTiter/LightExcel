@@ -21,7 +21,7 @@ namespace LightExcel.Renders
 
         public override IEnumerable<Row> RenderBody(object data, Sheet sheet, IEnumerable<ExcelColumnInfo> columns, ExcelConfiguration configuration)
         {
-            var values = data as IEnumerable<Dictionary<string, object>>;
+            var values = data as IEnumerable<Dictionary<string, object>> ?? throw new ArgumentException();
             var rowIndex = configuration.StartRowIndex;
             var maxColumnIndex = 0;
             foreach (var item in values!)
@@ -33,7 +33,7 @@ namespace LightExcel.Renders
                 {
                     if (col.Ignore) continue;
                     var cell = new Cell();
-                    var value = col.Name == "" ? "" : item[col.Name];
+                    var value = item[col.Name];
                     cellIndex = col.ColumnIndex ?? cellIndex;
                     cell.Reference = ReferenceHelper.ConvertXyToCellReference(cellIndex, rowIndex);
                     cell.Type = CellHelper.ConvertCellType(value?.GetType());
