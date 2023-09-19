@@ -1,8 +1,4 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using LightExcel.OpenXml.Interfaces;
-using System.IO.Compression;
-using System.Text;
-using System.Xml;
+﻿using LightExcel.OpenXml.Interfaces;
 
 namespace LightExcel.OpenXml
 {

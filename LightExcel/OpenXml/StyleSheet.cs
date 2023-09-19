@@ -1,13 +1,6 @@
-﻿using DocumentFormat.OpenXml.EMMA;
-using LightExcel.OpenXml.Interfaces;
+﻿using LightExcel.OpenXml.Interfaces;
 using LightExcel.OpenXml.Styles;
-using System;
-using System.Collections.Generic;
 using System.IO.Compression;
-using System.Linq;
-using System.Text.Unicode;
-using System.Threading.Tasks;
-using System.Xml;
 
 namespace LightExcel.OpenXml
 {

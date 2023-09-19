@@ -1,7 +1,5 @@
-﻿using DocumentFormat.OpenXml.Vml.Office;
-using System.IO.Compression;
+﻿using System.IO.Compression;
 using System.Text;
-using System.Xml.Linq;
 
 namespace LightExcel.OpenXml
 {

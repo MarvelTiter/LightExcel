@@ -1,7 +1,4 @@
-﻿using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Spreadsheet;
-using DocumentFormat.OpenXml.Validation;
-using LightExcel;
+﻿using LightExcel;
 using System.Diagnostics;
 using System.Text;
 using System.Xml.Linq;

@@ -1,6 +1,4 @@
-﻿using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
-using LightExcel.Utils;
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace LightExcel
 {

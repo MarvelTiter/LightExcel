@@ -1,8 +1,5 @@
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Validation;
 using LightExcel;
 using LightExcel.Attributes;
-using System.Collections;
 using System.Diagnostics;
 using System.Text;
 
@@ -75,26 +72,5 @@ namespace TestProject1
             //excel.WriteExcel("E:\\Documents\\Downloads\\test.xlsx", @"E:\Documents\Downloads\路檢報表格式.xlsx", ie);
         }
 
-        private static void Valid(string path)
-        {
-            var validator = new OpenXmlValidator();
-            int count = 0;
-            var doc = SpreadsheetDocument.Open(path, true);
-            StringBuilder sb = new StringBuilder();
-            foreach (ValidationErrorInfo error in validator.Validate(doc))
-            {
-                sb.AppendLine("Error Count : " + count);
-                sb.AppendLine("Description : " + error.Description);
-                sb.AppendLine("Path: " + error.Path?.XPath);
-                sb.AppendLine("Part: " + error.Part?.Uri);
-            }
-            Console.WriteLine(sb.ToString());
-        }
-
-        [TestMethod]
-        public void XlsxValid()
-        {
-            Valid(@"E:\Statistics\2023 06月 每月统计.xlsx");
-        }
     }
 }
