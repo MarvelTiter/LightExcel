@@ -5,17 +5,17 @@ namespace LightExcel.Renders
 {
     internal class DataReaderRender : IDataRender
     {
-        public void CollectExcelColumnInfo(object data, ExcelConfiguration configuration)
+        public IEnumerable<ExcelColumnInfo> CollectExcelColumnInfo(object data, ExcelConfiguration configuration)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<Row> RenderBody(object data, Sheet sheet, ExcelConfiguration configuration)
+        public IEnumerable<Row> RenderBody(object data, Sheet sheet, IEnumerable<ExcelColumnInfo> columns, ExcelConfiguration configuration)
         {
             throw new NotImplementedException();
         }
 
-        public Row RenderHeader(ExcelConfiguration configuration)
+        public Row RenderHeader(IEnumerable<ExcelColumnInfo> columns, ExcelConfiguration configuration)
         {
             throw new NotImplementedException();
         }

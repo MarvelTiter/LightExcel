@@ -23,7 +23,7 @@ namespace LightExcel.OpenXml
             }
         }
 
-        protected abstract IEnumerable<T> GetChildrenImpl(XmlReader reader);
+        protected abstract IEnumerable<T> GetChildrenImpl(LightExcelXmlReader reader);
 
         public IEnumerator<T> GetEnumerator()
         {

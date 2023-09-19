@@ -14,6 +14,7 @@ namespace LightExcel
         public Property? Property { get; set; }
         public string? Format { get; set; }
         public bool NumberFormat { get; set; }
+        internal int? ColumnIndex {  get; set; }
         public ExcelColumnInfo(string name)
         {
             Name = name;

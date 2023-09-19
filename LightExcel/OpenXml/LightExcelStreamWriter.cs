@@ -42,6 +42,7 @@ namespace LightExcel.OpenXml
             if (!disposedValue)
             {
                 streamWriter?.Dispose();
+                stream?.Dispose();
                 disposedValue = true;
             }
         }

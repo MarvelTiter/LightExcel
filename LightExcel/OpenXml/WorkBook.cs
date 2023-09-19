@@ -19,10 +19,13 @@ namespace LightExcel.OpenXml
         }
         internal void Save()
         {
-            Relationships.Write();
             WorkSheets.Write();
-            SharedStrings?.Write();
-            StyleSheet?.Write();
+            if (!configuration.FillByTemplate)
+            {
+                Relationships.Write();
+                SharedStrings?.Write();
+                StyleSheet?.Write();
+            }
         }
         /// <summary>
         /// xl/workbook.xml

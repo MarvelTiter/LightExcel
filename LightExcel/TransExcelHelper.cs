@@ -31,19 +31,19 @@ namespace LightExcel
         {
             var sheet = excelArchive!.WorkBook.AddNewSheet(sheetName);
             var render = RenderProvider.GetDataRender(data.GetType());
-            render.CollectExcelColumnInfo(data, configuration);
-            var all = NeedToReaderRows(render, sheet, data);
+            var columns = render.CollectExcelColumnInfo(data, configuration);
+            var all = NeedToReaderRows(render, sheet, data, columns);
             sheet!.Write(all);
         }
 
-        private IEnumerable<Row> NeedToReaderRows(IDataRender render, Sheet sheet, object data)
+        private IEnumerable<Row> NeedToReaderRows(IDataRender render, Sheet sheet, object data, IEnumerable<ExcelColumnInfo> columns)
         {
             if (configuration.UseHeader)
             {
-                var header = render.RenderHeader(configuration);
+                var header = render.RenderHeader(columns, configuration);
                 yield return header;
             }
-            var datas = render.RenderBody(data, sheet, configuration);
+            var datas = render.RenderBody(data, sheet, columns, configuration);
             foreach (var row in datas)
             {
                 yield return row;

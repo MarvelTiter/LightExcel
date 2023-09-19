@@ -4,5 +4,6 @@
     {
         void Write();
         void Write(IEnumerable<INode> children);
+        void Replace(IEnumerable<INode> children);
     }
 }

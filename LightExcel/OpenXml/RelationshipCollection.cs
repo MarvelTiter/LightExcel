@@ -14,15 +14,17 @@ namespace LightExcel.OpenXml
 
         }
 
-        protected override IEnumerable<Relationship> GetChildrenImpl(XmlReader reader)
+        protected override IEnumerable<Relationship> GetChildrenImpl(LightExcelXmlReader reader)
         {
-            while (reader.Read())
+            if (!reader.IsStartWith("Relationships", XmlHelper.RelaNs)) yield break;
+            if (!reader.ReadFirstContent()) yield break;
+            while (!reader.EOF)
             {
-                if (reader.LocalName == "Relationship")
+                if (reader.IsStartWith("Relationship", XmlHelper.RelaNs))
                 {
-                    var id = reader["Id"] ?? throw new Exception("Excel Xml Relationship Error (without id)");
-                    var type = reader["Type"] ?? throw new Exception("Excel Xml Relationship Error (without type)");
-                    var target = reader["Target"] ?? throw new Exception("Excel Xml Relationship Error (without target)");
+                    var id = reader.GetAttribute("Id") ?? throw new Exception("Excel Xml Relationship Error (without id)");
+                    var type = reader.GetAttribute("Type") ?? throw new Exception("Excel Xml Relationship Error (without type)");
+                    var target = reader.GetAttribute("Target") ?? throw new Exception("Excel Xml Relationship Error (without target)");
                     var rel = new Relationship(id, type, target);
                     yield return rel;
                 }

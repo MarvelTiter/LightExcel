@@ -38,8 +38,9 @@ namespace LightExcel.Utils
             return $"{xName}{y}";
         }
 
-        public static (int X, int Y) ConvertCellReferenceToXY(string cellref)
+        public static (int? X, int? Y) ConvertCellReferenceToXY(string? cellref)
         {
+            if (cellref == null) return (null, null);
             var x = GetColumnIndex(cellref);
             var y = GetRowIndex(cellref);
             return (x, y);

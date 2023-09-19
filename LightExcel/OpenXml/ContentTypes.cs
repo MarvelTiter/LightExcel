@@ -17,24 +17,22 @@ namespace LightExcel.OpenXml
         }
 
 
-        protected override IEnumerable<INode> GetChildrenImpl(XmlReader reader)
+        protected override IEnumerable<INode> GetChildrenImpl(LightExcelXmlReader reader)
         {
-            while (reader.Read())
+            if (!reader.IsStartWith("Types", XmlHelper.ContentTypesXmlns))
+                yield break;
+            if (!reader.ReadFirstContent()) yield break;
+            while (!reader.EOF)
             {
-                if (reader.LocalName == "Default")
+                if (reader.IsStartWith("Override", XmlHelper.ContentTypesXmlns))
                 {
-                    var ext = reader["Extension"];
-                    var ct = reader["ContentType"];
-                    var def = new Default(ext, ct);
-                    yield return def;
-                }
-                else if (reader.LocalName == "Override")
-                {
-                    var pn = reader["PartName"];
-                    var ct = reader["ContentType"];
+                    var pn = reader.GetAttribute("PartName");
+                    var ct = reader.GetAttribute("ContentType");
                     var ov = new Override(pn, ct);
                     yield return ov;
                 }
+                else if (!reader.SkipContent()) 
+                    yield break;
             }
         }
 

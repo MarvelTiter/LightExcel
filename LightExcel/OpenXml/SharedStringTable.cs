@@ -21,26 +21,35 @@ namespace LightExcel.OpenXml
         {
             get
             {
-                return cached?[index]?.Content;
+                if (cached == null)
+                {
+                    return GetChildren().ElementAt(index).Content;
+                }
+                else
+                {
+                    return cached[index].Content;
+                }
             }
         }
 
-        protected override IEnumerable<SharedStringNode> GetChildrenImpl(XmlReader reader)
+        protected override IEnumerable<SharedStringNode> GetChildrenImpl(LightExcelXmlReader reader)
         {
-            while (reader.Read())
+            if (!reader.IsStartWith("sst", XmlHelper.MainNs)) yield break;
+            if (!reader.ReadFirstContent()) yield break;
+            int.TryParse(reader["count"], out var count);
+            int.TryParse(reader["uniqueCount"], out var uniqueCount);
+            RefCount = count;
+            UniqueCount = uniqueCount;
+            while (!reader.EOF)
             {
-                if (reader.Name == "sst")
+                if (reader.IsStartWith("si", XmlHelper.MainNs))
                 {
-                    int.TryParse(reader["count"], out var count);
-                    int.TryParse(reader["uniqueCount"], out var uniqueCount);
-                    RefCount = count;
-                    UniqueCount = uniqueCount;
+                    var content = reader.ReadStringContent();
+                    yield return new SharedStringNode(content);
                 }
-                else if (reader.Name == "t")
+                else if (!reader.SkipContent())
                 {
-                    var content = reader.ReadString();
-                    var n = new SharedStringNode(content);
-                    yield return n;
+                    break;
                 }
             }
         }

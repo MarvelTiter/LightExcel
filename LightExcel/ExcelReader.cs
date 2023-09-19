@@ -1,6 +1,6 @@
-﻿using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Spreadsheet;
-using LightExcel.Extensions;
+﻿using LightExcel.Extensions;
+using LightExcel.OpenXml;
+using LightExcel.Utils;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -8,40 +8,47 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 namespace LightExcel
 {
     internal class ExcelReader : IExcelDataReader
     {
         private bool disposedValue;
-        //private readonly IEnumerable<WorksheetPart> sheetParts;
-        private readonly IEnumerable<Sheet> sheets;
-        private readonly SpreadsheetDocument document;
-        public string? this[int i] => CellAt(i)?.GetCellValue(document.WorkbookPart);
-        public string? this[string name] => CellAt(GetOrdinal(name))?.GetCellValue(document.WorkbookPart);
+        private readonly ExcelArchiveEntry document;
+        private readonly ExcelConfiguration configuration;
+        private readonly string? targetSheet;
 
-        Row[] rows = Array.Empty<Row>();
+        //private readonly IEnumerable<WorksheetPart> sheetParts
+        SharedStringTable? Sst => document.WorkBook.SharedStrings;
+        public string? this[int i] => CellAt(i)?.GetCellValue(Sst);
+        public string? this[string name] => CellAt(GetOrdinal(name))?.GetCellValue(Sst);
 
-        public string CurrentSheetName => sheets.ElementAt(currentSheetIndex)?.Name?.ToString() ?? "";
+        IEnumerator<Row>? rowEnumerator;
+        IEnumerator<Sheet> sheetEnumerator;
+
+        public string CurrentSheetName => sheetEnumerator.Current?.Name?.ToString() ?? "";
 
         public int FieldCount => cells.Length;
 
         Cell[] cells = Array.Empty<Cell>();
         string[] heads = Array.Empty<string>();
-        int currentSheetIndex = -1;
-        int currentRowIndex = 0;
-        int startRowIndex = 0;
-        public ExcelReader(SpreadsheetDocument document)
+
+        int startColumn = 0;
+        int startRow = 0;
+        public ExcelReader(ExcelArchiveEntry document, ExcelConfiguration configuration, string? targetSheet = null)
         {
             this.document = document;
-            //sheetParts = document.WorkbookPart?.WorksheetParts ?? Enumerable.Empty<WorksheetPart>();
-            sheets = document.WorkbookPart?.Workbook.Descendants<Sheet>() ?? Enumerable.Empty<Sheet>();
+            this.configuration = configuration;
+            this.targetSheet = targetSheet;
+            sheetEnumerator = document.WorkBook.WorkSheets.GetEnumerator();
+            var (X, Y) = ReferenceHelper.ConvertCellReferenceToXY(configuration.StartCell);
+            startColumn = X ?? 0;
+            startRow = Y ?? 0;
         }
 
-        private CellValue? ElementAt(int i)
+        private Cell? ElementAt(int i)
         {
             if (i > cells.Length) return null;
-            return cells[i].CellValue;
+            return cells[i];
         }
 
         private Cell? CellAt(int i)
@@ -50,36 +57,32 @@ namespace LightExcel
             return cells[i];
         }
 
-        public void Close()
-        {
-            document?.Dispose();
-        }
 
         public bool GetBoolean(int i)
         {
             bool ret = false;
-            ElementAt(i)?.TryGetBoolean(out ret);
+            ElementAt(i)?.TryGetBoolean(Sst, out ret);
             return ret;
         }
 
         public DateTime GetDateTime(int i)
         {
             DateTime ret = DateTime.MinValue;
-            ElementAt(i)?.TryGetDateTime(out ret);
+            ElementAt(i)?.TryGetDateTime(Sst, out ret);
             return ret;
         }
 
         public decimal GetDecimal(int i)
         {
             decimal ret = default;
-            ElementAt(i)?.TryGetDecimal(out ret);
+            ElementAt(i)?.TryGetDecimal(Sst, out ret);
             return ret;
         }
 
         public double GetDouble(int i)
         {
             double ret = default;
-            ElementAt(i)?.TryGetDouble(out ret);
+            ElementAt(i)?.TryGetDouble(Sst, out ret);
             return ret;
         }
 
@@ -87,7 +90,7 @@ namespace LightExcel
         public int GetInt32(int i)
         {
             int ret = default;
-            ElementAt(i)?.TryGetInt(out ret);
+            ElementAt(i)?.TryGetInt(Sst, out ret);
             return ret;
         }
 
@@ -106,45 +109,76 @@ namespace LightExcel
             return Array.IndexOf(heads, name);
         }
 
-        public string GetString(int i)
+        public string GetValue(int i)
         {
-            return ElementAt(i)?.Text ?? "";
+            return ElementAt(i)?.GetCellValue(document.WorkBook.SharedStrings) ?? "";
+        }
+
+        bool HasSheet
+        {
+            get
+            {
+                if (targetSheet == null)
+                    return sheetEnumerator.MoveNext();
+                else
+                {
+                    while (sheetEnumerator.MoveNext())
+                    {
+                        if (sheetEnumerator.Current.Name == targetSheet)
+                        {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            }
         }
 
         public bool NextResult()
         {
-            currentSheetIndex++;
-            //currentSheet = sheetParts?.Skip(currentSheetIndex).FirstOrDefault()?.Worksheet.Descendants<SheetData>().First();
-            //rows = sheetParts.ElementAt(currentSheetIndex).Worksheet.Descendants<Row>().ToArray();
-            if (currentSheetIndex >= sheets.Count()) return false;
-            var sheet = sheets.ElementAt(currentSheetIndex);
-            var current = (WorksheetPart)document.WorkbookPart?.GetPartById(sheet!.Id!)!;
-            rows = current.Worksheet.Descendants<Row>().ToArray();
-            if (rows.Length > 0)
+            if (HasSheet)
             {
-                heads = rows[0].Descendants<Cell>().Select(c => c.GetCellValue(document.WorkbookPart) ?? "").ToArray();
-            }
-            currentRowIndex = 0;
-            return rows.Length > 0;
-        }
-
-        public bool Read()
-        {
-            if (currentRowIndex < rows.Length)
-            {
-                cells = GetCells(rows[currentRowIndex]).ToArray();
-                currentRowIndex++;
+                rowEnumerator = sheetEnumerator.Current.GetEnumerator();
+                if (configuration.UseHeader && configuration.StartCell == null && rowEnumerator.MoveNext())
+                {
+                    heads = rowEnumerator.Current.RowDatas.Select(c => c.GetCellValue(document.WorkBook.SharedStrings) ?? "").ToArray();
+                }
                 return true;
             }
             return false;
         }
 
-        IEnumerable<Cell> GetCells(Row row)
+        bool HasRows
         {
-            foreach (Cell item in row)
+            get
             {
-                yield return item;
+                if (startRow == 0)
+                    return rowEnumerator?.MoveNext() ?? false;
+                else
+                {
+                    while (rowEnumerator?.MoveNext() ?? false)
+                    {
+                        if (rowEnumerator.Current.RowIndex >= startRow)
+                        {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
             }
+        }
+
+        public bool Read()
+        {
+            if (HasRows)
+            {
+                if (startColumn > 1)
+                    cells = rowEnumerator!.Current.RowDatas.Skip(startColumn - 1).ToArray();
+                else
+                    cells = rowEnumerator!.Current.RowDatas.ToArray();
+                return true;
+            }
+            return false;
         }
 
         protected virtual void Dispose(bool disposing)
@@ -153,7 +187,7 @@ namespace LightExcel
             {
                 if (disposing)
                 {
-                    Close();
+                    document?.Dispose();
                 }
                 disposedValue = true;
             }

@@ -27,7 +27,7 @@ namespace LightExcel
       
         int GetOrdinal(string name);
        
-        string GetString(int i);
+        string GetValue(int i);
        
     }
 }

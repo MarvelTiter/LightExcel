@@ -23,7 +23,7 @@ namespace LightExcel.OpenXml
         public NumberingFormatCollection? NumberingFormats { get; set; }
         public CellFormatCollection? CellFormats { get; set; }
 
-        protected override IEnumerable<INode> GetChildrenImpl(XmlReader reader)
+        protected override IEnumerable<INode> GetChildrenImpl(LightExcelXmlReader reader)
         {
             throw new NotImplementedException();
         }

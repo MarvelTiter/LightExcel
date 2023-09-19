@@ -9,7 +9,6 @@ namespace LightExcel.OpenXml
 {
     internal abstract partial class XmlPart<T> : IXmlPart<T> where T : INode
     {
-        protected Stream? stream;
         private bool disposedValue;
         protected ZipArchive? archive;
         internal virtual string Path { get; }
@@ -31,7 +30,11 @@ namespace LightExcel.OpenXml
             using var writer = archive!.GetWriter(Path);
             WriteImpl(writer, children);
         }
-
+        public void Replace(IEnumerable<INode> children)
+        {
+            archive!.GetEntry(Path)?.Delete();
+            Write(children);
+        }
         protected abstract void WriteImpl(LightExcelStreamWriter writer, IEnumerable<INode> children);
 
         protected virtual void Dispose(bool disposing)

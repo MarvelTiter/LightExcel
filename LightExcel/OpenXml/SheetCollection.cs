@@ -23,18 +23,38 @@ namespace LightExcel.OpenXml
             this.configuration = configuration;
         }
 
-        protected override IEnumerable<Sheet> GetChildrenImpl(XmlReader reader)
+        protected override IEnumerable<Sheet> GetChildrenImpl(LightExcelXmlReader reader)
         {
-            while (reader.Read())
+            if (!reader.IsStartWith("workbook", XmlHelper.MainNs)) yield break;
+            if (!reader.ReadFirstContent()) yield break;
+            while (!reader.EOF)
             {
-                if (reader.LocalName == "sheet")
+                if (reader.IsStartWith("sheets", XmlHelper.MainNs))
                 {
-                    var id = reader["id", ExcelArchiveEntry.Relationships.NamespaceName] ?? throw new Exception("Excel Xml Sheet Error (without id)");
-                    var name = reader["name"] ?? throw new Exception("Excel Xml Sheet Error (without name)");
-                    var sid = int.Parse(reader["sheetId"] ?? throw new Exception("Excel Xml Sheet Error (without sheetId)"));
-                    var sheet = new Sheet(archive!, id, name, sid);
-                    sheet.NeedToSave = false;
-                    yield return sheet;
+                    if (!reader.ReadFirstContent()) 
+                        continue;
+                    while (!reader.EOF)
+                    {
+                        if (reader.IsStartWith("sheet", XmlHelper.MainNs))
+                        {
+                            var id = reader["id", XmlHelper.SpreadsheetmlXmlRelationshipns] ?? throw new Exception("Excel Xml Sheet Error (without id)");
+                            var name = reader["name"] ?? throw new Exception("Excel Xml Sheet Error (without name)");
+                            var sid = int.Parse(reader["sheetId"] ?? throw new Exception("Excel Xml Sheet Error (without sheetId)"));
+                            var sheet = new Sheet(archive!, id, name, sid);
+                            sheet.NeedToSave = false;
+                            // <MyNode /> 这样的节点需要调用
+                            reader.SkipContent();
+                            yield return sheet;
+                        }
+                        else if (!reader.SkipContent())
+                        {
+                            break;
+                        }
+                    }
+                }
+                else if (!reader.SkipContent())
+                {
+                    break;
                 }
             }
         }

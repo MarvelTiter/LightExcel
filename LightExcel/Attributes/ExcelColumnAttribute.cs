@@ -6,9 +6,12 @@ using System.Threading.Tasks;
 
 namespace LightExcel.Attributes
 {
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
     public class ExcelColumnAttribute : Attribute
     {
         public string? Name { get; set; }
         public bool Ignore { get; set; }
+        public bool NumberFormat { get; set; }
+        public int? ColumnIndex { get; set; }
     }
 }

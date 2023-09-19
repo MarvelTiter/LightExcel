@@ -22,7 +22,6 @@ namespace TestProject1
                     ["Column3"] = 111,
                     ["Column4"] = "Hello",
                     ["Column5"] = "World",
-
                 };
             }
         }
@@ -45,8 +44,10 @@ namespace TestProject1
         {
             var ie = Ge();
             ExcelHelper excel = new ExcelHelper();
-            excel.WriteExcelByTemplate("12test.xlsx", "1test.xlsx", ie);
-
+            excel.WriteExcelByTemplate("12test.xlsx", "路檢報表格式.xlsx", ie, config: config =>
+            {
+                config.AddNumberFormat("Column2");
+            });
         }
     }
 }

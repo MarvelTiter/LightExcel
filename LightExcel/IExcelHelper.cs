@@ -16,8 +16,8 @@ namespace LightExcel
     {
         void WriteExcel(string path, object data, string sheetName = "sheet", Action<ExcelConfiguration>? config = null);
         ITransactionExcelHelper BeginTransaction(string path, Action<ExcelConfiguration>? config = null);
-        IExcelDataReader ReadExcel(string path);
-        IEnumerable<T> QueryExcel<T>(string path, string? sheetName = null, int startRow = 2);
-        IEnumerable<dynamic> QueryExcel(string path, string? sheetName = null, int startRow = 2);
+        IExcelDataReader ReadExcel(string path, string? sheetName = null, Action<ExcelConfiguration>? config = null);
+        IEnumerable<T> QueryExcel<T>(string path, string sheetName = "sheet1", Action<ExcelConfiguration>? config = null);
+        IEnumerable<dynamic> QueryExcel(string path, string sheetName = "sheet1", Action<ExcelConfiguration>? config = null);
     }
 }

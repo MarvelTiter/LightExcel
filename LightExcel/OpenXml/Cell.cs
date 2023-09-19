@@ -9,6 +9,7 @@ namespace LightExcel.OpenXml
         public string? Type { get; set; }
         public string? StyleIndex { get; set; }
         public string? Value { get; set; }
+        public int? ColumnIndex { get; set; }
 
         public void WriteToXml(LightExcelStreamWriter writer)
         {
