@@ -77,7 +77,7 @@ namespace TestProject1
             ExcelHelper excel = new ExcelHelper();
             excel.WriteExcelByTemplate("12test.xlsx", "路檢報表格式.xlsx", ie, config: config =>
             {
-                config.AddNumberFormat("Column2");
+
             });
         }
     }
