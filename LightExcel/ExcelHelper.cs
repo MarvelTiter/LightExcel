@@ -11,8 +11,6 @@ namespace LightExcel
     {
         private readonly ExcelConfiguration configuration = new ExcelConfiguration();
 
-
-
         public IExcelDataReader ReadExcel(string path, string? sheetName = null, Action<ExcelConfiguration>? config = null)
         {
             config?.Invoke(configuration);

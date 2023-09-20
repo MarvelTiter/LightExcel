@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace LightExcel
 {
-    internal class ExcelColumnInfo
+    public sealed class ExcelColumnInfo
     {
         public string Name { get; }
         public bool Ignore { get; set; }
@@ -15,8 +15,8 @@ namespace LightExcel
         public string? Format { get; set; }
         public Type? Type { get; set; }
         public bool NumberFormat { get; set; }
-        internal int? ColumnIndex {  get; set; }
-        public ExcelColumnInfo(string name)
+        internal int ColumnIndex {  get; set; }
+        internal ExcelColumnInfo(string name)
         {
             Name = name;
         }

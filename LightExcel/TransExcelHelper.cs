@@ -27,23 +27,25 @@ namespace LightExcel
 
             this.configuration = configuration;
         }
-        public void WriteExcel(object data, string? sheetName = null)
+        public void WriteExcel(object data, string? sheetName = null, Action<TransConfiguration>? config = null)
         {
+            var cfg = new TransConfiguration();
+            config?.Invoke(cfg);
             var sheet = excelArchive!.WorkBook.AddNewSheet(sheetName);
-            var render = RenderProvider.GetDataRender(data.GetType());
-            var columns = render.CollectExcelColumnInfo(data, configuration);
-            var all = NeedToReaderRows(render, sheet, data, columns);
+            var render = RenderProvider.GetDataRender(data.GetType(), configuration);
+            var columns = render.CollectExcelColumnInfo(data);
+            var all = NeedToReaderRows(render, sheet, data, columns, cfg);
             sheet!.Write(all);
         }
 
-        private IEnumerable<Row> NeedToReaderRows(IDataRender render, Sheet sheet, object data, IEnumerable<ExcelColumnInfo> columns)
+        private IEnumerable<Row> NeedToReaderRows(IDataRender render, Sheet sheet, object data, IEnumerable<ExcelColumnInfo> columns, TransConfiguration transCfg)
         {
             if (configuration.UseHeader)
             {
-                var header = render.RenderHeader(columns, configuration);
+                var header = render.RenderHeader(columns, transCfg);
                 yield return header;
             }
-            var datas = render.RenderBody(data, sheet, columns, configuration);
+            var datas = render.RenderBody(data, sheet, columns, transCfg);
             foreach (var row in datas)
             {
                 yield return row;

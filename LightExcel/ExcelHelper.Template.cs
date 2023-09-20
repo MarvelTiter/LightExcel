@@ -29,8 +29,8 @@ namespace LightExcel
             var templateRow = sheet.ToList().Last();
             // 获取共享字符串列表
             var sst = doc.WorkBook.SharedStrings?.ToList();
-            var render = RenderProvider.GetDataRender(data.GetType());
-            var columns = configuration.FillWithPlacholder ? CollectExcelColumnInfos(templateRow, sst) : render.CollectExcelColumnInfo(data, configuration);
+            var render = RenderProvider.GetDataRender(data.GetType(), configuration);
+            var columns = configuration.FillWithPlacholder ? CollectExcelColumnInfos(templateRow, sst) : render.CollectExcelColumnInfo(data);
             if (configuration.FillWithPlacholder)
             {
                 templateRow.IsTemplateRow = true;
@@ -40,8 +40,9 @@ namespace LightExcel
             {
                 configuration.StartRowIndex = templateRow.RowIndex;
             }
-            var newRows = render.RenderBody(data, sheet, columns, configuration);
+            var newRows = render.RenderBody(data, sheet, columns, new TransConfiguration { SheetNumberFormat = configuration.AddSheetNumberFormat });
             sheet.Replace(sheet.Concat(newRows));
+            doc.Save();
         }
 
         static readonly Regex extract = new Regex("{{(.+)}}");
@@ -64,7 +65,7 @@ namespace LightExcel
                     if (match.Success)
                     {
                         name = match.Groups[1].Value;
-                        var col = new ExcelColumnInfo(name) { ColumnIndex = X };
+                        var col = new ExcelColumnInfo(name) { ColumnIndex = X ?? 0 };
                         yield return col;
                     }
                 }

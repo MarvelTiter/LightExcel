@@ -12,7 +12,7 @@ namespace LightExcel.Utils
     internal class ReferenceHelper
 #endif
     {
-        const string AZ = " ABCDEDFHIJKLMNOPQRSTUVWXYZ";
+        const string AZ = " ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         /// <summary>
         /// (1, 1) => A1 , (2, 2) => B2
         /// </summary>

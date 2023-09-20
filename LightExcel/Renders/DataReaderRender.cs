@@ -6,7 +6,8 @@ namespace LightExcel.Renders
 {
     internal class DataReaderRender : RenderBase
     {
-        public override IEnumerable<ExcelColumnInfo> CollectExcelColumnInfo(object data, ExcelConfiguration configuration)
+        public DataReaderRender(ExcelConfiguration configuration) : base(configuration) { }
+        public override IEnumerable<ExcelColumnInfo> CollectExcelColumnInfo(object data)
         {
             if (data is IDataReader d)
             {
@@ -14,34 +15,36 @@ namespace LightExcel.Renders
                 {
                     var name = d.GetName(i);
                     var col = new ExcelColumnInfo(name);
-                    col.NumberFormat = configuration.CheckCellNumberFormat(name);
+                    col.NumberFormat = Configuration.CheckCellNumberFormat(name);
                     col.Type = d.GetFieldType(i);
+                    col.ColumnIndex = i + 1;
                     yield return col;
                 }
             }
         }
 
-        public override IEnumerable<Row> RenderBody(object data, Sheet sheet, IEnumerable<ExcelColumnInfo> columns, ExcelConfiguration configuration)
+        public override IEnumerable<Row> RenderBody(object data, Sheet sheet, IEnumerable<ExcelColumnInfo> columns, TransConfiguration configuration)
         {
             var reader = data as IDataReader ?? throw new ArgumentException();
-            var rowIndex = configuration.StartRowIndex;
+            var rowIndex = Configuration.StartRowIndex;
             var maxColumnIndex = 0;
             while (reader.Read())
             {
                 var row = new Row() { RowIndex = ++rowIndex };
-                var cellIndex = 1;
+                var cellIndex = 0;
                 foreach (var col in columns)
                 {
                     if (col.Ignore) continue;
+                    var value = reader.GetValue(col.ColumnIndex - 1);
+                    cellIndex = col.ColumnIndex;
+                    var nf = configuration.NumberFormatColumnFilter(col);
+                    //var cell = CellHelper.CreateCell(cellIndex, rowIndex, value, col, nf, Configuration);
                     var cell = new Cell();
-                    var value = reader.GetValue(reader.GetOrdinal(col.Name));
-                    cellIndex = col.ColumnIndex ?? cellIndex;
                     cell.Reference = ReferenceHelper.ConvertXyToCellReference(cellIndex, rowIndex);
                     cell.Type = CellHelper.ConvertCellType(col.Type);
-                    cell.Value = CellHelper.GetCellValue(col, value, configuration);
-                    cell.StyleIndex = col.NumberFormat ? "1" : null;
+                    cell.Value = CellHelper.GetCellValue(col, value, Configuration);
+                    cell.StyleIndex = col.NumberFormat || configuration.NumberFormatColumnFilter(col) ? "1" : null;
                     row.AppendChild(cell);
-                    cellIndex++;
                 }
                 maxColumnIndex = Math.Max(maxColumnIndex, cellIndex);
                 yield return row;

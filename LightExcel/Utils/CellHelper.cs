@@ -1,11 +1,21 @@
 ﻿using LightExcel.OpenXml;
 using System.ComponentModel;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace LightExcel.Utils
 {
     internal static class CellHelper
     {
+        public static bool IsNumeric(this string self)
+        {
+            var match = Regex.IsMatch(self, @"([1-9]\d*\.?\d*)|(0\.\d*[1-9])");
+            return match;
+        }
+        internal static bool IsStringNumber(this object? value)
+        {
+            return value?.ToString()?.IsNumeric() ?? false;
+        }
         internal static string ConvertCellType(Type? type, bool shared = false)
         {
             if (type == null) return "str";
@@ -14,14 +24,22 @@ namespace LightExcel.Utils
             return Type.GetTypeCode(type) switch
             {
                 TypeCode.Boolean => "b",
-                TypeCode.DateTime => "d",
+                //TypeCode.DateTime => "d",
                 TypeCode.String when shared => "s",
                 _ => "str"
             };
         }
 
         internal static Cell EmptyCell(string cr) => new() { Reference = cr, Type = "str" };
-
+        internal static Cell CreateCell(int x, int y, object? value, ExcelColumnInfo col, bool filted, ExcelConfiguration config)
+        {
+            var cell = new Cell();
+            cell.Reference = ReferenceHelper.ConvertXyToCellReference(x, y);
+            cell.Type = config.GetValueTypeAtRuntime && (value?.IsStringNumber() ?? false) ? "n" : ConvertCellType(col.Type ?? value?.GetType());
+            cell.Value = GetCellValue(col, value, config);
+            cell.StyleIndex = col.NumberFormat || filted ? "1"  : null;
+            return cell;
+        }
         internal static string? GetCellValue(ExcelColumnInfo col, object? value, ExcelConfiguration configuration)
         {
             if (value == null) return null;

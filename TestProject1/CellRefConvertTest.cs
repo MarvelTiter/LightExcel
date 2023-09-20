@@ -16,6 +16,8 @@ namespace TestProject1
             Assert.IsTrue(r3 == "AA3");
             var r4 = ReferenceHelper.ConvertXyToCellReference(55, 5);
             Assert.IsTrue(r4 == "BC5");
+            var r5 = ReferenceHelper.ConvertXyToCellReference(7, 5);
+            Assert.IsTrue(r5 == "G5");
         }
 
         [TestMethod]

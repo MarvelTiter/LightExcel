@@ -2,14 +2,29 @@
 
 namespace LightExcel
 {
+    public class TransConfiguration
+    {
+        public bool SheetNumberFormat { get; set; }
+        public Func<ExcelColumnInfo, bool> NumberFormatColumnFilter { get; set; }
+        public TransConfiguration()
+        {
+            NumberFormatColumnFilter = col => SheetNumberFormat;
+        }
+
+    }
     public class ExcelConfiguration
     {
         List<string> NeedToFormatNumberColumns = new();
+        List<string> NeedToFormatNumberSheet = new();
         public bool UseHeader { get; set; } = true;
         public string? StartCell { get; set; }
         internal bool Readonly { get; set; }
         internal bool FillByTemplate { get; set; }
         internal int StartRowIndex { get; set; }
+        /// <summary>
+        /// 例如字符串类型的数字
+        /// </summary>
+        public bool GetValueTypeAtRuntime { get; set; }
         /// <summary>
         /// eg. {{Name}}，false => 按顺序填充
         /// </summary>
@@ -25,11 +40,27 @@ namespace LightExcel
             }
             return this;
         }
+        public bool AddSheetNumberFormat { get; set; }
+        public ExcelConfiguration AddNumberFormatAllSheet(string sheetName)
+        {
+            if (!NeedToFormatNumberSheet.Contains(sheetName))
+            {
+                NeedToFormatNumberSheet.Add(sheetName);
+            }
+            return this;
+        }
         internal bool CheckCellNumberFormat(string name, string? sheetName = null)
         {
-            sheetName ??= "All";
-            var key = $"{sheetName}_{name}";
-            return NeedToFormatNumberColumns.Contains(key);
+            if (!AddSheetNumberFormat)
+            {
+                sheetName ??= "All";
+                var key = $"{sheetName}_{name}";
+                return NeedToFormatNumberColumns.Contains(key);
+            }
+            else
+            {
+                return NeedToFormatNumberSheet.Contains(name) || NeedToFormatNumberSheet.Contains(sheetName);
+            }
         }
 
     }

@@ -31,7 +31,7 @@ namespace LightExcel.Utils
             return Expression.Lambda<Func<object, object>>(ret, pExp).Compile();
         }
     }
-    internal class Property
+    public class Property
     {
         public PropertyInfo Info { get; }
         ReflectGetter? getter;

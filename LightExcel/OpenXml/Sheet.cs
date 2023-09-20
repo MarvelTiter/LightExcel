@@ -34,7 +34,6 @@ namespace LightExcel.OpenXml
 
         public int MaxColumnIndex { get; set; }
         public int MaxRowIndex { get; set; }
-
         public void WriteToXml(LightExcelStreamWriter writer)
         {
             writer.Write($@"<sheet name=""{Name}"" sheetId=""{SheetIdx}"" r:id=""{Id}"" />");
@@ -44,14 +43,15 @@ namespace LightExcel.OpenXml
         {
             writer.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
             writer.Write("<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\">");
+            // dimension
             var dimensionWritePosition = writer.WriteAndFlush("<dimension ref=\"");
             writer.Write("                              />");
+            // cols 
             if (ColInfos != null)
             {
                 writer.Write(ColInfos);
             }
             writer.Write("<sheetData>");
-            // dimension
             foreach (INode child in children)
             {
                 child.WriteToXml(writer);

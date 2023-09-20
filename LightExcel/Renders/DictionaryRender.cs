@@ -6,41 +6,41 @@ namespace LightExcel.Renders
 {
     internal class DictionaryRender : RenderBase
     {
-        public override IEnumerable<ExcelColumnInfo> CollectExcelColumnInfo(object data, ExcelConfiguration configuration)
+        public DictionaryRender(ExcelConfiguration configuration):base(configuration) { }
+
+        public override IEnumerable<ExcelColumnInfo> CollectExcelColumnInfo(object data)
         {
             if (data is IEnumerable<Dictionary<string, object>> d)
             {
+                int index = 1;
                 foreach (var item in d.First().Keys)
                 {
                     var col = new ExcelColumnInfo(item);
-                    col.NumberFormat = configuration.CheckCellNumberFormat(item);
+                    col.NumberFormat = Configuration.CheckCellNumberFormat(item);
+                    col.ColumnIndex = index++;
                     yield return col;
                 }
             }
         }
 
-        public override IEnumerable<Row> RenderBody(object data, Sheet sheet, IEnumerable<ExcelColumnInfo> columns, ExcelConfiguration configuration)
+        public override IEnumerable<Row> RenderBody(object data, Sheet sheet, IEnumerable<ExcelColumnInfo> columns, TransConfiguration configuration)
         {
             var values = data as IEnumerable<Dictionary<string, object>> ?? throw new ArgumentException();
-            var rowIndex = configuration.StartRowIndex;
+            var rowIndex = Configuration.StartRowIndex;
             var maxColumnIndex = 0;
             foreach (var item in values!)
             {
                 if (item is null) continue;
                 var row = new Row() { RowIndex = ++rowIndex };
-                var cellIndex = 1;
+                var cellIndex = 0;
                 foreach (var col in columns)
                 {
                     if (col.Ignore) continue;
-                    var cell = new Cell();
                     var value = item[col.Name];
-                    cellIndex = col.ColumnIndex ?? cellIndex;
-                    cell.Reference = ReferenceHelper.ConvertXyToCellReference(cellIndex, rowIndex);
-                    cell.Type = CellHelper.ConvertCellType(value?.GetType());
-                    cell.Value = CellHelper.GetCellValue(col, value, configuration);
-                    cell.StyleIndex = col.NumberFormat ? "1" : null;
+                    cellIndex = col.ColumnIndex;
+                    var nf = configuration.NumberFormatColumnFilter(col);
+                    var cell = CellHelper.CreateCell(cellIndex, rowIndex, value, col, nf, Configuration);
                     row.AppendChild(cell);
-                    cellIndex++;
                 }
                 maxColumnIndex = Math.Max(maxColumnIndex, cellIndex);
                 yield return row;

@@ -6,19 +6,15 @@ namespace LightExcel
 {
     public class RenderProvider
     {
-        internal static IDataRender GetDataRender(Type dataType)
+        internal static IDataRender GetDataRender(Type dataType, ExcelConfiguration configuration)
         {
-            if (dataType == typeof(IDataReader))
+            if (typeof(IDataReader).IsAssignableFrom(dataType))
             {
-                //return new DataReaderRender();
+                return new DataReaderRender(configuration);
             }
             else if (dataType == typeof(DataTable))
             {
-                //return new DataTableRender();
-            }
-            else if (dataType == typeof(DataSet))
-            {
-                //return new DataSetRender();
+                return new DataTableRender(configuration);
             }
             else if (dataType.FindInterfaces((t, o) => t == typeof(IEnumerable), null).Length > 0)
             {
@@ -27,11 +23,11 @@ namespace LightExcel
                 {
                     if (elementType == typeof(Dictionary<string, object>))
                     {
-                        return new DictionaryRender();
+                        return new DictionaryRender(configuration);
                     }
                     else
                     {
-                        return new EnumerableEntityRender(elementType);
+                        return new EnumerableEntityRender(elementType, configuration);
                     }
                 }
             }
