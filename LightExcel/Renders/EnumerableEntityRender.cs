@@ -22,7 +22,8 @@ namespace LightExcel.Renders
             foreach (var prop in properties)
             {
                 ExcelColumnAttribute? excelColumnAttribute = prop.GetCustomAttribute<ExcelColumnAttribute>();
-                var col = new ExcelColumnInfo(excelColumnAttribute?.Name ?? prop.Name);
+				if (excelColumnAttribute?.Ignore ?? false) continue;
+				var col = new ExcelColumnInfo(excelColumnAttribute?.Name ?? prop.Name);
                 col.Ignore = excelColumnAttribute?.Ignore ?? false;
                 col.Property = new Property(prop);
                 col.Type = prop.PropertyType;
@@ -45,7 +46,6 @@ namespace LightExcel.Renders
                 var cellIndex = 0;
                 foreach (var col in columns)
                 {
-                    if (col.Ignore) continue;
                     if (col.Property == null)
                     {
                         var p = elementType.GetProperty(col.Name);
