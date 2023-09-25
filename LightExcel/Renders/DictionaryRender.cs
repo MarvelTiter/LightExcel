@@ -18,7 +18,8 @@ namespace LightExcel.Renders
                     var col = new ExcelColumnInfo(item);
                     col.NumberFormat = Configuration.CheckCellNumberFormat(item);
                     col.ColumnIndex = index++;
-                    yield return col;
+					AssignDynamicInfo(col);
+					yield return col;
                 }
             }
         }

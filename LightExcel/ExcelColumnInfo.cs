@@ -16,6 +16,7 @@ namespace LightExcel
         public Type? Type { get; set; }
         public bool NumberFormat { get; set; }
         internal int ColumnIndex {  get; set; }
+        public bool AutoWidth { get; set; }
         internal ExcelColumnInfo(string name)
         {
             Name = name;

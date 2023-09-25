@@ -35,5 +35,12 @@ namespace LightExcel.Renders
             }
             return row;
         }
+
+        protected void AssignDynamicInfo(ExcelColumnInfo origin)
+        {
+            var dyCol = Configuration[origin.Name];
+            origin.Format = dyCol?.Format;
+            origin.AutoWidth = dyCol?.AutoWidth ?? false;
+        }
     }
 }

@@ -30,6 +30,7 @@ namespace LightExcel.Renders
                 col.NumberFormat = excelColumnAttribute?.NumberFormat ?? false;
                 col.Format = excelColumnAttribute?.Format;
                 col.ColumnIndex = index++;
+                col.AutoWidth = excelColumnAttribute?.AutoWidth ?? false;
                 yield return col;
             }
         }

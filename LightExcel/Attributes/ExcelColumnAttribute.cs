@@ -14,5 +14,6 @@ namespace LightExcel.Attributes
         public bool NumberFormat { get; set; }
         public int? ColumnIndex { get; set; }
         public string? Format { get; set; }
+        public bool AutoWidth { get; set; }
     }
 }
