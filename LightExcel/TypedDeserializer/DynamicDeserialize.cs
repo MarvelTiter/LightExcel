@@ -15,11 +15,10 @@ namespace LightExcel.TypedDeserializer
                 {
                     if (table == null)
                     {
-                        string[] names = new string[fieldCount - (startColumn - 1)];
-                        for (int i = 1; i <= fieldCount; i++)
+                        string[] names = new string[fieldCount];
+                        for (int i = 0; i < fieldCount; i++)
                         {
-                            if (i < startColumn) continue;
-                            names[i - startColumn] = ReferenceHelper.ConvertX(i);
+                            names[i] = ReferenceHelper.ConvertX(startColumn + i);
                         }
                         table = new MapperTable(names);
                     }
