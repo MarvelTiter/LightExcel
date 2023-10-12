@@ -37,10 +37,7 @@ namespace TestProject1
         public void ExcelReaderTestDynamic()
         {
             ExcelHelper excel = new ExcelHelper();
-            var result = excel.QueryExcel("C:\\Users\\Marvel\\Desktop\\lsh.xlsx", config: config =>
-            {
-                config.StartCell = "E9";
-            });
+            var result = excel.QueryExcel("C:\\Users\\Marvel\\Desktop\\lsh.xlsx");
             foreach (var field in result)
             {
                 Console.WriteLine($"E: {field.E}, F: {field.F}");

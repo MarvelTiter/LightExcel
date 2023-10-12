@@ -28,8 +28,8 @@ namespace LightExcel
         Cell[] cells = Array.Empty<Cell>();
         string[] heads = Array.Empty<string>();
 
-        int startColumn = 0;
-        int startRow = 0;
+        int startColumn = 1;
+        int startRow = 1;
         public ExcelReader(ExcelArchiveEntry document, ExcelConfiguration configuration, string? targetSheet = null)
         {
             this.document = document;
@@ -37,8 +37,8 @@ namespace LightExcel
             this.targetSheet = targetSheet;
             sheetEnumerator = document.WorkBook.WorkSheets.GetEnumerator();
             var (X, Y) = ReferenceHelper.ConvertCellReferenceToXY(configuration.StartCell);
-            startColumn = X ?? 0;
-            startRow = Y ?? 0;
+            startColumn = X ?? 1;
+            startRow = Y ?? 1;
         }
 
         private Cell? ElementAt(int i)
