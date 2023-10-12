@@ -8,6 +8,8 @@ namespace LightExcel
         bool Read();
         bool NextResult();
 
+        IEnumerable<dynamic> AsDynamic();
+        IEnumerable<TData> AsTyped<TData>();
         string? this[string name] { get; }
         string? this[int i] { get; }
         string CurrentSheetName { get; }

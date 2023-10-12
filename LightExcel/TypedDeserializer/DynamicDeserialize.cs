@@ -4,7 +4,7 @@ namespace LightExcel.TypedDeserializer
 {
     internal static class DynamicDeserialize
     {
-        internal static Func<IExcelDataReader, object> GetMapperRowDeserializer(IExcelDataReader reader)
+        internal static Func<IExcelDataReader, object> GetMapperRowDeserializer(IExcelDataReader reader, int startColumn)
         {
             var fieldCount = reader.FieldCount;
 
@@ -15,10 +15,11 @@ namespace LightExcel.TypedDeserializer
                 {
                     if (table == null)
                     {
-                        string[] names = new string[fieldCount];
+                        string[] names = new string[fieldCount - (startColumn - 1)];
                         for (int i = 1; i <= fieldCount; i++)
                         {
-                            names[i - 1] = ReferenceHelper.ConvertX(i);
+                            if (i < startColumn) continue;
+                            names[i - startColumn] = ReferenceHelper.ConvertX(i);
                         }
                         table = new MapperTable(names);
                     }

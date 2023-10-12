@@ -1,6 +1,9 @@
 ﻿using LightExcel.OpenXml;
+using LightExcel.TypedDeserializer;
 using LightExcel.Utils;
 using System.Data;
+using System.Reflection.PortableExecutable;
+
 namespace LightExcel
 {
     internal class ExcelReader : IExcelDataReader
@@ -195,6 +198,24 @@ namespace LightExcel
         {
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
+        }
+
+        public IEnumerable<dynamic> AsDynamic()
+        {
+            Func<IExcelDataReader, object>? deserializer = null;
+            while (Read())
+            {
+                deserializer ??= DynamicDeserialize.GetMapperRowDeserializer(this, startColumn);
+                yield return deserializer.Invoke(this);
+            }
+        }
+
+        public IEnumerable<TData> AsTyped<TData>()
+        {
+            while (Read())
+            {
+                yield return ExpressionDeserialize<TData>.Deserialize(this);
+            }
         }
     }
 }

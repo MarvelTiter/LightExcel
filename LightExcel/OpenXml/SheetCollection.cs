@@ -24,8 +24,9 @@ namespace LightExcel.OpenXml
             {
                 if (reader.IsStartWith("sheets", XmlHelper.MainNs))
                 {
-                    if (!reader.ReadFirstContent()) 
+                    if (!reader.ReadFirstContent())
                         continue;
+                    int index = 0;
                     while (!reader.EOF)
                     {
                         if (reader.IsStartWith("sheet", XmlHelper.MainNs))
@@ -33,8 +34,12 @@ namespace LightExcel.OpenXml
                             var id = reader["id", XmlHelper.SpreadsheetmlXmlRelationshipns] ?? throw new Exception("Excel Xml Sheet Error (without id)");
                             var name = reader["name"] ?? throw new Exception("Excel Xml Sheet Error (without name)");
                             var sid = int.Parse(reader["sheetId"] ?? throw new Exception("Excel Xml Sheet Error (without sheetId)"));
-                            var sheet = new Sheet(archive!, id, name, sid);
-                            sheet.NeedToSave = false;
+                            var sheet = new Sheet(archive!, id, name, sid)
+                            {
+                                NeedToSave = false,
+                                Seq = index
+                            };
+                            index += 1;
                             // <MyNode /> 这样的节点需要调用
                             reader.SkipContent();
                             yield return sheet;

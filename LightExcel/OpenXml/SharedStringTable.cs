@@ -23,13 +23,15 @@ namespace LightExcel.OpenXml
             {
                 if (cached == null)
                 {
-                    return GetChildren().ElementAt(index).Content;
+                    Flush();
                 }
-                else
-                {
-                    return cached[index].Content;
-                }
+                return cached![index].Content;
             }
+        }
+
+        private void Flush()
+        {
+            _ = GetChildren().ToList();
         }
 
         protected override IEnumerable<SharedStringNode> GetChildrenImpl(LightExcelXmlReader reader)

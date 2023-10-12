@@ -20,7 +20,6 @@ namespace LightExcel
 
         public IEnumerable<T> QueryExcel<T>(string path, string sheetName = "sheet1", Action<ExcelConfiguration>? config = null)
         {
-            configuration.StartCell = null;
             using var reader = ReadExcel(path, sheetName, config);
             while (reader.NextResult())
             {
@@ -33,15 +32,12 @@ namespace LightExcel
 
         public IEnumerable<dynamic> QueryExcel(string path, string sheetName = "sheet1", Action<ExcelConfiguration>? config = null)
         {
-            configuration.StartCell = null;
             using var reader = ReadExcel(path, sheetName, config);
-            Func<IExcelDataReader, object>? deserializer = null;
             while (reader.NextResult())
             {
-                while (reader.Read())
+                foreach (var item in reader.AsDynamic())
                 {
-                    deserializer ??= DynamicDeserialize.GetMapperRowDeserializer(reader);
-                    yield return deserializer.Invoke(reader);
+                    yield return item;
                 }
             }
         }

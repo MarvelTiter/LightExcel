@@ -11,9 +11,13 @@ namespace LightExcel.OpenXml
 {
     internal abstract partial class XmlPart<T>
     {
+        protected virtual LightExcelXmlReader? GetXmlReader()
+        {
+            return archive!.GetXmlReader(Path);
+        }
         protected virtual IEnumerable<T> GetChildren()
         {
-            using var reader = archive!.GetXmlReader(Path);
+            using var reader = GetXmlReader();
             if (reader == null) yield break;
             cached ??= new List<T>();
             foreach (var item in GetChildrenImpl(reader))

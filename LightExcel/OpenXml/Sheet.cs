@@ -26,11 +26,25 @@ namespace LightExcel.OpenXml
         }
 
         public string Id { get; set; }
+        /// <summary>
+        /// 在集合中的顺序（保底机制
+        /// </summary>
+        public int Seq { get; set; }
         public string? Name { get; set; }
         public int SheetIdx { get; set; }
         public bool NeedToSave { get; set; } = true;
         internal override string Path => $"xl/worksheets/sheet{SheetIdx}.xml";
         public string RelPath => $"worksheets/sheet{SheetIdx}.xml";
+
+        protected override LightExcelXmlReader? GetXmlReader()
+        {
+            var reader = base.GetXmlReader();
+            if (reader == null)
+            {
+                reader = archive?.GetXmlReader($"xl/worksheets/sheet{Seq + 1}.xml");
+            }
+            return reader;
+        }
 
         public int MaxColumnIndex { get; set; }
         public int MaxRowIndex { get; set; }
