@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.IO;
 using System.Text.RegularExpressions;
 using LightExcel.OpenXml;
 using LightExcel.TypedDeserializer;
@@ -6,7 +7,6 @@ using LightExcel.Utils;
 
 namespace LightExcel
 {
-
     public partial class ExcelHelper : IExcelHelper
     {
         private readonly ExcelConfiguration configuration = new ExcelConfiguration();
@@ -61,5 +61,7 @@ namespace LightExcel
             config?.Invoke(configuration);
             return new TransExcelHelper(path, configuration);
         }
+
+        
     }
 }

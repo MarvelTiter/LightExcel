@@ -15,7 +15,12 @@ namespace LightExcel.OpenXml
         public static ExcelArchiveEntry Open(string path, ExcelConfiguration configuration)
         {
             var fs = File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
-            var zip = new ExcelArchiveEntry(fs, configuration);
+            return Open(fs, configuration);
+        }
+
+        public static ExcelArchiveEntry Open(Stream stream, ExcelConfiguration configuration)
+        {
+            var zip = new ExcelArchiveEntry(stream, configuration);
             //TODO: 打开操作
             zip.WorkBook.InitStyleSheet();
             zip.WorkBook.InitSharedStringTable();
