@@ -18,7 +18,7 @@ namespace LightExcel
             return new ExcelReader(archive, configuration, sheetName);
         }
 
-        public IEnumerable<T> QueryExcel<T>(string path, string sheetName = "sheet1", Action<ExcelConfiguration>? config = null)
+        public IEnumerable<T> QueryExcel<T>(string path, string sheetName = "Sheet1", Action<ExcelConfiguration>? config = null)
         {
             using var reader = ReadExcel(path, sheetName, config);
             while (reader.NextResult())
@@ -30,7 +30,7 @@ namespace LightExcel
             }
         }
 
-        public IEnumerable<dynamic> QueryExcel(string path, string sheetName = "sheet1", Action<ExcelConfiguration>? config = null)
+        public IEnumerable<dynamic> QueryExcel(string path, string sheetName = "Sheet1", Action<ExcelConfiguration>? config = null)
         {
             using var reader = ReadExcel(path, sheetName, config);
             while (reader.NextResult())
@@ -42,14 +42,14 @@ namespace LightExcel
             }
         }
 
-        public void WriteExcel(string path, object data, string sheetName = "sheet1", Action<ExcelConfiguration>? config = null)
+        public void WriteExcel(string path, object data, string sheetName = "Sheet1", Action<ExcelConfiguration>? config = null)
         {
             if (File.Exists(path)) File.Delete(path);
             config?.Invoke(configuration);
             using var trans = new TransExcelHelper(path, configuration);
             trans.WriteExcel(data, sheetName);
         }
-        public void WriteExcelByTemplate(string path, string template, object data, string sheetName = "sheet1", Action<ExcelConfiguration>? config = null)
+        public void WriteExcelByTemplate(string path, string template, object data, string sheetName = "Sheet1", Action<ExcelConfiguration>? config = null)
         {
             config?.Invoke(configuration);
             HandleWriteTemplate(path, template, data, sheetName);

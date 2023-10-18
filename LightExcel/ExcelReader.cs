@@ -41,15 +41,10 @@ namespace LightExcel
             startRow = Y ?? 1;
         }
 
-        private Cell? ElementAt(int i)
-        {
-            if (i > cells.Length) return null;
-            return cells[i];
-        }
 
         private Cell? CellAt(int i)
         {
-            if (i > cells.Length) return null;
+            if (i < 0 || i > cells.Length) return null;
             return cells[i];
         }
 
@@ -57,28 +52,28 @@ namespace LightExcel
         public bool GetBoolean(int i)
         {
             bool ret = false;
-            ElementAt(i)?.TryGetBoolean(Sst, out ret);
+            CellAt(i)?.TryGetBoolean(Sst, out ret);
             return ret;
         }
 
         public DateTime GetDateTime(int i)
         {
             DateTime ret = DateTime.MinValue;
-            ElementAt(i)?.TryGetDateTime(Sst, out ret);
+            CellAt(i)?.TryGetDateTime(Sst, out ret);
             return ret;
         }
 
         public decimal GetDecimal(int i)
         {
             decimal ret = default;
-            ElementAt(i)?.TryGetDecimal(Sst, out ret);
+            CellAt(i)?.TryGetDecimal(Sst, out ret);
             return ret;
         }
 
         public double GetDouble(int i)
         {
             double ret = default;
-            ElementAt(i)?.TryGetDouble(Sst, out ret);
+            CellAt(i)?.TryGetDouble(Sst, out ret);
             return ret;
         }
 
@@ -86,13 +81,13 @@ namespace LightExcel
         public int GetInt32(int i)
         {
             int ret = default;
-            ElementAt(i)?.TryGetInt(Sst, out ret);
+            CellAt(i)?.TryGetInt(Sst, out ret);
             return ret;
         }
 
         public bool IsNullOrEmpty(int i)
         {
-            return string.IsNullOrEmpty(ElementAt(i)?.Value);
+            return string.IsNullOrEmpty(CellAt(i)?.Value);
         }
 
 
@@ -112,7 +107,7 @@ namespace LightExcel
 
         public string GetValue(int i)
         {
-            return ElementAt(i)?.GetCellValue(document.WorkBook.SharedStrings) ?? "";
+            return CellAt(i)?.GetCellValue(Sst) ?? "";
         }
 
         bool HasSheet
@@ -140,9 +135,10 @@ namespace LightExcel
             if (HasSheet)
             {
                 rowEnumerator = sheetEnumerator.Current.GetEnumerator();
-                if (configuration.UseHeader && configuration.StartCell == null && rowEnumerator.MoveNext())
+                if (configuration.UseHeader && rowEnumerator.MoveNext())
                 {
-                    heads = rowEnumerator.Current.RowDatas.Select(c => c.GetCellValue(document.WorkBook.SharedStrings) ?? "").ToArray();
+                    heads = rowEnumerator.Current.RowDatas.Select(c => c.GetCellValue(Sst) ?? "").ToArray();
+                    startRow += 1;
                 }
                 return true;
             }
@@ -153,6 +149,7 @@ namespace LightExcel
         {
             get
             {
+                // TODO startRow更改过，需要重新评估这里的代码
                 if (startRow == 0)
                     return rowEnumerator?.MoveNext() ?? false;
                 else
@@ -199,7 +196,14 @@ namespace LightExcel
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
-
+        /// <summary>
+        /// <para>根据Excel列取值</para>
+        /// <para>eg: </para>
+        /// <code>var datas = reader.AsDynamic();</code>
+        /// <code>var a = datas.A; </code>
+        /// <code>var b = datas.B; </code>
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<dynamic> AsDynamic()
         {
             Func<IExcelDataReader, object>? deserializer = null;

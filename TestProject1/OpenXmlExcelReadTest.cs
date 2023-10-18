@@ -37,11 +37,19 @@ namespace TestProject1
         public void ExcelReaderTestDynamic()
         {
             ExcelHelper excel = new ExcelHelper();
-            var result = excel.QueryExcel("C:\\Users\\Marvel\\Desktop\\lsh.xlsx");
-            foreach (var field in result)
+            var reader = excel.ReadExcel("C:\\Users\\Marvel\\Desktop\\截止20231017二期车证.xlsx");
+            while (reader.NextResult())
             {
-                Console.WriteLine($"E: {field.E}, F: {field.F}");
+                while (reader.Read())
+                {
+                    Console.WriteLine($"D: {reader["车牌号码"]}, E: {reader["车辆识别代码后4位"]}");
+                }
             }
+            //var resule = excel.QueryExcel("C:\\Users\\Marvel\\Desktop\\截止20231017二期车证.xlsx");
+            //foreach (var field in result)
+            //{
+            //    Console.WriteLine($"D: {field.D}, E: {field.E}");
+            //}
         }
 
     }

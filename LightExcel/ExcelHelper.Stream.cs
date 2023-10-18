@@ -17,7 +17,7 @@ namespace LightExcel
             return new ExcelReader(archive, configuration, sheetName);
         }
 
-        public IEnumerable<T> QueryExcel<T>(Stream stream, string sheetName = "sheet1", Action<ExcelConfiguration>? config = null)
+        public IEnumerable<T> QueryExcel<T>(Stream stream, string sheetName = "Sheet1", Action<ExcelConfiguration>? config = null)
         {
             using var reader = ReadExcel(stream, sheetName, config);
             while (reader.NextResult())
@@ -29,7 +29,7 @@ namespace LightExcel
             }
         }
 
-        public IEnumerable<dynamic> QueryExcel(Stream stream, string sheetName = "sheet1", Action<ExcelConfiguration>? config = null)
+        public IEnumerable<dynamic> QueryExcel(Stream stream, string sheetName = "Sheet1", Action<ExcelConfiguration>? config = null)
         {
             using var reader = ReadExcel(stream, sheetName, config);
             while (reader.NextResult())
