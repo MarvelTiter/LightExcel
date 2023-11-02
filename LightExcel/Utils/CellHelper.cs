@@ -1,5 +1,7 @@
 ﻿using LightExcel.OpenXml;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
@@ -35,11 +37,109 @@ namespace LightExcel.Utils
         {
             var cell = new Cell();
             cell.Reference = ReferenceHelper.ConvertXyToCellReference(x, y);
-            cell.Type = config.GetValueTypeAtRuntime && (value?.IsStringNumber() ?? false) ? "n" : ConvertCellType(col.Type ?? value?.GetType());
-            cell.Value = GetCellValue(col, value, config);
-            cell.StyleIndex = col.NumberFormat || filted ? "1"  : null;
+            //cell.Type = config.GetValueTypeAtRuntime && (value?.IsStringNumber() ?? false) ? "n" : ConvertCellType(col.Type ?? value?.GetType());
+            //cell.Value = GetCellValue(col, value, config);
+            var (v, t) = FormatCell(value, config, col);
+            cell.Value = v;
+            cell.Type = t;
+            cell.StyleIndex = col.NumberFormat || filted ? "1" : null;
             return cell;
         }
+        internal static (string?, string?) FormatCell(object? value, ExcelConfiguration config, ExcelColumnInfo info)
+        {
+            var v = string.Empty;
+            var t = "str";
+            if (value == null)
+            {
+                return (v, t);
+            }
+            if (value is string str)
+            {
+                v = value.ToString();
+            }
+            else if (info.Format != null && value is IFormattable formattable)
+            {
+                v = formattable.ToString(info.Format, config.CultureInfo);
+            }
+            else
+            {
+                Type? type = info.Type;
+                if (info.Type == null || info.Type == typeof(object))
+                {
+                    type = value.GetType();
+                    type = Nullable.GetUnderlyingType(type) ?? type;
+                }
+
+                if (type!.IsEnum)
+                {
+                    t = "str";
+                    var field = type.GetField(value.ToString()!);
+                    v = field?.GetCustomAttribute<DisplayAttribute>()?.Name
+                        ?? field?.GetCustomAttribute<DescriptionAttribute>()?.Description
+                        ?? value.ToString();
+                }
+                else if (TypeHelper.IsNumber(type))
+                {
+                    if (config.CultureInfo != CultureInfo.InvariantCulture)
+                        t = "str";
+                    else
+                        t = "n";
+
+                    if (type.IsAssignableFrom(typeof(decimal)))
+                        v = ((decimal)value).ToString(config.CultureInfo);
+                    else if (type.IsAssignableFrom(typeof(Int32)))
+                        v = ((Int32)value).ToString(config.CultureInfo);
+                    else if (type.IsAssignableFrom(typeof(Double)))
+                        v = ((Double)value).ToString(config.CultureInfo);
+                    else if (type.IsAssignableFrom(typeof(Int64)))
+                        v = ((Int64)value).ToString(config.CultureInfo);
+                    else if (type.IsAssignableFrom(typeof(UInt32)))
+                        v = ((UInt32)value).ToString(config.CultureInfo);
+                    else if (type.IsAssignableFrom(typeof(UInt16)))
+                        v = ((UInt16)value).ToString(config.CultureInfo);
+                    else if (type.IsAssignableFrom(typeof(UInt64)))
+                        v = ((UInt64)value).ToString(config.CultureInfo);
+                    else if (type.IsAssignableFrom(typeof(Int16)))
+                        v = ((Int16)value).ToString(config.CultureInfo);
+                    else if (type.IsAssignableFrom(typeof(Single)))
+                        v = ((Single)value).ToString(config.CultureInfo);
+                    else if (type.IsAssignableFrom(typeof(Single)))
+                        v = ((Single)value).ToString(config.CultureInfo);
+                    else
+                        v = decimal.Parse(value.ToString()!).ToString(config.CultureInfo);
+                }
+                else if (type == typeof(bool))
+                {
+                    t = "b";
+                    v = (bool)value ? "1" : "0";
+                }
+                else if (type == typeof(DateTime))
+                {
+                    if (config.CultureInfo != CultureInfo.InvariantCulture)
+                    {
+                        t = "str";
+                        v = ((DateTime)value).ToString(config.CultureInfo);
+                    }
+                    else if (info.Format == null)
+                    {
+                        t = null;
+                        v = ((DateTime)value).ToOADate().ToString(CultureInfo.InvariantCulture);
+                    }
+                    else
+                    {
+                        t = "str";
+                        v = ((DateTime)value).ToString(info.Format, config.CultureInfo);
+                    }
+                }
+                else
+                {
+                    v = value.ToString();
+                }
+            }
+
+            return (v, t);
+        }
+
         internal static string? GetCellValue(ExcelColumnInfo col, object? value, ExcelConfiguration configuration)
         {
             if (value == null) return null;

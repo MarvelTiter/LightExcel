@@ -13,7 +13,7 @@ namespace LightExcel.OpenXml
 
         public void WriteToXml(LightExcelStreamWriter writer)
         {
-            writer.Write($"<c r=\"{Reference}\" t=\"{Type}\" {(StyleIndex != null ? $"s=\"{StyleIndex}\"":"")}>");
+            writer.Write($"<c r=\"{Reference}\" {(Type == null ? "": $"t=\"{Type}\"")} {(StyleIndex != null ? $"s=\"{StyleIndex}\"":"")}>");
             writer.Write($"<v>{Value}</v>");
             writer.Write("</c>");
         }

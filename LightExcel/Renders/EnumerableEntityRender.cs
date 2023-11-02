@@ -55,11 +55,16 @@ namespace LightExcel.Renders
                     }
                     var value = col.Property.GetValue(item);
                     cellIndex = col.ColumnIndex;
-                    var cell = new Cell();
-                    cell.Reference = ReferenceHelper.ConvertXyToCellReference(cellIndex, rowIndex);
-                    cell.Type = CellHelper.ConvertCellType(col.Type);
-                    cell.Value = CellHelper.GetCellValue(col, value, Configuration);
-                    cell.StyleIndex = col.NumberFormat || configuration.NumberFormatColumnFilter(col) ? "1" : null;
+                    //var cell = new Cell();
+                    //cell.Reference = ReferenceHelper.ConvertXyToCellReference(cellIndex, rowIndex);
+                    //var (v, t) = CellHelper.FormatCell(value, Configuration, col);
+                    ////cell.Type = CellHelper.ConvertCellType(col.Type);
+                    ////cell.Value = CellHelper.GetCellValue(col, value, Configuration);
+                    //cell.Value = v;
+                    //cell.Type = t;
+                    //cell.StyleIndex = col.NumberFormat || configuration.NumberFormatColumnFilter(col) ? "1" : null;
+                    var nf = configuration.NumberFormatColumnFilter(col);
+                    var cell = CellHelper.CreateCell(cellIndex, rowIndex, value, col, nf, Configuration);
                     row.AppendChild(cell);
                 }
                 maxColumnIndex = Math.Max(maxColumnIndex, cellIndex);
