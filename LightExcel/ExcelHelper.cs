@@ -18,8 +18,12 @@ namespace LightExcel
             return new ExcelReader(archive, configuration, sheetName);
         }
 
-        public IEnumerable<T> QueryExcel<T>(string path, string? sheetName = null, Action<ExcelConfiguration>? config = null)
+        public IEnumerable<T> QueryExcel<T>(string path, string? sheetName, Action<ExcelConfiguration>? config = null)
         {
+            if (string.IsNullOrEmpty(sheetName))
+            {
+                throw new ArgumentNullException(nameof(sheetName));
+            }
             using var reader = ReadExcel(path, sheetName, config);
             while (reader.NextResult())
             {
@@ -30,8 +34,12 @@ namespace LightExcel
             }
         }
 
-        public IEnumerable<dynamic> QueryExcel(string path, string? sheetName = null, Action<ExcelConfiguration>? config = null)
+        public IEnumerable<dynamic> QueryExcel(string path, string? sheetName, Action<ExcelConfiguration>? config = null)
         {
+            if (string.IsNullOrEmpty(sheetName))
+            {
+                throw new ArgumentNullException(nameof(sheetName));
+            }
             using var reader = ReadExcel(path, sheetName, config);
             while (reader.NextResult())
             {

@@ -1,4 +1,5 @@
 ﻿using LightExcel;
+using System.Data;
 using System.Diagnostics;
 using System.Text;
 using System.Xml.Linq;
@@ -40,6 +41,26 @@ namespace TestProject1
                 };
             }
         }
+
+        public static DataTable GetDataTable()
+        {
+            DataTable dt = new DataTable();
+            for (int i = 0; i < 10; i++)
+            {
+                dt.Columns.Add($"Column{i}");
+            }
+            for (int i = 0; i < 10; i++)
+            {
+                var row = dt.NewRow();
+                for (int j = 0; j < 10; j++)
+                {
+                    //row[j] = $"D({i}x{j})";
+                    row[j] = $"{i * j}";
+                }
+                dt.Rows.Add(row);
+            }
+            return dt;
+        }
     }
     [TestClass]
     public class OpenXmlExcelTest
@@ -66,6 +87,13 @@ namespace TestProject1
             Process.Start("powershell", $"start {AppDomain.CurrentDomain.BaseDirectory}");
         }
 
+        [TestMethod]
+        public void CreateExcelDataTable()
+        {
+            ExcelHelper excel = new();
+            excel.WriteExcel("dttest.xlsx", Datas.GetDataTable());
+            Process.Start("powershell", $"start {AppDomain.CurrentDomain.BaseDirectory}");
+        }
 
         [TestMethod]
         public void TemplateTest()
