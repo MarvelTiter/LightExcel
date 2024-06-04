@@ -2,6 +2,7 @@
 using LightExcel.OpenXml;
 using LightExcel.Utils;
 using System.Collections;
+using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
 namespace LightExcel.Renders
@@ -22,8 +23,9 @@ namespace LightExcel.Renders
             foreach (var prop in properties)
             {
                 ExcelColumnAttribute? excelColumnAttribute = prop.GetCustomAttribute<ExcelColumnAttribute>();
-				if (excelColumnAttribute?.Ignore ?? false) continue;
-				var col = new ExcelColumnInfo(excelColumnAttribute?.Name ?? prop.Name);
+                DisplayAttribute? displayAttribute = prop.GetCustomAttribute<DisplayAttribute>();
+                if (excelColumnAttribute?.Ignore ?? false) continue;
+                var col = new ExcelColumnInfo(excelColumnAttribute?.Name ?? displayAttribute?.Name ?? prop.Name);
                 col.Ignore = excelColumnAttribute?.Ignore ?? false;
                 col.Property = new Property(prop);
                 col.Type = prop.PropertyType;
