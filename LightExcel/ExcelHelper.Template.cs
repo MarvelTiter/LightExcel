@@ -65,7 +65,7 @@ namespace LightExcel
                     if (match.Success)
                     {
                         name = match.Groups[1].Value;
-                        var col = new ExcelColumnInfo(name) { ColumnIndex = X ?? 0 };
+                        var col = new ExcelColumnInfo(name) { ColumnIndex = X ?? 0, StyleIndex = cell.StyleIndex };
                         yield return col;
                     }
                 }

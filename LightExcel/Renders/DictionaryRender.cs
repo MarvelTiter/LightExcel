@@ -6,7 +6,7 @@ namespace LightExcel.Renders
 {
     internal class DictionaryRender : RenderBase
     {
-        public DictionaryRender(ExcelConfiguration configuration):base(configuration) { }
+        public DictionaryRender(ExcelConfiguration configuration) : base(configuration) { }
 
         public override IEnumerable<ExcelColumnInfo> CollectExcelColumnInfo(object data)
         {
@@ -18,8 +18,8 @@ namespace LightExcel.Renders
                     var col = new ExcelColumnInfo(item);
                     col.NumberFormat = Configuration.CheckCellNumberFormat(item);
                     col.ColumnIndex = index++;
-					AssignDynamicInfo(col);
-					yield return col;
+                    AssignDynamicInfo(col);
+                    yield return col;
                 }
             }
         }
@@ -37,7 +37,7 @@ namespace LightExcel.Renders
                 foreach (var col in columns)
                 {
                     if (col.Ignore) continue;
-                    var value = item[col.Name];
+                    item.TryGetValue(col.Name, out var value);
                     cellIndex = col.ColumnIndex;
                     var nf = configuration.NumberFormatColumnFilter(col);
                     var cell = CellHelper.CreateCell(cellIndex, rowIndex, value, col, nf, Configuration);

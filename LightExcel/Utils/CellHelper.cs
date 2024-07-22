@@ -42,7 +42,7 @@ namespace LightExcel.Utils
             var (v, t) = FormatCell(value, config, col);
             cell.Value = v;
             cell.Type = t;
-            cell.StyleIndex = col.NumberFormat || filted ? "1" : null;
+            cell.StyleIndex = col.StyleIndex ?? (col.NumberFormat || filted ? "1" : null);
             return cell;
         }
         internal static (string?, string?) FormatCell(object? value, ExcelConfiguration config, ExcelColumnInfo info)
