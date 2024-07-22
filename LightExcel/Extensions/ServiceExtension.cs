@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿#if NET6_0_OR_GREATER
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,3 +17,5 @@ namespace LightExcel
         }
     }
 }
+
+#endif

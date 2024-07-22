@@ -1,8 +1,6 @@
 ﻿using LightExcel.OpenXml;
 using LightExcel.TypedDeserializer;
 using LightExcel.Utils;
-using System.Data;
-using System.Reflection.PortableExecutable;
 
 namespace LightExcel
 {
@@ -25,8 +23,8 @@ namespace LightExcel
 
         public int FieldCount => cells.Length;
 
-        Cell[] cells = Array.Empty<Cell>();
-        string[] heads = Array.Empty<string>();
+        Cell[] cells = [];
+        string[] heads = [];
 
         int startColumn = 1;
         int startRow = 1;

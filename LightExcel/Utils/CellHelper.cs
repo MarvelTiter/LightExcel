@@ -1,6 +1,5 @@
 ﻿using LightExcel.OpenXml;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -74,9 +73,13 @@ namespace LightExcel.Utils
                 {
                     t = "str";
                     var field = type.GetField(value.ToString()!);
-                    v = field?.GetCustomAttribute<DisplayAttribute>()?.Name
+#if NET6_0_OR_GREATER
+                    v = field?.GetCustomAttribute<System.ComponentModel.DataAnnotations.DisplayAttribute>()?.Name
                         ?? field?.GetCustomAttribute<DescriptionAttribute>()?.Description
                         ?? value.ToString();
+#else
+                    v = field?.GetCustomAttribute<DescriptionAttribute>()?.Description ?? value.ToString();
+#endif
                 }
                 else if (TypeHelper.IsNumber(type))
                 {

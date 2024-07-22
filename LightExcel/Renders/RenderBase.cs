@@ -1,7 +1,5 @@
 ﻿using LightExcel.OpenXml;
 using LightExcel.Utils;
-using System.Data;
-using System.Reflection.PortableExecutable;
 
 namespace LightExcel.Renders
 {
