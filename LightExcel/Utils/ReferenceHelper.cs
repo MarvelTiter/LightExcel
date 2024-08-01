@@ -33,10 +33,13 @@ namespace LightExcel.Utils
              */
             string xName = String.Empty;
             int mod;
-
             while (x > 0)
             {
                 mod = x % 26;
+                if (mod == 0)
+                {
+                    mod += 26;
+                }
                 xName = AZ[mod] + xName;
                 x = (x - mod) / 26;
             }
