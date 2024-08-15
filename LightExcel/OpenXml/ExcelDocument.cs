@@ -26,12 +26,15 @@ namespace LightExcel.OpenXml
             zip.WorkBook.InitSharedStringTable();
             return zip;
         }
-
         public static ExcelArchiveEntry Create(string path, ExcelConfiguration configuration)
         {
             //TODO: buffer size of create file
             var fs = File.Create(path, 1024 * 512);
-            var zip = new ExcelArchiveEntry(fs, configuration);
+            return Create(fs, configuration);
+        }
+        public static ExcelArchiveEntry Create(Stream stream, ExcelConfiguration configuration)
+        {
+            var zip = new ExcelArchiveEntry(stream, configuration);
             //TODO: 创建初始化操作
             zip.AddEntry("_rels/.rels", "application/vnd.openxmlformats-package.relationships+xml", defaultRels);
             zip.AddWorkBook();
@@ -44,9 +47,13 @@ namespace LightExcel.OpenXml
         {
             using var templateStream = File.Open(template, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
             var fs = File.Create(path, 1024 * 512);
-            templateStream.CopyTo(fs);
-            var zip = new ExcelArchiveEntry(fs, configuration);
-            //zip.SetTemplate(templateStream);
+            return CreateByTemplate(fs, templateStream, configuration);
+        }
+
+        public static ExcelArchiveEntry CreateByTemplate(Stream stream, Stream templateStream, ExcelConfiguration configuration)
+        {
+            templateStream.CopyTo(stream);
+            var zip = new ExcelArchiveEntry(stream, configuration);
             zip.WorkBook.InitSharedStringTable();
             zip.WorkBook.InitStyleSheet();
             return zip;

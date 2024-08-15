@@ -1,6 +1,7 @@
 ﻿using LightExcel.OpenXml;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
@@ -27,6 +28,13 @@ namespace LightExcel
 
             this.configuration = configuration;
         }
+
+        public TransExcelHelper(Stream stream, ExcelConfiguration configuration)
+        {
+            excelArchive = ExcelDocument.Create(stream, configuration);
+            this.configuration = configuration;
+        }
+
         public void WriteExcel(object data, string? sheetName = null, Action<TransConfiguration>? config = null)
         {
             var cfg = new TransConfiguration();

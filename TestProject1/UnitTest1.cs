@@ -13,7 +13,9 @@ namespace TestProject1
         {
             var ie = Ge();
             ExcelHelper excel = new ExcelHelper();
-            //excel.WriteExcel($"{Guid.NewGuid():N}.xlsx", ie);
+            using var ms = new MemoryStream();
+            excel.WriteExcel(ms, ie);
+            File.WriteAllBytes($"{Guid.NewGuid():N}.xlsx", ms.ToArray());
             Process.Start("powershell", $"start {AppDomain.CurrentDomain.BaseDirectory}");
         }
 
@@ -65,11 +67,29 @@ namespace TestProject1
         public void TemplateTest()
         {
             ExcelHelper excel = new ExcelHelper();
-            const string Path1 = "E:\\Documents\\Downloads\\test.xlsx";
-            var ie = Ge();
+            const string Path1 = "templateTest.xlsx";
             if (File.Exists(Path1))
                 File.Delete(Path1);
-            //excel.WriteExcel("E:\\Documents\\Downloads\\test.xlsx", @"E:\Documents\Downloads\路檢報表格式.xlsx", ie);
+            using var ms = new MemoryStream();
+            using var template = File.Open("template.xlsx", FileMode.Open, FileAccess.Read, FileShare.Read);
+            excel.WriteExcelByTemplate(ms, template, Ge());
+            File.WriteAllBytes(Path1, ms.ToArray());
+            Process.Start("powershell", $"start {AppDomain.CurrentDomain.BaseDirectory}");
+        }
+
+        [TestMethod]
+        public void EmbeddedTemplateTest()
+        {
+            ExcelHelper excel = new ExcelHelper();
+            const string Path1 = "templateEmbededTest.xlsx";
+            if (File.Exists(Path1))
+                File.Delete(Path1);
+            var files = GetType().Assembly.GetManifestResourceNames().FirstOrDefault(s => s.EndsWith("template.xlsx"));
+            using var ms = new MemoryStream();
+            using var template = GetType().Assembly.GetManifestResourceStream(files!)!;
+            excel.WriteExcelByTemplate(ms, template, Ge());
+            File.WriteAllBytes(Path1, ms.ToArray());
+            Process.Start("powershell", $"start {AppDomain.CurrentDomain.BaseDirectory}");
         }
 
     }

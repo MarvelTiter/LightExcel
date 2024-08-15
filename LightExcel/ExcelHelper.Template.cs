@@ -19,10 +19,10 @@ namespace LightExcel
         /// <param name="data"></param>
         /// <param name="sheetName"></param>
         /// <exception cref="Exception"></exception>
-        public void HandleWriteTemplate(string path, string template, object data, string sheetName)
+        internal void HandleWriteTemplate(ExcelArchiveEntry doc, object data, string sheetName)
         {
             configuration.FillByTemplate = true;
-            using var doc = ExcelDocument.CreateByTemplate(path, template, configuration);
+            
             // 获取sheet对象
             var sheet = doc.WorkBook.WorkSheets.FirstOrDefault() ?? throw new Exception("read excel sheet failed");
             // 获取最后一行当模板

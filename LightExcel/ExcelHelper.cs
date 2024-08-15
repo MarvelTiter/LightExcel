@@ -59,8 +59,10 @@ namespace LightExcel
         }
         public void WriteExcelByTemplate(string path, string template, object data, string sheetName = "Sheet1", Action<ExcelConfiguration>? config = null)
         {
+            if (File.Exists(path)) File.Delete(path);
             config?.Invoke(configuration);
-            HandleWriteTemplate(path, template, data, sheetName);
+            using var doc = ExcelDocument.CreateByTemplate(path, template, configuration);
+            HandleWriteTemplate(doc, data, sheetName);
         }
 
         public ITransactionExcelHelper BeginTransaction(string path, Action<ExcelConfiguration>? config = null)
@@ -70,6 +72,6 @@ namespace LightExcel
             return new TransExcelHelper(path, configuration);
         }
 
-        
+
     }
 }
