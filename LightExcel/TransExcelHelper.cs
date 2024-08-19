@@ -41,12 +41,13 @@ namespace LightExcel
             config?.Invoke(cfg);
             var sheet = excelArchive!.WorkBook.AddNewSheet(sheetName);
             var render = RenderProvider.GetDataRender(data.GetType(), configuration);
-            var columns = render.CollectExcelColumnInfo(data);
+            var columns = render.CollectExcelColumnInfo(data).ToArray();
+            sheet.Columns = columns;
             var all = NeedToReaderRows(render, sheet, data, columns, cfg);
             sheet!.Write(all);
         }
 
-        private IEnumerable<Row> NeedToReaderRows(IDataRender render, Sheet sheet, object data, IEnumerable<ExcelColumnInfo> columns, TransConfiguration transCfg)
+        private IEnumerable<Row> NeedToReaderRows(IDataRender render, Sheet sheet, object data, ExcelColumnInfo[] columns, TransConfiguration transCfg)
         {
             if (configuration.UseHeader)
             {

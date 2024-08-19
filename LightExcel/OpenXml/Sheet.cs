@@ -45,12 +45,12 @@ namespace LightExcel.OpenXml
             }
             return reader;
         }
-
+        public ExcelColumnInfo[] Columns { get; set; }
         public int MaxColumnIndex { get; set; }
         public int MaxRowIndex { get; set; }
         public void WriteToXml(LightExcelStreamWriter writer)
         {
-            writer.Write($@"<sheet name=""{Name}"" sheetId=""{SheetIdx}"" r:id=""{Id}"" />");
+            writer.Write($"""<sheet name="{Name}" sheetId="{SheetIdx}" r:id="{Id}" />""");
         }
 
         protected override void WriteImpl(LightExcelStreamWriter writer, IEnumerable<INode> children)
@@ -59,12 +59,11 @@ namespace LightExcel.OpenXml
             writer.Write("<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\">");
             // dimension
             var dimensionWritePosition = writer.WriteAndFlush("<dimension ref=\"");
-            writer.Write("                              />");
             // cols 
-            if (ColInfos != null)
-            {
-                writer.Write(ColInfos);
-            }
+            var colsWritePosition = writer.WriteAndFlush("                              />");
+            // <cols><col min="" max="" width="" customWidth="1"/></cols>
+            var reserveLen = ReserveColsSpace(this);
+            writer.Write(new string(' ', reserveLen));
             writer.Write("<sheetData>");
             foreach (INode child in children)
             {
@@ -77,6 +76,12 @@ namespace LightExcel.OpenXml
             // set dimension
             writer.SetPosition(dimensionWritePosition);
             writer.WriteAndFlush($@"A1:{ReferenceHelper.ConvertXyToCellReference(MaxColumnIndex, MaxRowIndex)}""");
+            writer.SetPosition(colsWritePosition);
+            CollectCols(this);
+            if (ColInfos != null)
+            {
+                writer.WriteAndFlush(ColInfos);
+            }
         }
 
         private void WriteMergeInfo(LightExcelStreamWriter writer)
@@ -185,6 +190,46 @@ namespace LightExcel.OpenXml
             }
 
             return stringValue;
+        }
+
+        private static void CollectCols(Sheet sheet)
+        {
+            if (!string.IsNullOrEmpty(sheet.ColInfos))
+            {
+                return;
+            }
+
+           var cols = sheet.Columns.Where(c => c.Width.HasValue).Select(c =>
+                $"""<col min="{c.ColumnIndex}" max="{c.ColumnIndex}" width="{c.Width}" customWidth="1"/>""");
+           sheet.ColInfos = $"<cols>{string.Join("",cols)}</cols>";
+        }
+
+        private static int ReserveColsSpace(Sheet sheet)
+        {
+            if (!string.IsNullOrEmpty(sheet.ColInfos))
+            {
+                return sheet.ColInfos!.Length;
+            }
+
+            return 13 + sheet.Columns.Where(c => c.Width.HasValue || c.AutoWidth).Sum(c =>
+            {
+                // 13 {Columns}.Max(ColumnIndex).Length * {Columns}.Length * 2 + 预留宽度(10个字符=>最大宽度 9999999999)
+                // <cols></cols>
+                // 41
+                // <col min="" max="" width="" customWidth="1"/>
+                return 41 + StringLen(c.ColumnIndex) * 2 + 10;
+            });
+
+            static int StringLen(int val)
+            {
+                int len = 1;
+                while(val >= 10)
+                {
+                    val /= 10;
+                    len++;
+                }
+                return len;
+            }
         }
     }
 

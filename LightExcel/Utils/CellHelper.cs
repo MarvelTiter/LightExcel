@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace LightExcel.Utils
@@ -42,6 +43,7 @@ namespace LightExcel.Utils
             cell.Value = v;
             cell.Type = t;
             cell.StyleIndex = col.StyleIndex ?? (col.NumberFormat || filted ? "1" : null);
+            CalcCellWidth(col, v);
             return cell;
         }
         internal static (string?, string?) FormatCell(object? value, ExcelConfiguration config, ExcelColumnInfo info)
@@ -83,10 +85,7 @@ namespace LightExcel.Utils
                 }
                 else if (TypeHelper.IsNumber(type))
                 {
-                    if (config.CultureInfo != CultureInfo.InvariantCulture)
-                        t = "str";
-                    else
-                        t = "n";
+                    t = !Equals(config.CultureInfo, CultureInfo.InvariantCulture) ? "str" : "n";
 
                     if (type.IsAssignableFrom(typeof(decimal)))
                         v = ((decimal)value).ToString(config.CultureInfo);
@@ -118,7 +117,7 @@ namespace LightExcel.Utils
                 }
                 else if (type == typeof(DateTime))
                 {
-                    if (config.CultureInfo != CultureInfo.InvariantCulture)
+                    if (!Equals(config.CultureInfo, CultureInfo.InvariantCulture))
                     {
                         t = "str";
                         v = ((DateTime)value).ToString(config.CultureInfo);
@@ -143,40 +142,49 @@ namespace LightExcel.Utils
             return (v, t);
         }
 
-        internal static string? GetCellValue(ExcelColumnInfo col, object? value, ExcelConfiguration configuration)
+        internal static void CalcCellWidth(ExcelColumnInfo col, string? value)
         {
-            if (value == null) return null;
-            var type = value.GetType();
-            var underType = Nullable.GetUnderlyingType(type) ?? type;
-            if (underType.IsEnum)
+            if (!col.AutoWidth)
             {
-                var description = GetEnumDescription(type, value);
-                return description ?? value.ToString();
+                return;
             }
-            else if (underType == typeof(bool))
+            if (string.IsNullOrWhiteSpace(value))
             {
-                return (bool)value ? "1" : "0";
+                return;
             }
-            else if (value is IFormattable formattable)
+            if (!col.Width.HasValue)
             {
-                if (col.Format != null)
-                    return formattable.ToString(col.Format, configuration.CultureInfo);
-                else
-                    return formattable.ToString();
+                col.Width = CalcStringWidth(col.Name);
             }
-            else
+            double cellLength = CalcStringWidth(value!);
+            col.Width = Math.Max(col.Width.Value, cellLength);
+
+        }
+        internal static double CalcStringWidth(string value)
+        {
+            var mg = Regex.Matches(value, "[^\x00-\xff]+");
+            int dl = 0;
+            int sl = 0;
+            foreach (Match m in mg)
             {
-                return value.ToString();
+                if (m.Success)
+                {
+                    dl += m.Value.Length;
+                }
             }
+            sl = value!.Length - dl;
+
+            var cellLength = dl * 2.1 + sl * 1.1;
+            return Math.Round(cellLength, 3);
         }
 
 
-        private static string? GetEnumDescription(Type type, object value)
-        {
-            var field = type.GetField(value.ToString()!)!;
-            var descAttr = field.GetCustomAttribute<DescriptionAttribute>();
-            return descAttr?.Description;
-        }
+        // private static string? GetEnumDescription(Type type, object value)
+        // {
+        //     var field = type.GetField(value.ToString()!)!;
+        //     var descAttr = field.GetCustomAttribute<DescriptionAttribute>();
+        //     return descAttr?.Description;
+        // }
 
         internal static string? GetCellValue(this Cell cell, SharedStringTable? table)
         {

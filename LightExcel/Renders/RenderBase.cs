@@ -14,9 +14,9 @@ namespace LightExcel.Renders
 
         public abstract IEnumerable<ExcelColumnInfo> CollectExcelColumnInfo(object data);
 
-        public abstract IEnumerable<Row> RenderBody(object data, Sheet sheet, IEnumerable<ExcelColumnInfo> columns, TransConfiguration configuration);
+        public abstract IEnumerable<Row> RenderBody(object data, Sheet sheet, ExcelColumnInfo[] columns, TransConfiguration configuration);
 
-        public virtual Row RenderHeader(IEnumerable<ExcelColumnInfo> columns, TransConfiguration configuration)
+        public virtual Row RenderHeader(ExcelColumnInfo[] columns, TransConfiguration configuration)
         {
             var row = new Row() { RowIndex = 1 };
             Configuration.StartRowIndex = 1;
@@ -38,7 +38,8 @@ namespace LightExcel.Renders
         {
             var dyCol = Configuration[origin.Name];
             origin.Format = dyCol?.Format;
-            origin.AutoWidth = dyCol?.AutoWidth ?? false;
+            origin.Width = dyCol?.Width;
+            origin.AutoWidth = !origin.Width.HasValue && (dyCol?.AutoWidth ?? Configuration.AutoWidth);
         }
     }
 }

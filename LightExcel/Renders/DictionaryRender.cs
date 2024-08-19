@@ -24,7 +24,7 @@ namespace LightExcel.Renders
             }
         }
 
-        public override IEnumerable<Row> RenderBody(object data, Sheet sheet, IEnumerable<ExcelColumnInfo> columns, TransConfiguration configuration)
+        public override IEnumerable<Row> RenderBody(object data, Sheet sheet, ExcelColumnInfo[] columns, TransConfiguration configuration)
         {
             var values = data as IEnumerable<Dictionary<string, object>> ?? throw new ArgumentException();
             var rowIndex = Configuration.StartRowIndex;

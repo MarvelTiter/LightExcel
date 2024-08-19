@@ -37,11 +37,12 @@ namespace LightExcel.Renders
                 col.Format = excelColumnAttribute?.Format;
                 col.ColumnIndex = index++;
                 col.AutoWidth = excelColumnAttribute?.AutoWidth ?? false;
+                col.Width = excelColumnAttribute?.Width;
                 yield return col;
             }
         }
 
-        public override IEnumerable<Row> RenderBody(object data, Sheet sheet, IEnumerable<ExcelColumnInfo> columns, TransConfiguration configuration)
+        public override IEnumerable<Row> RenderBody(object data, Sheet sheet, ExcelColumnInfo[] columns, TransConfiguration configuration)
         {
             var values = data as IEnumerable ?? throw new ArgumentException();
             var rowIndex = Configuration.StartRowIndex;

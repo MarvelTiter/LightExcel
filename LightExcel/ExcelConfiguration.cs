@@ -22,6 +22,7 @@ namespace LightExcel
 		internal bool Readonly { get; set; }
 		internal bool FillByTemplate { get; set; }
 		internal int StartRowIndex { get; set; }
+		public bool AutoWidth { get; set; }
 		/// <summary>
 		/// 例如字符串类型的数字
 		/// </summary>

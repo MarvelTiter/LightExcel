@@ -14,7 +14,17 @@ namespace TestProject1
             var ie = Ge();
             ExcelHelper excel = new ExcelHelper();
             using var ms = new MemoryStream();
-            excel.WriteExcel(ms, ie);
+            excel.WriteExcel(ms, ie, config: c =>
+            {
+                c.AutoWidth = true;
+                c.AddDynamicColumnInfo("Column1", col =>
+                {
+                    col.Width = 20;
+                }).AddDynamicColumnInfo("Column3", col =>
+                {
+                    col.AutoWidth = false;
+                });
+            });
             File.WriteAllBytes($"{Guid.NewGuid():N}.xlsx", ms.ToArray());
             Process.Start("powershell", $"start {AppDomain.CurrentDomain.BaseDirectory}");
         }
@@ -34,9 +44,9 @@ namespace TestProject1
                 yield return new Dictionary<string, object>
                 {
                     ["Column1"] = 222,
-                    ["Column2"] = "≤‚ ‘",
+                    ["Column2"] = new string('≤‚', (i + 1) * 2),
                     ["Column3"] = 111,
-                    ["Column4"] = "Hello",
+                    ["Column4"] = new string('A', (i + 1) * 2),
                     ["Column5"] = "World",
 
                 };

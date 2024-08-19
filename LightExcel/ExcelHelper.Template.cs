@@ -30,7 +30,8 @@ namespace LightExcel
             // 获取共享字符串列表
             var sst = doc.WorkBook.SharedStrings?.ToList();
             var render = RenderProvider.GetDataRender(data.GetType(), configuration);
-            var columns = configuration.FillWithPlacholder ? CollectExcelColumnInfos(templateRow, sst) : render.CollectExcelColumnInfo(data);
+            var columns = configuration.FillWithPlacholder ? CollectExcelColumnInfos(templateRow, sst).ToArray() : render.CollectExcelColumnInfo(data).ToArray();
+            sheet.Columns = columns;
             if (configuration.FillWithPlacholder)
             {
                 templateRow.IsTemplateRow = true;
