@@ -44,7 +44,7 @@ namespace TestProject1
                 yield return new Dictionary<string, object>
                 {
                     ["Column1"] = 222,
-                    ["Column2"] = new string('²â', (i + 1) * 2),
+                    ["Column2"] = new string('B', (i + 1) * 3),
                     ["Column3"] = 111,
                     ["Column4"] = new string('A', (i + 1) * 2),
                     ["Column5"] = "World",
