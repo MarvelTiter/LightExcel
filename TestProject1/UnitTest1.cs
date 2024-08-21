@@ -1,6 +1,7 @@
 using LightExcel;
 using LightExcel.Attributes;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace TestProject1
@@ -57,7 +58,7 @@ namespace TestProject1
         public void TestRead()
         {
             ExcelHelper excel = new ExcelHelper();
-            var reader = excel.ReadExcel(@"E:\Documents\Desktop\导出流水\整备质量数据表 (润通).xlsx");
+            var reader = excel.ReadExcel(@"D:\Documents\Desktop\导入模板.xlsx");
             while (reader.NextResult())
             {
                 Console.WriteLine($"================={reader.CurrentSheetName}================");
@@ -71,6 +72,22 @@ namespace TestProject1
                 }
                 break;
             }
+        }
+        public class User
+        {
+            public string? UserId { get; set; }
+            public string? UserName { get; set; }
+            public string? Password { get; set; }
+            public int? Age { get; set; }
+            public string? Sign { get; set; }
+            public DateTime? LastLogin { get; set; }
+            public IEnumerable<string>? Roles { get; set; }
+        }
+        [TestMethod]
+        public void TestReadModel()
+        {
+            ExcelHelper excel = new ExcelHelper();
+            var reader = excel.QueryExcel<User>(@"D:\Documents\Desktop\导入模板.xlsx", "Sheet1");
         }
 
         [TestMethod]
