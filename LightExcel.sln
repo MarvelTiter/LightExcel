@@ -3,9 +3,18 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33110.190
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LightExcel", "LightExcel\LightExcel.csproj", "{72E3FCE6-9B81-4E00-A746-8CD10D72E84C}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestProject1", "TestProject1\TestProject1.csproj", "{3D579273-52DE-4FD6-85D3-3B5E5DD9EADA}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{B2FD2062-683B-4C26-885B-4489099D5413}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{8AA424C9-22B6-47AB-8D87-90B0BA6D4056}"
+	ProjectSection(SolutionItems) = preProject
+		doc\版本日志.md = doc\版本日志.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LightExcel", "src\LightExcel\LightExcel.csproj", "{5B732295-01DA-A139-0B27-9A5E0F8349A7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestProject1", "test\TestProject1\TestProject1.csproj", "{76B5C402-BFB6-F6DB-F49E-5D9940F415AA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,17 +22,21 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{72E3FCE6-9B81-4E00-A746-8CD10D72E84C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{72E3FCE6-9B81-4E00-A746-8CD10D72E84C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{72E3FCE6-9B81-4E00-A746-8CD10D72E84C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{72E3FCE6-9B81-4E00-A746-8CD10D72E84C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3D579273-52DE-4FD6-85D3-3B5E5DD9EADA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3D579273-52DE-4FD6-85D3-3B5E5DD9EADA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3D579273-52DE-4FD6-85D3-3B5E5DD9EADA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3D579273-52DE-4FD6-85D3-3B5E5DD9EADA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B732295-01DA-A139-0B27-9A5E0F8349A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B732295-01DA-A139-0B27-9A5E0F8349A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B732295-01DA-A139-0B27-9A5E0F8349A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B732295-01DA-A139-0B27-9A5E0F8349A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76B5C402-BFB6-F6DB-F49E-5D9940F415AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76B5C402-BFB6-F6DB-F49E-5D9940F415AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76B5C402-BFB6-F6DB-F49E-5D9940F415AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76B5C402-BFB6-F6DB-F49E-5D9940F415AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5B732295-01DA-A139-0B27-9A5E0F8349A7} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{76B5C402-BFB6-F6DB-F49E-5D9940F415AA} = {B2FD2062-683B-4C26-885B-4489099D5413}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {20AC327A-726A-4E95-BF78-ED643CAC84E9}

@@ -51,6 +51,25 @@ namespace TestProject1
             //    Console.WriteLine($"D: {field.D}, E: {field.E}");
             //}
         }
-
+        // "C:\Users\Marvel\Desktop\驾驶人证件过期短信提醒\20250416模板\1驾驶人临近期满换证（期满日期前3个月）_结果.xlsx"
+        [TestMethod]
+        public void ExcelReaderTestDynamic2()
+        {
+            ExcelHelper excel = new ExcelHelper();
+            var reader = excel.ReadExcel("C:\\Users\\Marvel\\Desktop\\驾驶人证件过期短信提醒\\20250416模板\\1驾驶人临近期满换证（期满日期前3个月）_结果.xlsx");
+            while (reader.NextResult())
+            {
+                while (reader.Read())
+                {
+                    //Console.WriteLine($"Index: {reader.RowIndex}, F: {reader[5]}, H: {reader[7]}");
+                    _ = $"Index: {reader.RowIndex}, F: {reader[5]}, H: {reader[7]}";
+                }
+            }
+            //var resule = excel.QueryExcel("C:\\Users\\Marvel\\Desktop\\截止20231017二期车证.xlsx");
+            //foreach (var field in result)
+            //{
+            //    Console.WriteLine($"D: {field.D}, E: {field.E}");
+            //}
+        }
     }
 }

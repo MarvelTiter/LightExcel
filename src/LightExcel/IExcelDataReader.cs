@@ -14,6 +14,7 @@ namespace LightExcel
         string? this[int i] { get; }
         string CurrentSheetName { get; }
         int FieldCount { get; }
+        int RowIndex { get; }
         bool GetBoolean(int i);
       
         DateTime GetDateTime(int i);

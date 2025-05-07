@@ -22,7 +22,7 @@ namespace LightExcel
         public string CurrentSheetName => sheetEnumerator.Current?.Name?.ToString() ?? "";
 
         public int FieldCount => cells.Length;
-
+        public int RowIndex => rowEnumerator?.Current.RowIndex ?? 0;
         Cell[] cells = [];
         string[] heads = [];
 
@@ -42,7 +42,9 @@ namespace LightExcel
 
         private Cell? CellAt(int i)
         {
-            if (i < 0 || i > cells.Length) return null;
+            System.Diagnostics.Debug.WriteLine($"{RowIndex}: CellAt {i}, Enable {i < 0 || i >= cells.Length}");
+            if (i < 0 || i >= cells.Length) 
+                return null;
             return cells[i];
         }
 
@@ -135,7 +137,7 @@ namespace LightExcel
                 rowEnumerator = sheetEnumerator.Current.GetEnumerator();
                 if (configuration.UseHeader && rowEnumerator.MoveNext())
                 {
-                    heads = rowEnumerator.Current.RowDatas.Select(c => c.GetCellValue(Sst) ?? "").ToArray();
+                    heads = [.. rowEnumerator.Current.RowDatas.Select(c => c.GetCellValue(Sst) ?? "")];
                     startRow += 1;
                 }
                 return true;
@@ -169,9 +171,10 @@ namespace LightExcel
             if (HasRows)
             {
                 if (startColumn > 1)
-                    cells = rowEnumerator!.Current.RowDatas.Skip(startColumn - 1).ToArray();
+                    cells = [.. rowEnumerator!.Current.RowDatas.Skip(startColumn - 1)];
                 else
-                    cells = rowEnumerator!.Current.RowDatas.ToArray();
+                    cells = [.. rowEnumerator!.Current.RowDatas];
+                System.Diagnostics.Debug.WriteLine($"{RowIndex}: Read, Cells {cells.Length}");
                 return true;
             }
             return false;
