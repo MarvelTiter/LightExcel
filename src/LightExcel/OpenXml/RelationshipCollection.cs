@@ -1,4 +1,5 @@
-﻿using LightExcel.OpenXml.Interfaces;
+﻿using LightExcel.OpenXml.Basic;
+using LightExcel.OpenXml.Interfaces;
 using LightExcel.Utils;
 using System.Collections;
 using System.IO.Compression;
@@ -7,15 +8,11 @@ using System.Xml;
 
 namespace LightExcel.OpenXml
 {
-    internal class RelationshipCollection : NodeCollectionXmlPart<Relationship>
+    internal class RelationshipCollection(ZipArchive archive) : NodeCollectionXmlPart<Relationship>(archive, "xl/_rels/workbook.xml.rels")
     {
-        public RelationshipCollection(ZipArchive archive) : base(archive, "xl/_rels/workbook.xml.rels")
+        protected override IEnumerable<Relationship> GetChildrenImpl()
         {
-
-        }
-
-        protected override IEnumerable<Relationship> GetChildrenImpl(LightExcelXmlReader reader)
-        {
+            if (reader is null) yield break;
             if (!reader.IsStartWith("Relationships", XmlHelper.RelaNs)) yield break;
             if (!reader.ReadFirstContent()) yield break;
             while (!reader.EOF)
@@ -31,7 +28,7 @@ namespace LightExcel.OpenXml
             }
         }
 
-        protected override void WriteImpl(LightExcelStreamWriter writer, IEnumerable<INode> children)
+        protected override void WriteImpl<TNode>(LightExcelStreamWriter writer, IEnumerable<TNode> children)
         {
             writer.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
             writer.Write("<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\">");
@@ -41,6 +38,5 @@ namespace LightExcel.OpenXml
             }
             writer.Write("</Relationships>");
         }
-
     }
 }

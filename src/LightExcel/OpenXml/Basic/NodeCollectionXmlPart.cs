@@ -1,36 +1,38 @@
 ﻿using System.IO.Compression;
 using LightExcel.OpenXml.Interfaces;
 using LightExcel.Utils;
+using System.Collections;
+namespace LightExcel.OpenXml.Basic;
 
-namespace LightExcel.OpenXml
+internal abstract class NodeCollectionXmlPart<T>(ZipArchive archive, string path) : XmlPart<T>(archive, path), INodeCollection<T> where T : INode
 {
-    internal abstract class NodeCollectionXmlPart<T> : XmlPart<T>, INodeCollection<T> where T : INode
+    public List<T> Children { get; } = new List<T>();
+
+    public int Count => Children.Count;
+
+    public void AppendChild(T child) => Children.Add(child);
+
+    public override void Write()
     {
-
-        public NodeCollectionXmlPart(ZipArchive archive, string path) : base(archive, path)
+        using var writer = archive!.GetWriter(Path);
+        WriteImpl(writer, Children);
+    }
+    protected virtual IEnumerable<T> GetChildren()
+    {
+        SetXmlReader();
+        if (reader == null) yield break;
+        foreach (var item in GetChildrenImpl())
         {
-
+            yield return item;
         }
+    }
 
-        public int Count => cached?.Count ?? GetChildren().Count();
+    protected abstract IEnumerable<T> GetChildrenImpl();
 
-        public void AppendChild(T child)
-        {
-            cached ??= new List<T>();
-            cached.Add(child);
-        }
-        public override void Write()
-        {
-            using var writer = archive!.GetWriter(Path);
-            WriteImpl(writer, cached?.Cast<INode>() ?? Enumerable.Empty<INode>());
-        }
+    public virtual IEnumerator<T> GetEnumerator() => GetChildren().GetEnumerator();
 
-        private IEnumerable<T> CollectSelfValues()
-        {
-            foreach (var item in this)
-            {
-                yield return item;
-            }
-        }
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
     }
 }

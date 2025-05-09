@@ -1,21 +1,15 @@
-﻿using LightExcel.OpenXml.Interfaces;
+﻿using System.Collections;
+using LightExcel.OpenXml.Basic;
+using LightExcel.OpenXml.Interfaces;
 
 namespace LightExcel.OpenXml.Styles
 {
-    internal class BorderCollection : INodeCollection<Border>, INode
+    internal class BorderCollection : SimpleNodeCollectionXmlPart<Border>
     {
-        internal IList<Border> Borders { get; set; } = new List<Border>();
-        public int Count => Borders.Count;
-
-        public void AppendChild(Border child)
-        {
-            Borders.Add(child);
-        }
-
-        public void WriteToXml(LightExcelStreamWriter writer)
+        public override void WriteToXml(LightExcelStreamWriter writer)
         {
             writer.Write($"<borders count={Count}>");
-            foreach (var item in Borders)
+            foreach (var item in Children)
             {
                 item.WriteToXml(writer);
             }

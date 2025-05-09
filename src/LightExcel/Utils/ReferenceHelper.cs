@@ -54,7 +54,7 @@ namespace LightExcel.Utils
             return (x, y);
         }
 
-        private static int GetRowIndex(string cellref)
+        public static int GetRowIndex(string cellref)
         {
             var num = string.Empty;
             foreach (var c in cellref)
@@ -67,7 +67,7 @@ namespace LightExcel.Utils
             return int.Parse(num);
         }
 
-        private static int GetColumnIndex(string cellref)
+        public static int GetColumnIndex(string cellref)
         {
             var x = 0;
             foreach (var c in cellref)

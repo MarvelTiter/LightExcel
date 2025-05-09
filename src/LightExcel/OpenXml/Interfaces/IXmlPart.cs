@@ -1,9 +1,9 @@
 ﻿namespace LightExcel.OpenXml.Interfaces
 {
-    internal interface IXmlPart<T> : IDisposable, IEnumerable<T> where T : INode
+    internal interface IXmlPart<T> : IDisposable where T : INode
     {
         void Write();
-        void Write(IEnumerable<INode> children);
-        void Replace(IEnumerable<INode> children);
+        void Write<TNode>(IEnumerable<TNode> children) where TNode : INode;
+        void Replace<TNode>(IEnumerable<TNode> children) where TNode : INode;
     }
 }

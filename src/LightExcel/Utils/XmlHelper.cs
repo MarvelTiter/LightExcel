@@ -14,9 +14,11 @@ namespace LightExcel.Utils
     {
         public static LightExcelXmlReader? GetXmlReader(this ZipArchive archive, string path)
         {
+            System.Diagnostics.Debug.WriteLine($"opening {path}");
             var stream = archive.GetEntry(path)?.Open();
+            System.Diagnostics.Debug.WriteLine($"opened {path}");
             if (stream == null) return null;
-            return new LightExcelXmlReader(stream);
+            return new LightExcelXmlReader(stream, path);
         }
 
         public static LightExcelStreamWriter GetWriter(this ZipArchive archive, string path)

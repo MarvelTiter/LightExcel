@@ -22,15 +22,16 @@ namespace LightExcel
         internal void HandleWriteTemplate(ExcelArchiveEntry doc, object data, string sheetName)
         {
             configuration.FillByTemplate = true;
-            
+
             // 获取sheet对象
             var sheet = doc.WorkBook.WorkSheets.FirstOrDefault() ?? throw new Exception("read excel sheet failed");
             // 获取最后一行当模板
-            var templateRow = sheet.ToList().Last();
+            var header = sheet.ToList();
+            var templateRow = header.Last();
             // 获取共享字符串列表
             var sst = doc.WorkBook.SharedStrings?.ToList();
             var render = RenderProvider.GetDataRender(data.GetType(), configuration);
-            var columns = configuration.FillWithPlacholder ? CollectExcelColumnInfos(templateRow, sst).ToArray() : render.CollectExcelColumnInfo(data).ToArray();
+            ExcelColumnInfo[]? columns = configuration.FillWithPlacholder ? [.. CollectExcelColumnInfos(templateRow, sst)] : [.. render.CollectExcelColumnInfo(data)];
             sheet.Columns = columns;
             if (configuration.FillWithPlacholder)
             {
@@ -42,14 +43,19 @@ namespace LightExcel
                 configuration.StartRowIndex = templateRow.RowIndex;
             }
             var newRows = render.RenderBody(data, sheet, columns, new TransConfiguration { SheetNumberFormat = configuration.AddSheetNumberFormat });
-            sheet.Replace(sheet.Concat(newRows));
+            sheet.Replace(header.Concat(newRows));
             doc.Save();
         }
-
-        static readonly Regex extract = new Regex("{{(.+)}}");
-        private IEnumerable<ExcelColumnInfo> CollectExcelColumnInfos(Row templateRow, List<SharedStringNode>? sst)
+#if NET8_0_OR_GREATER
+        [GeneratedRegex("{{(.+)}}")]
+        private static partial Regex ExtractColumn();
+#else
+        static readonly Regex extract = new("{{(.+)}}");
+        private static Regex ExtractColumn() => extract;
+#endif
+        private static IEnumerable<ExcelColumnInfo> CollectExcelColumnInfos(Row templateRow, List<SharedStringNode>? sst)
         {
-            foreach (var cell in templateRow.RowDatas)
+            foreach (var cell in templateRow.Children)
             {
                 string? name = cell.Value;
                 var (X, Y) = ReferenceHelper.ConvertCellReferenceToXY(cell.Reference);
@@ -62,7 +68,7 @@ namespace LightExcel
                 }
                 if (name != null)
                 {
-                    var match = extract.Match(name);
+                    var match = ExtractColumn().Match(name);
                     if (match.Success)
                     {
                         name = match.Groups[1].Value;

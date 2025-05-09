@@ -1,4 +1,5 @@
-﻿using LightExcel.OpenXml.Interfaces;
+﻿using LightExcel.OpenXml.Basic;
+using LightExcel.OpenXml.Interfaces;
 using LightExcel.Utils;
 using System.IO.Compression;
 using System.Net;
@@ -9,7 +10,7 @@ namespace LightExcel.OpenXml
     /// <summary>
     /// xl/worksheets/sheet{id}.xml
     /// </summary>
-    internal class Sheet : XmlPart<Row>, INode
+    internal class Sheet : NodeCollectionXmlPart<Row>, INode
     {
         public Sheet(ZipArchive archive, string id, string name, int sid) : base(archive, "")
         {
@@ -18,6 +19,7 @@ namespace LightExcel.OpenXml
             Name = name;
             SheetIdx = sid;
         }
+
         public Sheet(ZipArchive archive, string name, int index) : base(archive, "")
         {
             Id = $"R{Guid.NewGuid():N}";
@@ -26,34 +28,33 @@ namespace LightExcel.OpenXml
         }
 
         public string Id { get; set; }
+
         /// <summary>
         /// 在集合中的顺序（保底机制
         /// </summary>
         public int Seq { get; set; }
+
         public string? Name { get; set; }
         public int SheetIdx { get; set; }
         public bool NeedToSave { get; set; } = true;
         internal override string Path => $"xl/worksheets/sheet{SheetIdx}.xml";
         public string RelPath => $"worksheets/sheet{SheetIdx}.xml";
 
-        protected override LightExcelXmlReader? GetXmlReader()
+        protected override void SetXmlReader()
         {
-            var reader = base.GetXmlReader();
-            if (reader == null)
-            {
-                reader = archive?.GetXmlReader($"xl/worksheets/sheet{Seq + 1}.xml");
-            }
-            return reader;
+            reader ??= archive?.GetXmlReader($"xl/worksheets/sheet{Seq + 1}.xml");
         }
-        public ExcelColumnInfo[] Columns { get; set; }
+
+        public ExcelColumnInfo[] Columns { get; set; } = [];
         public int MaxColumnIndex { get; set; }
         public int MaxRowIndex { get; set; }
+
         public void WriteToXml(LightExcelStreamWriter writer)
         {
             writer.Write($"""<sheet name="{Name}" sheetId="{SheetIdx}" r:id="{Id}" />""");
         }
 
-        protected override void WriteImpl(LightExcelStreamWriter writer, IEnumerable<INode> children)
+        protected override void WriteImpl<TNode>(LightExcelStreamWriter writer, IEnumerable<TNode> children)
         {
             writer.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
             writer.Write("<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\">");
@@ -65,7 +66,7 @@ namespace LightExcel.OpenXml
             var reserveLen = ReserveColsSpace(this);
             writer.Write(new string(' ', reserveLen));
             writer.Write("<sheetData>");
-            foreach (INode child in children)
+            foreach (var child in children)
             {
                 child.WriteToXml(writer);
             }
@@ -92,8 +93,9 @@ namespace LightExcel.OpenXml
         internal MergeCellCollection? MergeCells { get; set; }
         internal string? ColInfos { get; set; }
 
-        protected override IEnumerable<Row> GetChildrenImpl(LightExcelXmlReader reader)
+        protected override IEnumerable<Row> GetChildrenImpl()
         {
+            if (reader is null) yield break;
             if (!reader.IsStartWith("worksheet", XmlHelper.MainNs))
                 yield break;
             if (!reader.ReadFirstContent())
@@ -124,13 +126,14 @@ namespace LightExcel.OpenXml
                                         StyleIndex = reader.GetAttribute("s"),
                                     };
                                     cell.Value = ReadCellValue(reader);
-                                    row.RowDatas.Add(cell);
+                                    row.AddAndFixed(cell);
                                 }
                                 else if (!reader.SkipContent())
                                 {
                                     break;
                                 }
                             }
+
                             yield return row;
                         }
                         else if (!reader.SkipContent())
@@ -198,10 +201,9 @@ namespace LightExcel.OpenXml
             {
                 return;
             }
-
-           var cols = sheet.Columns.Where(c => c.Width.HasValue).Select(c =>
+            var cols = sheet.Columns.Where(c => c.Width.HasValue).Select(c =>
                 $"""<col min="{c.ColumnIndex}" max="{c.ColumnIndex}" width="{c.Width}" customWidth="1"/>""");
-           sheet.ColInfos = $"<cols>{string.Join("",cols)}</cols>";
+            sheet.ColInfos = $"<cols>{string.Join("", cols)}</cols>";
         }
 
         private static int ReserveColsSpace(Sheet sheet)
@@ -211,26 +213,23 @@ namespace LightExcel.OpenXml
                 return sheet.ColInfos!.Length;
             }
 
-            return 13 + sheet.Columns.Where(c => c.Width.HasValue || c.AutoWidth).Sum(c =>
-            {
-                // 13 {Columns}.Max(ColumnIndex).Length * {Columns}.Length * 2 + 预留宽度(10个字符=>最大宽度 9999999999)
-                // <cols></cols>
-                // 41
-                // <col min="" max="" width="" customWidth="1"/>
-                return 41 + StringLen(c.ColumnIndex) * 2 + 10;
-            });
+            // 13 {Columns}.Max(ColumnIndex).Length * {Columns}.Length * 2 + 预留宽度(10个字符=>最大宽度 9999999999)
+            // <cols></cols>
+            // 41
+            // <col min="" max="" width="" customWidth="1"/>
+            return 13 + sheet.Columns.Where(c => c.Width.HasValue || c.AutoWidth).Sum(c => 41 + StringLen(c.ColumnIndex) * 2 + 10);
 
             static int StringLen(int val)
             {
                 int len = 1;
-                while(val >= 10)
+                while (val >= 10)
                 {
                     val /= 10;
                     len++;
                 }
+
                 return len;
             }
         }
     }
-
 }

@@ -1,4 +1,5 @@
-﻿using LightExcel.OpenXml.Interfaces;
+﻿using LightExcel.OpenXml.Basic;
+using LightExcel.OpenXml.Interfaces;
 using LightExcel.Utils;
 using System.IO.Compression;
 using System.Text;
@@ -17,8 +18,9 @@ namespace LightExcel.OpenXml
         }
 
 
-        protected override IEnumerable<INode> GetChildrenImpl(LightExcelXmlReader reader)
+        protected override IEnumerable<INode> GetChildrenImpl()
         {
+            if (reader is null) yield break;
             if (!reader.IsStartWith("Types", XmlHelper.ContentTypesXmlns))
                 yield break;
             if (!reader.ReadFirstContent()) yield break;
@@ -31,12 +33,12 @@ namespace LightExcel.OpenXml
                     var ov = new Override(pn, ct);
                     yield return ov;
                 }
-                else if (!reader.SkipContent()) 
+                else if (!reader.SkipContent())
                     yield break;
             }
         }
 
-        protected override void WriteImpl(LightExcelStreamWriter writer, IEnumerable<INode> children)
+        protected override void WriteImpl<TNode>(LightExcelStreamWriter writer, IEnumerable<TNode> children)
         {
             writer.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
             writer.Write("<Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\">");

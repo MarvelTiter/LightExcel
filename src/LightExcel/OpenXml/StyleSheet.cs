@@ -1,4 +1,5 @@
-﻿using LightExcel.OpenXml.Interfaces;
+﻿using LightExcel.OpenXml.Basic;
+using LightExcel.OpenXml.Interfaces;
 using LightExcel.OpenXml.Styles;
 using System.IO.Compression;
 
@@ -16,12 +17,12 @@ namespace LightExcel.OpenXml
         public NumberingFormatCollection? NumberingFormats { get; set; }
         public CellFormatCollection? CellFormats { get; set; }
 
-        protected override IEnumerable<INode> GetChildrenImpl(LightExcelXmlReader reader)
+        protected override IEnumerable<INode> GetChildrenImpl()
         {
             throw new NotImplementedException();
         }
 
-        protected override void WriteImpl(LightExcelStreamWriter writer, IEnumerable<INode> children)
+        protected override void WriteImpl<TNode>(LightExcelStreamWriter writer, IEnumerable<TNode> children)
         {
             writer.Write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
             writer.Write("<styleSheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\">");

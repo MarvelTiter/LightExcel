@@ -1,9 +1,11 @@
 ﻿using LightExcel.OpenXml.Interfaces;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LightExcel.OpenXml.Basic;
 
 namespace LightExcel.OpenXml
 {
@@ -20,19 +22,12 @@ namespace LightExcel.OpenXml
             writer.Write($"<col min=\"{Min}\" max=\"{Max}\" {WString} {CwString} />");
         }
     }
-    internal class SheetCols : INodeCollection<Col>,INode
+    internal class SheetCols : SimpleNodeCollectionXmlPart<Col>
     {
-        public int Count => Cols.Count;
-        List<Col> Cols = new List<Col>();
-        public void AppendChild(Col child)
-        {
-            Cols.Add(child);
-        }
-
-        public void WriteToXml(LightExcelStreamWriter writer)
+        public override void WriteToXml(LightExcelStreamWriter writer)
         {
             writer.Write("<cols xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\">");
-            foreach (var item in Cols)
+            foreach (var item in Children)
             {
                 item.WriteToXml(writer);
             }

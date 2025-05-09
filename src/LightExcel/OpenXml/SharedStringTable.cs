@@ -1,4 +1,5 @@
-﻿using LightExcel.OpenXml.Interfaces;
+﻿using LightExcel.OpenXml.Basic;
+using LightExcel.OpenXml.Interfaces;
 using LightExcel.Utils;
 using System.IO.Compression;
 using System.Xml;
@@ -12,34 +13,42 @@ namespace LightExcel.OpenXml
     {
         public int RefCount { get; set; }
         public int UniqueCount { get; set; }
+        //private readonly IDictionary<int, string> values = new Dictionary<int, string>();
+
         public SharedStringTable(ZipArchive archive) : base(archive, "xl/sharedStrings.xml")
         {
-
+            Flush();
         }
 
         internal string? this[int index]
         {
             get
             {
-                if (cached == null)
-                {
-                    Flush();
-                }
-                return cached![index].Content;
+                if (index < 0 || index >= Children.Count)
+                    return null;
+                return Children[index].Content;
             }
         }
 
         private void Flush()
         {
-            _ = GetChildren().ToList();
+            // _ = GetChildren().ToList();
+            Children.Clear();
+            foreach (var s in GetChildren())
+            {
+                Children.Add(s);
+            }
         }
 
-        protected override IEnumerable<SharedStringNode> GetChildrenImpl(LightExcelXmlReader reader)
+        public override IEnumerator<SharedStringNode> GetEnumerator() => Children.GetEnumerator();
+
+        protected override IEnumerable<SharedStringNode> GetChildrenImpl()
         {
+            if (reader is null) yield break;
             if (!reader.IsStartWith("sst", XmlHelper.MainNs)) yield break;
             if (!reader.ReadFirstContent()) yield break;
-            int.TryParse(reader["count"], out var count);
-            int.TryParse(reader["uniqueCount"], out var uniqueCount);
+            _ = int.TryParse(reader["count"], out var count);
+            _ = int.TryParse(reader["uniqueCount"], out var uniqueCount);
             RefCount = count;
             UniqueCount = uniqueCount;
             while (!reader.EOF)
@@ -56,7 +65,7 @@ namespace LightExcel.OpenXml
             }
         }
 
-        protected override void WriteImpl(LightExcelStreamWriter writer, IEnumerable<INode> children)
+        protected override void WriteImpl<TNode>(LightExcelStreamWriter writer, IEnumerable<TNode> children)
         {
             writer.Write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
             writer.Write($"<sst xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" count=\"{RefCount}\" uniqueCount=\"{UniqueCount}\">");
@@ -64,6 +73,7 @@ namespace LightExcel.OpenXml
             {
                 child.WriteToXml(writer);
             }
+
             writer.Write("</sst>");
         }
     }
