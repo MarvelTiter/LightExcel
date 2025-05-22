@@ -4,17 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LightExcel.OpenXml.Basic;
 
 namespace LightExcel.OpenXml.Styles
 {
-    internal class FontCollection : INodeCollection<Font>
+    internal class FontCollection : SimpleNodeCollectionXmlPart<Font>
     {
-        public int Count => throw new NotImplementedException();
-
-        public void AppendChild(Font child)
-        {
-            throw new NotImplementedException();
-        }
+       
     }
 
     internal class Font : INode

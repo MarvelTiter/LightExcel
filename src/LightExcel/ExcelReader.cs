@@ -21,13 +21,14 @@ namespace LightExcel
 
         public string CurrentSheetName => sheetEnumerator.Current?.Name?.ToString() ?? "";
 
-        public int FieldCount => cells.Length;
+        public int FieldCount => cells.Count;
         public int RowIndex => rowEnumerator?.Current.RowIndex ?? 0;
-        Cell[] cells = [];
+        List<Cell> cells = [];
         string[] heads = [];
 
         int startColumn = 1;
         int startRow = 1;
+        int fixedColumn = 0;
         public ExcelReader(ExcelArchiveEntry document, ExcelConfiguration configuration, string? targetSheet = null)
         {
             this.document = document;
@@ -42,12 +43,12 @@ namespace LightExcel
 
         private Cell? CellAt(int i)
         {
-            System.Diagnostics.Debug.WriteLine($"{RowIndex}: CellAt {i}, Enable {i < 0 || i >= cells.Length}");
-            if (i < 0 || i >= cells.Length) 
+            //System.Diagnostics.Debug.WriteLine($"{RowIndex}: CellAt {i}, Enable {i + fixedColumn < 0 || i + fixedColumn >= cells.Count}");
+            if (i + fixedColumn < 0 || i + fixedColumn >= cells.Count)
                 return null;
-            return cells[i];
-        }
 
+            return cells[i + fixedColumn];
+        }
 
         public bool GetBoolean(int i)
         {
@@ -137,7 +138,7 @@ namespace LightExcel
                 rowEnumerator = sheetEnumerator.Current.GetEnumerator();
                 if (configuration.UseHeader && rowEnumerator.MoveNext())
                 {
-                    heads = [.. rowEnumerator.Current.RowDatas.Select(c => c.GetCellValue(Sst) ?? "")];
+                    heads = [.. rowEnumerator.Current.Children.Select(c => c.GetCellValue(Sst) ?? "")];
                     startRow += 1;
                 }
                 return true;
@@ -170,11 +171,15 @@ namespace LightExcel
         {
             if (HasRows)
             {
+                //if (startColumn > 1)
+                //    cells = rowEnumerator!.Current.RowDatas.Skip(startColumn - 1);
+                //else
                 if (startColumn > 1)
-                    cells = [.. rowEnumerator!.Current.RowDatas.Skip(startColumn - 1)];
-                else
-                    cells = [.. rowEnumerator!.Current.RowDatas];
-                System.Diagnostics.Debug.WriteLine($"{RowIndex}: Read, Cells {cells.Length}");
+                {
+                    fixedColumn = startColumn - 1;
+                }
+                cells = rowEnumerator!.Current!.Children;
+                //System.Diagnostics.Debug.WriteLine($"{RowIndex}: Read, Cells {cells.Count}");
                 return true;
             }
             return false;

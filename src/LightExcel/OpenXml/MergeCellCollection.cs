@@ -1,25 +1,20 @@
 ﻿using LightExcel.OpenXml.Interfaces;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LightExcel.OpenXml.Basic;
 
 namespace LightExcel.OpenXml
 {
-    internal class MergeCellCollection : INodeCollection<MergeCell>, INode
+    internal class MergeCellCollection : SimpleNodeCollectionXmlPart<MergeCell>
     {
-        public int Count => _cells.Count;
-        IList<MergeCell> _cells = new List<MergeCell>();
-        public void AppendChild(MergeCell child)
-        {
-            _cells.Add(child);
-        }
-
-        public void WriteToXml(LightExcelStreamWriter writer)
+        public override void WriteToXml(LightExcelStreamWriter writer)
         {
             writer.Write($"<mergeCells count=\"{Count}\">");
-            foreach (var item in _cells)
+            foreach (var item in Children)
             {
                 item.WriteToXml(writer);
             }
@@ -27,13 +22,10 @@ namespace LightExcel.OpenXml
         }
     }
 
-    internal class MergeCell : INode
+    internal class MergeCell(string mergeref) : INode
     {
-        public string MergeRef { get; set; }
-        public MergeCell(string mergeref)
-        {
-            MergeRef = mergeref;
-        }
+        public string MergeRef { get; set; } = mergeref;
+
         public void WriteToXml(LightExcelStreamWriter writer)
         {
             writer.Write($"<mergeCell ref=\"{MergeRef}\" />");

@@ -1,4 +1,5 @@
-﻿using LightExcel.OpenXml.Interfaces;
+﻿using LightExcel.OpenXml.Basic;
+using LightExcel.OpenXml.Interfaces;
 using LightExcel.Utils;
 using System.IO.Compression;
 
@@ -16,7 +17,7 @@ namespace LightExcel.OpenXml
             this.configuration = configuration;
         }
 
-        protected override IEnumerable<Sheet> GetChildrenImpl(LightExcelXmlReader reader)
+        protected override IEnumerable<Sheet> GetChildrenImpl()
         {
             if (!reader.IsStartWith("workbook", XmlHelper.MainNs)) yield break;
             if (!reader.ReadFirstContent()) yield break;
@@ -57,12 +58,12 @@ namespace LightExcel.OpenXml
             }
         }
 
-        protected override void WriteImpl(LightExcelStreamWriter writer, IEnumerable<INode> children)
+        protected override void WriteImpl<TNode>(LightExcelStreamWriter writer, IEnumerable<TNode> children)
         {
             writer.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
             writer.Write("<workbook xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\">");
             writer.Write("<sheets>");
-            foreach (INode child in children)
+            foreach (var child in children)
             {
                 child.WriteToXml(writer);
             }

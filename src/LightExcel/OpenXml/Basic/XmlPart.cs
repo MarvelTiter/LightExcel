@@ -11,31 +11,39 @@ namespace LightExcel.OpenXml
     {
         private bool disposedValue;
         protected ZipArchive? archive;
+        protected LightExcelXmlReader? reader = null;
         internal virtual string Path { get; }
         public XmlPart(ZipArchive archive, string path)
         {
             this.archive = archive;
             Path = path;
         }
-
-        protected IList<T>? cached;
+        protected virtual void SetXmlReader()
+        {
+            reader ??= archive!.GetXmlReader(Path);
+        }
 
         public virtual void Write()
         {
 
         }
 
-        public void Write(IEnumerable<INode> children)
+        public void Write<TNode>(IEnumerable<TNode> children) where TNode : INode
         {
             using var writer = archive!.GetWriter(Path);
             WriteImpl(writer, children);
         }
-        public void Replace(IEnumerable<INode> children)
+        public void Replace<TNode>(IEnumerable<TNode> children) where TNode : INode
         {
-            archive!.GetEntry(Path)?.Delete();
+            if (reader?.Path == Path)
+            {
+                reader?.Dispose();
+                reader = null;
+                archive!.GetEntry(Path)?.Delete();
+            }
             Write(children);
         }
-        protected abstract void WriteImpl(LightExcelStreamWriter writer, IEnumerable<INode> children);
+        protected abstract void WriteImpl<TNode>(LightExcelStreamWriter writer, IEnumerable<TNode> children) where TNode : INode;
 
         protected virtual void Dispose(bool disposing)
         {
@@ -45,6 +53,8 @@ namespace LightExcel.OpenXml
                 {
                     archive?.Dispose();
                     archive = null;
+                    reader?.Dispose();
+                    reader = null;
                 }
                 disposedValue = true;
             }

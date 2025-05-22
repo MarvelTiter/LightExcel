@@ -188,7 +188,7 @@ namespace LightExcel.Utils
 
         internal static string? GetCellValue(this Cell cell, SharedStringTable? table)
         {
-            if (cell == null) return null;
+            // if (cell == null) return null;
             if (cell.Type == "s")
             {
                 if (int.TryParse(cell.Value, out var s))

@@ -35,7 +35,7 @@ namespace LightExcel
 
 		internal ConcurrentDictionary<string, ExcelColumnInfo> DynamicColumns { get; set; } = new();
 
-		public ExcelColumnInfo? this[string name] => DynamicColumns.ContainsKey(name) ? DynamicColumns[name] : null;
+		public ExcelColumnInfo? this[string name] => DynamicColumns.TryGetValue(name, out ExcelColumnInfo? value) ? value : null;
 
 		public ExcelConfiguration AddDynamicColumnInfo(string name, Action<ExcelColumnInfo> info)
 		{
