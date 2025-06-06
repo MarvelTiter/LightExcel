@@ -1,9 +1,9 @@
 ﻿namespace LightExcel.OpenXml.Interfaces
 {
-    internal interface INode
+    public interface INode
     {
         //string ToXmlString();
-        void WriteToXml(LightExcelStreamWriter writer);
+        internal void WriteToXml(LightExcelStreamWriter writer);
     }
     internal interface IStyleNode : INode
     {

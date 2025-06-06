@@ -6,10 +6,12 @@ namespace LightExcel
 	public class TransConfiguration
 	{
 		public bool SheetNumberFormat { get; set; }
+		internal ExcelConfiguration ExcelConfig { get; set; }
 		public Func<ExcelColumnInfo, bool> NumberFormatColumnFilter { get; set; }
-		public TransConfiguration()
+		public TransConfiguration(ExcelConfiguration configuration)
 		{
 			NumberFormatColumnFilter = col => SheetNumberFormat;
+			ExcelConfig = configuration;
 		}
 
 	}

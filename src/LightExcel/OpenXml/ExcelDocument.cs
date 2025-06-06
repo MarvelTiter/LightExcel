@@ -50,6 +50,18 @@ namespace LightExcel.OpenXml
             return CreateByTemplate(fs, templateStream, configuration);
         }
 
+        public static ExcelArchiveEntry CreateByTemplate(Stream stream, string template, ExcelConfiguration configuration)
+        {
+            using var templateStream = File.Open(template, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
+            return CreateByTemplate(stream, templateStream, configuration);
+        }
+
+        public static ExcelArchiveEntry CreateByTemplate(string path, Stream templateStream, ExcelConfiguration configuration)
+        {
+            var fs = File.Create(path, 1024 * 512);
+            return CreateByTemplate(fs, templateStream, configuration);
+        }
+
         public static ExcelArchiveEntry CreateByTemplate(Stream stream, Stream templateStream, ExcelConfiguration configuration)
         {
             templateStream.CopyTo(stream);

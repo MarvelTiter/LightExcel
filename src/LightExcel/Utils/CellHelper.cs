@@ -33,26 +33,26 @@ namespace LightExcel.Utils
         }
 
         internal static Cell EmptyCell(string cr) => new() { Reference = cr, Type = "str" };
-        internal static Cell CreateCell(int x, int y, object? value, ExcelColumnInfo col, bool filted, ExcelConfiguration config)
+        internal static Cell CreateCell(int x, int y, object? value, ExcelColumnInfo col, TransConfiguration transConfig)
         {
             var cell = new Cell();
             cell.Reference = ReferenceHelper.ConvertXyToCellReference(x, y);
             //cell.Type = config.GetValueTypeAtRuntime && (value?.IsStringNumber() ?? false) ? "n" : ConvertCellType(col.Type ?? value?.GetType());
             //cell.Value = GetCellValue(col, value, config);
-            var (v, t) = FormatCell(value, config, col);
-            cell.Value = v;
-            cell.Type = t;
-            cell.StyleIndex = col.StyleIndex ?? (col.NumberFormat || filted ? "1" : null);
-            CalcCellWidth(col, v);
+            FormatCell(ref cell, value, transConfig, col);
+            //cell.Value = v;
+            //cell.Type = t;
+            CalcCellWidth(col, cell.Value);
             return cell;
         }
-        internal static (string?, string?) FormatCell(object? value, ExcelConfiguration config, ExcelColumnInfo info)
+        internal static void FormatCell(ref Cell cell, object? value, TransConfiguration transConfig, ExcelColumnInfo info)
         {
             var v = string.Empty;
             var t = "str";
+            var config = transConfig.ExcelConfig;
             if (value == null)
             {
-                return (v, t);
+                return;
             }
             if (value is string str)
             {
@@ -126,6 +126,7 @@ namespace LightExcel.Utils
                     {
                         t = null;
                         v = ((DateTime)value).ToOADate().ToString(CultureInfo.InvariantCulture);
+                        cell.StyleIndex = info.StyleIndex ?? "2";
                     }
                     else
                     {
@@ -138,8 +139,11 @@ namespace LightExcel.Utils
                     v = value.ToString();
                 }
             }
+            cell.Value = v;
+            cell.Type = t;
+            var filted = transConfig.NumberFormatColumnFilter(info);
+            cell.StyleIndex ??= info.StyleIndex ?? (info.NumberFormat || filted ? "1" : null);
 
-            return (v, t);
         }
 
         internal static void CalcCellWidth(ExcelColumnInfo col, string? value)

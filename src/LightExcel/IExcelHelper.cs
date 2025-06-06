@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LightExcel.OpenXml;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -10,25 +11,38 @@ namespace LightExcel
 {
     public interface ITransactionExcelHelper : IDisposable
     {
-        void WriteExcel(object data, string? sheetName = null, Action<TransConfiguration>? config = null);
+        internal ExcelConfiguration Configuration { get; }
+        void WriteExcel(IDataRender render, object data, string? sheetName = null, TransConfiguration? config = null);
+#if NET6_0_OR_GREATER
+        internal Task WriteExcelAsync<TRender>(object datas, string? sheetName = null, Action<TransConfiguration>? config = null, CancellationToken cancellationToken = default)
+                where TRender : IAsyncDataRender;
+
+        //internal Task WriteByTemplateAsync<T, TRender>(ExcelArchiveEntry doc, IAsyncEnumerable<T> data, string sheetName, ExcelConfiguration configuration, CancellationToken cancellationToken = default)
+        //        where TRender : IAsyncDataRender<T>;
+#endif
     }
+
     public interface IExcelHelper
     {
-        // write file
-        void WriteExcel(string path, object data, string sheetName = "Sheet1", Action<ExcelConfiguration>? config = null);
-        void WriteExcelByTemplate(string path, string template, object data, string sheetName = "Sheet1", Action<ExcelConfiguration>? config = null);
-        ITransactionExcelHelper BeginTransaction(string path, Action<ExcelConfiguration>? config = null);
+        #region 写入
+        void WriteExcel(IDataRender render, string path, object data, string sheetName = "Sheet1", ExcelConfiguration? config = null);
+        void WriteExcelByTemplate(IDataRender render, string path, string template, object data, string sheetName = "Sheet1", ExcelConfiguration? config = null);
+        internal ITransactionExcelHelper BeginTransaction(ExcelArchiveEntry doc, ExcelConfiguration? config = null);
         // write stream
-        void WriteExcel(Stream stream, object data, string sheetName = "Sheet1", Action<ExcelConfiguration>? config = null);
-        void WriteExcelByTemplate(Stream stream, Stream templateStream, object data, string sheetName = "Sheet1", Action<ExcelConfiguration>? config = null);
+        void WriteExcel(IDataRender render, Stream stream, object data, string sheetName = "Sheet1", ExcelConfiguration? config = null);
+        void WriteExcelByTemplate(IDataRender render, Stream stream, Stream templateStream, object data, string sheetName = "Sheet1", ExcelConfiguration? config = null);
+        internal void WriteExcelByTemplate(IDataRender render, ExcelArchiveEntry doc, object data, string sheetName = "Sheet1", ExcelConfiguration? config = null);
         ITransactionExcelHelper BeginTransaction(Stream stream, Action<ExcelConfiguration>? config = null);
-        // read
+        #endregion
+
+        #region 读取
         IExcelDataReader ReadExcel(string path, string? sheetName = null, Action<ExcelConfiguration>? config = null);
-        IEnumerable<T> QueryExcel<T>(string path, string? sheetName , Action<ExcelConfiguration>? config = null);
-        IEnumerable<dynamic> QueryExcel(string path, string? sheetName , Action<ExcelConfiguration>? config = null);
+        IEnumerable<T> QueryExcel<T>(string path, string? sheetName, Action<ExcelConfiguration>? config = null);
+        IEnumerable<dynamic> QueryExcel(string path, string? sheetName, Action<ExcelConfiguration>? config = null);
 
         IExcelDataReader ReadExcel(Stream stream, string? sheetName = null, Action<ExcelConfiguration>? config = null);
         IEnumerable<T> QueryExcel<T>(Stream stream, string? sheetName, Action<ExcelConfiguration>? config = null);
         IEnumerable<dynamic> QueryExcel(Stream stream, string? sheetName, Action<ExcelConfiguration>? config = null);
+        #endregion
     }
 }
