@@ -28,11 +28,24 @@ namespace LightExcel.OpenXml
 
         }
 
-        public void Write<TNode>(IEnumerable<TNode> children) where TNode : INode
+        public void Write<TNode>(IEnumerable<TNode> children) 
+            where TNode : INode
         {
             using var writer = archive!.GetWriter(Path);
             WriteImpl(writer, children);
         }
+#if NET6_0_OR_GREATER
+        public async Task WriteAsync<TNode>(IAsyncEnumerable<TNode> children, CancellationToken cancellationToken = default)
+            where TNode : INode
+        {
+            using var writer = archive!.GetWriter(Path);
+            await WriteAsyncImpl(writer, children, cancellationToken);
+        }
+        protected virtual Task WriteAsyncImpl<TNode>(LightExcelStreamWriter writer, IAsyncEnumerable<TNode> children, CancellationToken cancellationToken = default) where TNode : INode
+        {
+            throw new NotSupportedException();
+        }
+#endif
         public void Replace<TNode>(IEnumerable<TNode> children) where TNode : INode
         {
             if (reader?.Path == Path)
@@ -43,7 +56,20 @@ namespace LightExcel.OpenXml
             }
             Write(children);
         }
+
+        public void DeleteEntry()
+        {
+            if (reader?.Path == Path)
+            {
+                reader?.Dispose();
+                reader = null;
+                archive!.GetEntry(Path)?.Delete();
+            }
+        }
+
         protected abstract void WriteImpl<TNode>(LightExcelStreamWriter writer, IEnumerable<TNode> children) where TNode : INode;
+
+        
 
         protected virtual void Dispose(bool disposing)
         {

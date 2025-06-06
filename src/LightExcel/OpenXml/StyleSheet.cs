@@ -24,8 +24,69 @@ namespace LightExcel.OpenXml
 
         protected override void WriteImpl<TNode>(LightExcelStreamWriter writer, IEnumerable<TNode> children)
         {
+            /*
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+    <numFmts count="1">
+        <numFmt numFmtId="14" formatCode="yyyy-MM-dd"/>
+    </numFmts>
+    <fonts count="2">
+        <font>
+            <sz val="11" />
+            <name val="宋体" />
+        </font>
+        <font>
+            <sz val="9" />
+            <name val="宋体" />
+            <family val="3" />
+            <charset val="134" />
+        </font>
+    </fonts>
+    <fills count="2">
+        <fill>
+            <patternFill patternType="none" />
+        </fill>
+        <fill>
+            <patternFill patternType="gray125" />
+        </fill>
+    </fills>
+    <borders count="1">
+        <border>
+            <left />
+            <right />
+            <top />
+            <bottom />
+            <diagonal />
+        </border>
+    </borders>
+    <cellStyleXfs count="1">
+        <xf numFmtId="0" fontId="0" fillId="0" borderId="0">
+            <alignment vertical="center" />
+        </xf>
+    </cellStyleXfs>
+    <cellXfs count="3">
+        <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0">
+            <alignment vertical="center" />
+        </xf>
+        <!-- 百分比格式 -->
+        <xf numFmtId="10" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1">
+            <alignment vertical="center" />
+        </xf>
+        <!-- 日期格式 -->
+        <xf numFmtId="14" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1">
+            <alignment vertical="center" />
+        </xf>
+    </cellXfs>
+    <cellStyles count="1">
+        <cellStyle name="常规" xfId="0" builtinId="0" />
+    </cellStyles>
+</styleSheet>
+             */
             writer.Write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
             writer.Write("<styleSheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\">");
+            writer.Write("<numFmts count=\"1\">");
+            writer.Write("<numFmt numFmtId=\"14\" formatCode=\"yyyy-MM-dd\"/>");
+            writer.Write("</numFmts>");
             writer.Write("<fonts count=\"2\">");
             writer.Write("<font>");
             writer.Write("<sz val=\"11\" />");
@@ -65,6 +126,9 @@ namespace LightExcel.OpenXml
             writer.Write("<alignment vertical=\"center\" />");
             writer.Write("</xf>");
             writer.Write("<xf numFmtId=\"10\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\" applyNumberFormat=\"1\">");
+            writer.Write("<alignment vertical=\"center\" />");
+            writer.Write("</xf>");
+            writer.Write("<xf numFmtId=\"14\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\" applyNumberFormat=\"1\">");
             writer.Write("<alignment vertical=\"center\" />");
             writer.Write("</xf>");
             writer.Write("</cellXfs>");

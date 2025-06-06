@@ -10,7 +10,7 @@ namespace LightExcel.OpenXml
     /// <summary>
     /// xl/worksheets/sheet{id}.xml
     /// </summary>
-    internal class Sheet : NodeCollectionXmlPart<Row>, INode
+    internal class Sheet : NodeCollectionXmlPart<Row>, INode, IRenderSheet
     {
         public Sheet(ZipArchive archive, string id, string name, int sid) : base(archive, "")
         {
@@ -56,21 +56,47 @@ namespace LightExcel.OpenXml
 
         protected override void WriteImpl<TNode>(LightExcelStreamWriter writer, IEnumerable<TNode> children)
         {
-            writer.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
-            writer.Write("<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\">");
-            // dimension
-            var dimensionWritePosition = writer.WriteAndFlush("<dimension ref=\"");
-            // cols 
-            var colsWritePosition = writer.WriteAndFlush("                              />");
-            // <cols><col min="" max="" width="" customWidth="1"/></cols>
-            var reserveLen = ReserveColsSpace(this);
-            writer.Write(new string(' ', reserveLen));
-            writer.Write("<sheetData>");
+            WriteBefore(writer, out var dimensionWritePosition, out var colsWritePosition);
+
             foreach (var child in children)
             {
                 child.WriteToXml(writer);
             }
 
+            WriteAfter(writer, dimensionWritePosition, colsWritePosition);
+        }
+#if NET6_0_OR_GREATER
+        protected override async Task WriteAsyncImpl<TNode>(LightExcelStreamWriter writer, IAsyncEnumerable<TNode> children, CancellationToken cancellationToken = default)
+        {
+            WriteBefore(writer, out long dimensionWritePosition, out long colsWritePosition);
+
+            await foreach (var child in children.WithCancellation(cancellationToken))
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    break;
+                }
+                child.WriteToXml(writer);
+            }
+            WriteAfter(writer, dimensionWritePosition, colsWritePosition);
+        }
+#endif
+        private void WriteBefore(LightExcelStreamWriter writer, out long dimensionWritePosition, out long colsWritePosition)
+        {
+            writer.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+            writer.Write("<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\">");
+            // dimension
+            dimensionWritePosition = writer.WriteAndFlush("<dimension ref=\"");
+            // cols 
+            colsWritePosition = writer.WriteAndFlush("                              />");
+            // <cols><col min="" max="" width="" customWidth="1"/></cols>
+            var reserveLen = ReserveColsSpace(this);
+            writer.Write(new string(' ', reserveLen));
+            writer.Write("<sheetData>");
+        }
+
+        private void WriteAfter(LightExcelStreamWriter writer, long dimensionWritePosition, long colsWritePosition)
+        {
             writer.Write("</sheetData>");
             WriteMergeInfo(writer);
             writer.WriteAndFlush("</worksheet>");
@@ -84,6 +110,10 @@ namespace LightExcel.OpenXml
                 writer.WriteAndFlush(ColInfos);
             }
         }
+
+
+
+
 
         private void WriteMergeInfo(LightExcelStreamWriter writer)
         {

@@ -4,42 +4,43 @@ using System.Data;
 
 namespace LightExcel.Renders
 {
-    internal class DataReaderRender : RenderBase
+    internal class DataReaderRender(ExcelConfiguration configuration) : SyncRenderBase<IDataReader, IDataReader>(configuration)
     {
-        public DataReaderRender(ExcelConfiguration configuration) : base(configuration) { }
-        public override IEnumerable<ExcelColumnInfo> CollectExcelColumnInfo(object data)
+        public override IEnumerable<ExcelColumnInfo> CollectExcelColumnInfo(IDataReader data)
         {
-            if (data is IDataReader d)
+            //if (data is not IDataReader d)
+            //{
+            //    yield break;
+            //}
+            for (int i = 0; i < data.FieldCount; i++)
             {
-                for (int i = 0; i < d.FieldCount; i++)
-                {
-                    var name = d.GetName(i);
-                    var col = new ExcelColumnInfo(name);
-                    col.NumberFormat = Configuration.CheckCellNumberFormat(name);
-                    col.Type = d.GetFieldType(i);
-                    col.ColumnIndex = i + 1;
-                    AssignDynamicInfo(col);
-                    yield return col;
-                }
+                var name = data.GetName(i);
+                var col = new ExcelColumnInfo(name);
+                col.NumberFormat = Configuration.CheckCellNumberFormat(name);
+                col.Type = data.GetFieldType(i);
+                col.ColumnIndex = i + 1;
+                AssignDynamicInfo(col);
+                yield return col;
             }
         }
+        public override IDataReader GetFirstElement(IDataReader data) => data;
 
-        public override IEnumerable<Row> RenderBody(object data, Sheet sheet, ExcelColumnInfo[] columns, TransConfiguration configuration)
+        public override IEnumerable<Row> RenderBody(IDataReader data, IRenderSheet sheet, TransConfiguration configuration)
         {
-            var reader = data as IDataReader ?? throw new ArgumentException();
+            //var reader = data as IDataReader ?? throw new ArgumentException();
+            var reader = data;
             var rowIndex = Configuration.StartRowIndex;
             var maxColumnIndex = 0;
             while (reader.Read())
             {
                 var row = new Row() { RowIndex = ++rowIndex };
                 var cellIndex = 0;
-                foreach (var col in columns)
+                foreach (var col in sheet.Columns)
                 {
                     if (col.Ignore) continue;
                     var value = reader.GetValue(col.ColumnIndex - 1);
                     cellIndex = col.ColumnIndex;
-                    var nf = configuration.NumberFormatColumnFilter(col);
-                    var cell = CellHelper.CreateCell(cellIndex, rowIndex, value, col, nf, Configuration);
+                    var cell = CellHelper.CreateCell(cellIndex, rowIndex, value, col, configuration);
                     //var cell = new Cell();
                     //var (v, t) = CellHelper.FormatCell(value, Configuration, col);
                     ////cell.Type = CellHelper.ConvertCellType(col.Type);

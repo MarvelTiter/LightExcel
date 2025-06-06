@@ -1,4 +1,4 @@
-using LightExcel;
+Ôªøusing LightExcel;
 using LightExcel.Attributes;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -32,9 +32,9 @@ namespace TestProject1
 
         class Test01
         {
-            [ExcelColumn(Name = " Ù–‘1")]
+            [ExcelColumn(Name = "Â±ûÊÄß1")]
             public int Prop1 { get; set; }
-            [ExcelColumn(Name = " Ù–‘2")]
+            [ExcelColumn(Name = "Â±ûÊÄß2")]
             public int Prop2 { get; set; }
         }
 
@@ -58,7 +58,7 @@ namespace TestProject1
         public void TestRead()
         {
             ExcelHelper excel = new ExcelHelper();
-            var reader = excel.ReadExcel(@"D:\Documents\Desktop\µº»Îƒ£∞Â.xlsx");
+            var reader = excel.ReadExcel(@"D:\Documents\Desktop\ÂØºÂÖ•Ê®°Êùø.xlsx");
             while (reader.NextResult())
             {
                 Console.WriteLine($"================={reader.CurrentSheetName}================");
@@ -87,19 +87,18 @@ namespace TestProject1
         public void TestReadModel()
         {
             ExcelHelper excel = new ExcelHelper();
-            var reader = excel.QueryExcel<User>(@"D:\Documents\Desktop\µº»Îƒ£∞Â.xlsx", "Sheet1");
+            var reader = excel.QueryExcel<User>(@"D:\Documents\Desktop\ÂØºÂÖ•Ê®°Êùø.xlsx", "Sheet1");
         }
 
         [TestMethod]
         public void TemplateTest()
         {
-            ExcelHelper excel = new ExcelHelper();
+            IExcelHelper excel = new ExcelHelper();
             const string Path1 = "templateTest.xlsx";
             if (File.Exists(Path1))
                 File.Delete(Path1);
             using var ms = new MemoryStream();
-            using var template = File.Open("template.xlsx", FileMode.Open, FileAccess.Read, FileShare.Read);
-            excel.WriteExcelByTemplate(ms, template, Ge());
+            excel.WriteExcelByTemplate(ms, "template.xlsx", Ge());
             File.WriteAllBytes(Path1, ms.ToArray());
             Process.Start("powershell", $"start {AppDomain.CurrentDomain.BaseDirectory}");
         }
@@ -107,7 +106,7 @@ namespace TestProject1
         [TestMethod]
         public void EmbeddedTemplateTest()
         {
-            ExcelHelper excel = new ExcelHelper();
+            IExcelHelper excel = new ExcelHelper();
             const string Path1 = "templateEmbededTest.xlsx";
             if (File.Exists(Path1))
                 File.Delete(Path1);

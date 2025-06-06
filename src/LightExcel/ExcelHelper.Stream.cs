@@ -1,5 +1,6 @@
 ﻿using LightExcel.OpenXml;
 using LightExcel.TypedDeserializer;
+using LightExcel.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,29 +10,25 @@ using System.Threading.Tasks;
 
 namespace LightExcel
 {
-    public partial class ExcelHelper
+    internal partial class ExcelHelper
     {
-
-        public void WriteExcel(Stream stream, object data, string sheetName = "Sheet1", Action<ExcelConfiguration>? config = null)
+        public void WriteExcel(IDataRender render, Stream stream, object data, string sheetName = "Sheet1", ExcelConfiguration? config = null)
         {
-            config?.Invoke(configuration);
-            using var trans = new TransExcelHelper(stream, configuration);
-            trans.WriteExcel(data, sheetName);
+            config ??= new();
+            using var trans = new TransExcelHelper(stream, config);
+            trans.WriteExcel(render, data, sheetName);
         }
-        public void WriteExcelByTemplate(Stream stream, Stream templateStream, object data, string sheetName = "Sheet1", Action<ExcelConfiguration>? config = null)
-        {
-            config?.Invoke(configuration);
-            using var doc = ExcelDocument.CreateByTemplate(stream, templateStream, configuration);
-            HandleWriteTemplate(doc, data, sheetName);
-        }
+        
         public ITransactionExcelHelper BeginTransaction(Stream stream, Action<ExcelConfiguration>? config = null)
         {
+            ExcelConfiguration configuration = new();
             config?.Invoke(configuration);
             return new TransExcelHelper(stream, configuration);
         }
 
         public IExcelDataReader ReadExcel(Stream stream, string? sheetName = null, Action<ExcelConfiguration>? config = null)
         {
+            ExcelConfiguration configuration = new();
             config?.Invoke(configuration);
             var archive = ExcelDocument.Open(stream, configuration);
             return new ExcelReader(archive, configuration, sheetName);

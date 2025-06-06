@@ -19,6 +19,7 @@ namespace LightExcel.OpenXml
 
         protected override IEnumerable<Sheet> GetChildrenImpl()
         {
+            if (reader is null) yield break;
             if (!reader.IsStartWith("workbook", XmlHelper.MainNs)) yield break;
             if (!reader.ReadFirstContent()) yield break;
             while (!reader.EOF)

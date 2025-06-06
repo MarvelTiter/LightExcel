@@ -4,6 +4,9 @@
     {
         void Write();
         void Write<TNode>(IEnumerable<TNode> children) where TNode : INode;
+        [Obsolete]
         void Replace<TNode>(IEnumerable<TNode> children) where TNode : INode;
+
+        void DeleteEntry();
     }
 }
