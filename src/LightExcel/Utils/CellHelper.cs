@@ -32,27 +32,28 @@ namespace LightExcel.Utils
             };
         }
 
-        internal static Cell EmptyCell(string cr) => new() { Reference = cr, Type = "str" };
+        internal static Cell EmptyCell(string cr) => new(null, cr, "str");
         internal static Cell CreateCell(int x, int y, object? value, ExcelColumnInfo col, TransConfiguration transConfig)
         {
-            var cell = new Cell();
-            cell.Reference = ReferenceHelper.ConvertXyToCellReference(x, y);
+            //var cell = new Cell();
+            //cell.Reference = ReferenceHelper.ConvertXyToCellReference(x, y);
             //cell.Type = config.GetValueTypeAtRuntime && (value?.IsStringNumber() ?? false) ? "n" : ConvertCellType(col.Type ?? value?.GetType());
             //cell.Value = GetCellValue(col, value, config);
-            FormatCell(ref cell, value, transConfig, col);
+            var cell = FormatCell(ReferenceHelper.ConvertXyToCellReference(x, y), value, transConfig, col);
             //cell.Value = v;
             //cell.Type = t;
             CalcCellWidth(col, cell.Value);
             return cell;
         }
-        internal static void FormatCell(ref Cell cell, object? value, TransConfiguration transConfig, ExcelColumnInfo info)
+        internal static Cell FormatCell(string r, object? value, TransConfiguration transConfig, ExcelColumnInfo info)
         {
             var v = string.Empty;
             var t = "str";
+            string? s = null;
             var config = transConfig.ExcelConfig;
             if (value == null)
             {
-                return;
+                return new Cell(null, r, null);
             }
             if (value is string str)
             {
@@ -126,7 +127,7 @@ namespace LightExcel.Utils
                     {
                         t = null;
                         v = ((DateTime)value).ToOADate().ToString(CultureInfo.InvariantCulture);
-                        cell.StyleIndex = info.StyleIndex ?? "2";
+                        s = info.StyleIndex ?? "2";
                     }
                     else
                     {
@@ -139,10 +140,11 @@ namespace LightExcel.Utils
                     v = value.ToString();
                 }
             }
-            cell.Value = v;
-            cell.Type = t;
+            //cell.Value = v;
+            //cell.Type = t;
             var filted = transConfig.NumberFormatColumnFilter(info);
-            cell.StyleIndex ??= info.StyleIndex ?? (info.NumberFormat || filted ? "1" : null);
+            s ??= info.StyleIndex ?? (info.NumberFormat || filted ? "1" : null);
+            return new Cell(v, r, t, s);
 
         }
 
@@ -203,28 +205,60 @@ namespace LightExcel.Utils
             return cell.Value;
         }
 
-        internal static void TryGetBoolean(this Cell cell, SharedStringTable? table, out bool value)
+        internal static void TryGetBoolean(this Cell cell
+            , SharedStringTable? table
+            , int index
+            , ExcelConfiguration configuration
+            , out bool value)
         {
             var val = GetCellValue(cell, table);
             _ = bool.TryParse(val, out value);
         }
-        internal static void TryGetDecimal(this Cell cell, SharedStringTable? table, out decimal value)
+        internal static void TryGetDecimal(this Cell cell
+            , SharedStringTable? table
+            , int index
+            , ExcelConfiguration configuration
+            , out decimal value)
         {
             var val = GetCellValue(cell, table);
             _ = decimal.TryParse(val, out value);
         }
 
-        internal static void TryGetDateTime(this Cell cell, SharedStringTable? table, out DateTime value)
+        internal static void TryGetDateTime(this Cell cell
+            , SharedStringTable? table
+            , int index
+            , ExcelConfiguration configuration
+            , out DateTime value)
         {
             var val = GetCellValue(cell, table);
-            _ = DateTime.TryParse(val, out value);
+            if (!DateTime.TryParse(val, out value))
+            {
+                // ExcelColumnInfo的Index是从1开始的，参数的index是从0开始
+                var ci = configuration[index + 1];
+                if (ci?.Format is not null)
+                {
+                    _ = DateTime.TryParseExact(val, ci.Format, CultureInfo.InvariantCulture, DateTimeStyles.None, out value);
+                }
+                else if (double.TryParse(val, out var oad))
+                {
+                    value = DateTime.FromOADate(oad);
+                }
+            }
         }
-        internal static void TryGetDouble(this Cell cell, SharedStringTable? table, out double value)
+        internal static void TryGetDouble(this Cell cell
+            , SharedStringTable? table
+            , int index
+            , ExcelConfiguration configuration
+            , out double value)
         {
             var val = GetCellValue(cell, table);
             _ = double.TryParse(val, out value);
         }
-        internal static void TryGetInt(this Cell cell, SharedStringTable? table, out int value)
+        internal static void TryGetInt(this Cell cell
+            , SharedStringTable? table
+            , int index
+            , ExcelConfiguration configuration
+            , out int value)
         {
             var val = GetCellValue(cell, table);
             _ = int.TryParse(val, out value);

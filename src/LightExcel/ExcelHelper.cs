@@ -19,23 +19,40 @@ namespace LightExcel
             return new ExcelReader(archive, configuration, sheetName);
         }
 
-        public IEnumerable<T> QueryExcel<T>(string path, string? sheetName, Action<ExcelConfiguration>? config = null)
+        public IEnumerable<T> QueryExcel<T>(string path, string? sheetName = null, Action<ExcelConfiguration>? config = null)
         {
-            if (string.IsNullOrEmpty(sheetName))
+            IExcelDataReader? reader = null;
+            try
             {
-                throw new ArgumentNullException(nameof(sheetName));
-            }
-            using var reader = ReadExcel(path, sheetName, config);
-            while (reader.NextResult())
-            {
-                while (reader.Read())
+                if (config is null)
                 {
-                    yield return ExpressionDeserialize<T>.Deserialize(reader);
+                    config = c => c.AddDynamicColumns(typeof(T).CollectEntityInfo());
+                    reader = ReadExcel(path, sheetName, config);
+                }
+                else
+                {
+                    reader = ReadExcel(path, sheetName, c =>
+                    {
+                        config.Invoke(c);
+                        c.AddDynamicColumns(typeof(T).CollectEntityInfo());
+                    });
+                }
+                while (reader.NextResult())
+                {
+                    while (reader.Read())
+                    {
+                        yield return ExpressionDeserialize<T>.Deserialize(reader);
+                    }
                 }
             }
+            finally
+            {
+                reader?.Dispose();
+            }
+
         }
 
-        public IEnumerable<dynamic> QueryExcel(string path, string? sheetName, Action<ExcelConfiguration>? config = null)
+        public IEnumerable<dynamic> QueryExcel(string path, string? sheetName = null, Action<ExcelConfiguration>? config = null)
         {
             if (string.IsNullOrEmpty(sheetName))
             {

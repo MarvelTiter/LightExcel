@@ -14,7 +14,7 @@ namespace LightExcel.OpenXml
 </Relationships>";
         public static ExcelArchiveEntry Open(string path, ExcelConfiguration configuration)
         {
-            var fs = File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
+            var fs = File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
             return Open(fs, configuration);
         }
 

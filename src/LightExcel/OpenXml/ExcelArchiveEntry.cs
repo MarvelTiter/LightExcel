@@ -53,6 +53,7 @@ namespace LightExcel.OpenXml
 				{
 					archive?.Dispose();
 					stream?.Dispose();
+					WorkBook.Dispose();
 				}
 				disposedValue = true;
 			}

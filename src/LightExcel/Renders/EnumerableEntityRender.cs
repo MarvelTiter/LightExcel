@@ -17,30 +17,31 @@ namespace LightExcel.Renders
 
         public override IEnumerable<ExcelColumnInfo> CollectExcelColumnInfo(T data)
         {
-            var properties = elementType.GetProperties();
-            int index = 1;
-            foreach (var prop in properties)
-            {
-                ExcelColumnAttribute? excelColumnAttribute = prop.GetCustomAttribute<ExcelColumnAttribute>();
-                if (excelColumnAttribute?.Ignore ?? false) continue;
-#if NET6_0_OR_GREATER
-                var displayAttribute = prop.GetCustomAttribute<System.ComponentModel.DataAnnotations.DisplayAttribute>();
-                var col = new ExcelColumnInfo(excelColumnAttribute?.Name ?? displayAttribute?.Name ?? prop.Name);
-#else
-                var col = new ExcelColumnInfo(excelColumnAttribute?.Name ??  prop.Name);
-#endif
+            //            var properties = elementType.GetProperties();
+            //            int index = 1;
+            //            foreach (var prop in properties)
+            //            {
+            //                ExcelColumnAttribute? excelColumnAttribute = prop.GetCustomAttribute<ExcelColumnAttribute>();
+            //                if (excelColumnAttribute?.Ignore ?? false) continue;
+            //#if NET6_0_OR_GREATER
+            //                var displayAttribute = prop.GetCustomAttribute<System.ComponentModel.DataAnnotations.DisplayAttribute>();
+            //                var col = new ExcelColumnInfo(excelColumnAttribute?.Name ?? displayAttribute?.Name ?? prop.Name);
+            //#else
+            //                var col = new ExcelColumnInfo(excelColumnAttribute?.Name ??  prop.Name);
+            //#endif
 
-                col.Ignore = excelColumnAttribute?.Ignore ?? false;
-                col.Property = new Property(prop);
-                col.Type = prop.PropertyType;
-                col.NumberFormat = excelColumnAttribute?.NumberFormat ?? false;
-                col.Format = excelColumnAttribute?.Format;
-                col.ColumnIndex = index++;
-                col.AutoWidth = excelColumnAttribute?.AutoWidth ?? false;
-                col.Width = excelColumnAttribute?.Width;
-                AssignDynamicInfo(col);
-                yield return col;
-            }
+            //                col.Ignore = excelColumnAttribute?.Ignore ?? false;
+            //                col.Property = new Property(prop);
+            //                col.Type = prop.PropertyType;
+            //                col.NumberFormat = excelColumnAttribute?.NumberFormat ?? false;
+            //                col.Format = excelColumnAttribute?.Format;
+            //                col.ColumnIndex = index++;
+            //                col.AutoWidth = excelColumnAttribute?.AutoWidth ?? false;
+            //                col.Width = excelColumnAttribute?.Width;
+            //                AssignDynamicInfo(col);
+            //                yield return col;
+            //            }
+            return elementType.CollectEntityInfo(AssignDynamicInfo);
         }
 
         public override T GetFirstElement(IEnumerable<T> data) => data.First();

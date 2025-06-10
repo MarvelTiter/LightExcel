@@ -3,33 +3,28 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace LightExcel
 {
-    public interface IExcelDataReader : IDisposable
+    public interface IExcelDataReader :  IDisposable
     {
         bool Read();
         bool NextResult();
 
-        IEnumerable<dynamic> AsDynamic();
-        IEnumerable<TData> AsTyped<TData>();
         string? this[string name] { get; }
         string? this[int i] { get; }
-        string CurrentSheetName { get; }
         int FieldCount { get; }
-        int RowIndex { get; }
+
         bool GetBoolean(int i);
-      
         DateTime GetDateTime(int i);
-      
         decimal GetDecimal(int i);
-       
         double GetDouble(int i);
-      
         int GetInt32(int i);
-               
         string GetName(int i);
-      
         int GetOrdinal(string name);
-       
         string GetValue(int i);
+
         bool IsNullOrEmpty(int i);
+        string CurrentSheetName { get; }
+        int RowIndex { get; }
+        IEnumerable<dynamic> AsDynamic();
+        IEnumerable<TData> AsTyped<TData>();
     }
 }

@@ -2,7 +2,7 @@
 
 namespace LightExcel.OpenXml
 {
-    internal class SharedStringNode : INode
+    internal readonly struct SharedStringNode : INode
     {
         public SharedStringNode(string content)
         {

@@ -71,7 +71,7 @@ namespace TestProject1
         {
             var ie = Datas.DictionarySource();
             ExcelHelper excel = new ExcelHelper();
-            excel.WriteExcelByTemplate("template-test.xlsx", "路檢報表格式.xlsx", ie, config: config =>
+            excel.WriteExcelByTemplate("template-test.xlsx", "template.xlsx", ie, config: config =>
             {
                 //config.FillWithPlacholder = true;
             });
@@ -83,7 +83,7 @@ namespace TestProject1
         {
             var ie = Datas.DictionarySourceAsync();
             ExcelHelper excel = new ExcelHelper();
-            await excel.WriteExcelByTemplateAsync("async-template-test.xlsx", "路檢報表格式.xlsx", ie, config: config =>
+            await excel.WriteExcelByTemplateAsync("async-template-test.xlsx", "template.xlsx", ie, config: config =>
              {
                  //config.FillWithPlacholder = true;
              });

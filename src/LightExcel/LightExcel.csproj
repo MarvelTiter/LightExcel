@@ -9,7 +9,7 @@
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Title>MT.LightExcel</Title>
 		<Description>基于OpenXml的Excel读取与写入</Description>
-		<Version>2.1.4</Version>
+		<Version>2.1.5</Version>
 		<RepositoryUrl>https://github.com/MarvelTiter/LightExcel.git</RepositoryUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageReadmeFile>Nuget.md</PackageReadmeFile>

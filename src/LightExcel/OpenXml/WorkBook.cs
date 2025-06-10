@@ -4,19 +4,12 @@ using System.Xml.Linq;
 
 namespace LightExcel.OpenXml
 {
-    internal class WorkBook
+    internal class WorkBook(ZipArchive archive, ExcelArchiveEntry doc, ExcelConfiguration configuration) : IDisposable
     {
-        private readonly ZipArchive archive;
-        private readonly ExcelArchiveEntry doc;
-        private readonly ExcelConfiguration configuration;
-        public WorkBook(ZipArchive archive, ExcelArchiveEntry doc, ExcelConfiguration configuration)
-        {
-            this.archive = archive;
-            this.doc = doc;
-            this.configuration = configuration;
-            WorkSheets = new SheetCollection(archive, configuration);
-            Relationships = new RelationshipCollection(archive);
-        }
+        private bool disposedValue;
+        private RelationshipCollection? relationships;
+        private SheetCollection? workSheets;
+
         internal void Save()
         {
             WorkSheets.Write();
@@ -30,7 +23,15 @@ namespace LightExcel.OpenXml
         /// <summary>
         /// xl/workbook.xml
         /// </summary>
-        internal SheetCollection WorkSheets { get; set; }
+        internal SheetCollection WorkSheets
+        {
+            get
+            {
+                workSheets ??= new SheetCollection(archive, configuration);
+                return workSheets;
+            }
+            set => workSheets = value;
+        }
         /// <summary>
         /// xl/sharedStrings.xml
         /// </summary>
@@ -39,10 +40,19 @@ namespace LightExcel.OpenXml
         /// xl/styles.xml
         /// </summary>
         internal StyleSheet? StyleSheet { get; set; }
+
         /// <summary>
         /// xl/_rels/workbook.xml.rels
         /// </summary>
-        internal RelationshipCollection Relationships { get; set; }
+        internal RelationshipCollection Relationships
+        {
+            get
+            {
+                relationships ??= new RelationshipCollection(archive);
+                return relationships;
+            }
+            set => relationships = value;
+        }
         internal void InitSharedStringTable()
         {
             SharedStrings = new SharedStringTable(archive);
@@ -75,6 +85,25 @@ namespace LightExcel.OpenXml
             Relationships.AppendChild(new Relationship(sheet.Id, "worksheet", sheet.RelPath));
             doc.ContentTypes.AppendChild(new Override(sheet.Path, "application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"));
             return sheet;
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                }
+                SharedStrings?.Dispose();
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // 不要更改此代码。请将清理代码放入“Dispose(bool disposing)”方法中
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

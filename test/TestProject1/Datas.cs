@@ -44,8 +44,9 @@ namespace TestProject1
                 yield return new Model
                 {
                     Index = i + 1,
-                    Birthday = DateTime.Now,
-                    Name = "Hello"
+                    Birthday = DateTime.Now.Date,
+                    Name = "Hello",
+                    Birthday2 = DateTime.Now
                 };
             }
         }
@@ -58,7 +59,8 @@ namespace TestProject1
                 {
                     Index = i + 1,
                     Birthday = DateTime.Now,
-                    Name = "Hello"
+                    Name = "Hello",
+                    Birthday2 = DateTime.Now
                 };
                 await Task.Delay(5);
             }

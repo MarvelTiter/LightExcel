@@ -61,7 +61,7 @@ namespace LightExcel
             var header = sheet.ToList();
             var templateRow = header.Last();
             // 获取共享字符串列表
-            var sst = doc.WorkBook.SharedStrings?.ToList();
+            var sst = doc.WorkBook.SharedStrings;
             //var render = RenderProvider.GetDataRender(data.GetType(), configuration);
             if (configuration.FillWithPlacholder)
             {
@@ -150,7 +150,7 @@ namespace LightExcel
         static readonly Regex extract = new("{{(.+)}}");
         private static Regex ExtractColumn() => extract;
 #endif
-        private static IEnumerable<ExcelColumnInfo> CollectExcelColumnInfos(Row templateRow, List<SharedStringNode>? sst)
+        private static IEnumerable<ExcelColumnInfo> CollectExcelColumnInfos(Row templateRow, SharedStringTable? sst)
         {
             foreach (var cell in templateRow.Children)
             {
@@ -160,7 +160,7 @@ namespace LightExcel
                 {
                     if (int.TryParse(name, out var s) && sst!.Count > s)
                     {
-                        name = sst[s].Content;
+                        name = sst[s];
                     }
                 }
                 if (name != null)

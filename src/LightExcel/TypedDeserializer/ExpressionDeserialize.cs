@@ -18,15 +18,15 @@ namespace LightExcel.TypedDeserializer
     /// </summary>
     internal static class ExpressionDeserialize<T>
     {
-        private static readonly MethodInfo DataRecord_GetInt16 = typeof(IExcelDataReader).GetMethod("GetInt16", new Type[] { typeof(int) })!;
-        private static readonly MethodInfo DataRecord_GetInt32 = typeof(IExcelDataReader).GetMethod("GetInt32", new Type[] { typeof(int) })!;
-        private static readonly MethodInfo DataRecord_GetInt64 = typeof(IExcelDataReader).GetMethod("GetInt64", new Type[] { typeof(int) })!;
-        private static readonly MethodInfo DataRecord_GetDouble = typeof(IExcelDataReader).GetMethod("GetDouble", new Type[] { typeof(int) })!;
-        private static readonly MethodInfo DataRecord_GetDecimal = typeof(IExcelDataReader).GetMethod("GetDecimal", new Type[] { typeof(int) })!;
-        private static readonly MethodInfo DataRecord_GetBoolean = typeof(IExcelDataReader).GetMethod("GetBoolean", new Type[] { typeof(int) })!;
-        private static readonly MethodInfo DataRecord_GetDateTime = typeof(IExcelDataReader).GetMethod("GetDateTime", new Type[] { typeof(int) })!;
-        private static readonly MethodInfo DataRecord_GetValue = typeof(IExcelDataReader).GetMethod("GetValue", new Type[] { typeof(int) })!;
-        private static readonly MethodInfo IsNullOrEmpty = typeof(IExcelDataReader).GetMethod("IsNullOrEmpty", new Type[] { typeof(int) })!;
+        private static readonly MethodInfo DataRecord_GetInt16 = typeof(IExcelDataReader).GetMethod("GetInt16", [typeof(int)])!;
+        private static readonly MethodInfo DataRecord_GetInt32 = typeof(IExcelDataReader).GetMethod("GetInt32", [typeof(int)])!;
+        private static readonly MethodInfo DataRecord_GetInt64 = typeof(IExcelDataReader).GetMethod("GetInt64", [typeof(int)])!;
+        private static readonly MethodInfo DataRecord_GetDouble = typeof(IExcelDataReader).GetMethod("GetDouble", [typeof(int)])!;
+        private static readonly MethodInfo DataRecord_GetDecimal = typeof(IExcelDataReader).GetMethod("GetDecimal", [typeof(int)])!;
+        private static readonly MethodInfo DataRecord_GetBoolean = typeof(IExcelDataReader).GetMethod("GetBoolean", [typeof(int)])!;
+        private static readonly MethodInfo DataRecord_GetDateTime = typeof(IExcelDataReader).GetMethod("GetDateTime", [typeof(int)])!;
+        private static readonly MethodInfo DataRecord_GetValue = typeof(IExcelDataReader).GetMethod("GetValue", [typeof(int)])!;
+        private static readonly MethodInfo IsNullOrEmpty = typeof(IExcelDataReader).GetMethod("IsNullOrEmpty", [typeof(int)])!;
         readonly static Dictionary<Type, MethodInfo> typeMapMethod = new Dictionary<Type, MethodInfo>(37)
         {
             [typeof(short)] = DataRecord_GetInt16,
@@ -226,8 +226,9 @@ namespace LightExcel.TypedDeserializer
             int Ordinal,
             Type TargetMemberType)
         {
-            Expression RecordFieldExpression = GetRecordFieldExpression(recordInstanceExp, Ordinal, typeof(string));
-            Expression ConvertedRecordFieldExpression = GetConversionExpression(typeof(string), RecordFieldExpression, TargetMemberType, Culture);
+            var needConvert = GetRecordFieldExpression(recordInstanceExp, Ordinal, TargetMemberType, out var RecordFieldExpression);
+            Expression ConvertedRecordFieldExpression = needConvert ? GetConversionExpression(typeof(string), RecordFieldExpression, TargetMemberType, Culture)
+                : RecordFieldExpression;
             MethodCallExpression NullCheckExpression = GetNullCheckExpression(recordInstanceExp, Ordinal);
 
             Expression TargetValueExpression = Expression.Condition(
@@ -239,16 +240,16 @@ namespace LightExcel.TypedDeserializer
             return TargetValueExpression;
         }
 
-        private static Expression GetRecordFieldExpression(ParameterExpression recordInstanceExp, int Ordinal, Type RecordFieldType)
+        private static bool GetRecordFieldExpression(ParameterExpression recordInstanceExp, int Ordinal, Type RecordFieldType, out Expression expression)
         {
             //MethodInfo GetValueMethod = default(MethodInfo);
-            typeMapMethod.TryGetValue(RecordFieldType, out var GetValueMethod);
+            var has = typeMapMethod.TryGetValue(RecordFieldType, out var GetValueMethod);
             if (GetValueMethod == null)
                 GetValueMethod = DataRecord_GetValue;
 
-            Expression RecordFieldExpression = Expression.Call(recordInstanceExp, GetValueMethod, Expression.Constant(Ordinal, typeof(int)));
+            expression = Expression.Call(recordInstanceExp, GetValueMethod, Expression.Constant(Ordinal, typeof(int)));
 
-            return RecordFieldExpression;
+            return !has;
         }
 
         private static MethodCallExpression GetNullCheckExpression(ParameterExpression RecordInstance, int Ordinal)
@@ -274,7 +275,7 @@ namespace LightExcel.TypedDeserializer
             }
             else if (ReferenceEquals(TargetType, typeof(bool)))
             {
-                MethodInfo ToBooleanMethod = typeof(Convert).GetMethod("ToBoolean", new[] { SourceType })!;
+                MethodInfo ToBooleanMethod = typeof(Convert).GetMethod("ToBoolean", [SourceType])!;
                 TargetExpression = Expression.Call(ToBooleanMethod, SourceExpression);
             }
             else if (ReferenceEquals(SourceType, typeof(byte[])))
@@ -337,34 +338,34 @@ namespace LightExcel.TypedDeserializer
             }
             Expression GetGenericParseExpression(Expression sourceExpression, Type type)
             {
-                MethodInfo ParseMetod = type.GetMethod("Parse", new[] { typeof(string) })!;
-                MethodCallExpression CallExpression = Expression.Call(ParseMetod, new[] { sourceExpression });
+                MethodInfo ParseMetod = type.GetMethod("Parse", [typeof(string)])!;
+                MethodCallExpression CallExpression = Expression.Call(ParseMetod, [sourceExpression]);
                 return CallExpression;
             }
             Expression GetDateTimeParseExpression(Expression sourceExpression, Type type, CultureInfo culture)
             {
-                MethodInfo ParseMetod = type.GetMethod("Parse", new[] { typeof(string), typeof(DateTimeFormatInfo) })!;
+                MethodInfo ParseMetod = type.GetMethod("Parse", [typeof(string), typeof(DateTimeFormatInfo)])!;
                 ConstantExpression ProviderExpression = Expression.Constant(culture.DateTimeFormat, typeof(DateTimeFormatInfo));
-                MethodCallExpression CallExpression = Expression.Call(ParseMetod, new[] { sourceExpression, ProviderExpression });
+                MethodCallExpression CallExpression = Expression.Call(ParseMetod, [sourceExpression, ProviderExpression]);
                 return CallExpression;
             }
 
             MethodCallExpression GetEnumParseExpression(Expression sourceExpression, Type type)
             {
                 //Get the MethodInfo for parsing an Enum
-                MethodInfo EnumParseMethod = typeof(Enum).GetMethod("Parse", new[] { typeof(Type), typeof(string), typeof(bool) })!;
+                MethodInfo EnumParseMethod = typeof(Enum).GetMethod("Parse", [typeof(Type), typeof(string), typeof(bool)])!;
                 ConstantExpression TargetMemberTypeExpression = Expression.Constant(type);
                 ConstantExpression IgnoreCase = Expression.Constant(true, typeof(bool));
                 //Create an expression the calls the Parse method
-                MethodCallExpression CallExpression = Expression.Call(EnumParseMethod, new[] { TargetMemberTypeExpression, sourceExpression, IgnoreCase });
+                MethodCallExpression CallExpression = Expression.Call(EnumParseMethod, [TargetMemberTypeExpression, sourceExpression, IgnoreCase]);
                 return CallExpression;
             }
 
             MethodCallExpression GetNumberParseExpression(Expression sourceExpression, Type type, CultureInfo culture)
             {
-                MethodInfo ParseMetod = type.GetMethod("Parse", new[] { typeof(string), typeof(NumberFormatInfo) })!;
+                MethodInfo ParseMetod = type.GetMethod("Parse", [typeof(string), typeof(NumberFormatInfo)])!;
                 ConstantExpression ProviderExpression = Expression.Constant(culture.NumberFormat, typeof(NumberFormatInfo));
-                MethodCallExpression CallExpression = Expression.Call(ParseMetod, new[] { sourceExpression, ProviderExpression });
+                MethodCallExpression CallExpression = Expression.Call(ParseMetod, [sourceExpression, ProviderExpression]);
                 return CallExpression;
             }
         }

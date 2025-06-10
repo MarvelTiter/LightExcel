@@ -1,10 +1,12 @@
 ﻿using LightExcel.OpenXml;
 using LightExcel.TypedDeserializer;
 using LightExcel.Utils;
+using System.Diagnostics.CodeAnalysis;
 
 namespace LightExcel
 {
-    internal class ExcelReader : IExcelDataReader
+
+    internal partial class ExcelReader : IExcelDataReader
     {
         private bool disposedValue;
         private readonly ExcelArchiveEntry document;
@@ -53,28 +55,28 @@ namespace LightExcel
         public bool GetBoolean(int i)
         {
             bool ret = false;
-            CellAt(i)?.TryGetBoolean(Sst, out ret);
+            CellAt(i)?.TryGetBoolean(Sst, i, configuration, out ret);
             return ret;
         }
 
         public DateTime GetDateTime(int i)
         {
             DateTime ret = DateTime.MinValue;
-            CellAt(i)?.TryGetDateTime(Sst, out ret);
+            CellAt(i)?.TryGetDateTime(Sst, i, configuration, out ret);
             return ret;
         }
 
         public decimal GetDecimal(int i)
         {
             decimal ret = default;
-            CellAt(i)?.TryGetDecimal(Sst, out ret);
+            CellAt(i)?.TryGetDecimal(Sst, i, configuration, out ret);
             return ret;
         }
 
         public double GetDouble(int i)
         {
             double ret = default;
-            CellAt(i)?.TryGetDouble(Sst, out ret);
+            CellAt(i)?.TryGetDouble(Sst, i, configuration, out ret);
             return ret;
         }
 
@@ -82,7 +84,7 @@ namespace LightExcel
         public int GetInt32(int i)
         {
             int ret = default;
-            CellAt(i)?.TryGetInt(Sst, out ret);
+            CellAt(i)?.TryGetInt(Sst, i, configuration, out ret);
             return ret;
         }
 
@@ -196,6 +198,10 @@ namespace LightExcel
                 disposedValue = true;
             }
         }
+        public void Close()
+        {
+
+        }
 
         public void Dispose()
         {
@@ -227,5 +233,100 @@ namespace LightExcel
                 yield return ExpressionDeserialize<TData>.Deserialize(this);
             }
         }
+    }
+
+    internal partial class ExcelReader
+    {
+        //object System.Data.IDataRecord.this[int i] => throw new NotImplementedException();
+
+        //object System.Data.IDataRecord.this[string name] => throw new NotImplementedException();
+        //object System.Data.IDataRecord.GetValue(int i)
+        //{
+        //    return GetValue(i);
+        //}
+
+        public int Depth => throw new NotImplementedException();
+
+        public bool IsClosed => throw new NotImplementedException();
+
+        public int RecordsAffected => throw new NotImplementedException();
+
+
+        public byte GetByte(int i)
+        {
+            throw new NotImplementedException();
+        }
+
+        public long GetBytes(int i, long fieldOffset, byte[]? buffer, int bufferoffset, int length)
+        {
+            throw new NotImplementedException();
+        }
+
+        public char GetChar(int i)
+        {
+            throw new NotImplementedException();
+        }
+
+        public long GetChars(int i, long fieldoffset, char[]? buffer, int bufferoffset, int length)
+        {
+            throw new NotImplementedException();
+        }
+
+        public System.Data.IDataReader GetData(int i)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string GetDataTypeName(int i)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Type GetFieldType(int i)
+        {
+            throw new NotImplementedException();
+        }
+
+        public float GetFloat(int i)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Guid GetGuid(int i)
+        {
+            throw new NotImplementedException();
+        }
+
+        public short GetInt16(int i)
+        {
+            throw new NotImplementedException();
+        }
+
+        public long GetInt64(int i)
+        {
+            throw new NotImplementedException();
+        }
+
+        public System.Data.DataTable? GetSchemaTable()
+        {
+            throw new NotImplementedException();
+        }
+
+        public string GetString(int i)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int GetValues(object[] values)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsDBNull(int i)
+        {
+            throw new NotImplementedException();
+        }
+
+
     }
 }

@@ -31,7 +31,14 @@ namespace TestProject1
         public void ExcelReaderTestEntity()
         {
             ExcelHelper excel = new ExcelHelper();
-            var result = excel.QueryExcel<Model>("etest.xlsx", "Sheet1");
+            var result = excel.QueryExcel<Model>("entity-test.xlsx", config: config =>
+            {
+
+            });
+            foreach (var item in result)
+            {
+                Console.WriteLine($"{item.Name} - {item.Birthday} - {item.Birthday2}");
+            }
         }
         [TestMethod]
         public void ExcelReaderTestDynamic()

@@ -26,12 +26,13 @@ internal abstract class RenderBase(ExcelConfiguration configuration)
         var index = 0;
         foreach (var col in columns)
         {
-            var cell = new Cell
-            {
-                Reference = ReferenceHelper.ConvertXyToCellReference(++index, 1),
-                Type = "str",
-                Value = col.Name
-            };
+            var r = ReferenceHelper.ConvertXyToCellReference(++index, 1);
+            var cell = new Cell(col.Name, r, "str");
+            //{
+            //    Reference = ReferenceHelper.ConvertXyToCellReference(++index, 1),
+            //    Type = "str",
+            //    Value = col.Name
+            //};
             row.AppendChild(cell);
         }
         yield return row;

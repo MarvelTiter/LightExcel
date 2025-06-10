@@ -111,10 +111,6 @@ namespace LightExcel.OpenXml
             }
         }
 
-
-
-
-
         private void WriteMergeInfo(LightExcelStreamWriter writer)
         {
             MergeCells?.WriteToXml(writer);
@@ -149,13 +145,17 @@ namespace LightExcel.OpenXml
                             {
                                 if (reader.IsStartWith("c", XmlHelper.MainNs))
                                 {
-                                    var cell = new Cell()
-                                    {
-                                        Reference = reader.GetAttribute("r"),
-                                        Type = reader.GetAttribute("t"),
-                                        StyleIndex = reader.GetAttribute("s"),
-                                    };
-                                    cell.Value = ReadCellValue(reader);
+                                    var r = reader.GetAttribute("r");
+                                    var t = reader.GetAttribute("t");
+                                    var s = reader.GetAttribute("s");
+                                    var v = ReadCellValue(reader);
+                                    var cell = new Cell(v, r, t, s, null);
+                                    //{
+                                    //    Reference = reader.GetAttribute("r"),
+                                    //    Type = reader.GetAttribute("t"),
+                                    //    StyleIndex = reader.GetAttribute("s"),
+                                    //};
+                                    //cell.Value = ReadCellValue(reader);
                                     row.AddAndFixed(cell);
                                 }
                                 else if (!reader.SkipContent())

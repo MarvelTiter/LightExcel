@@ -77,8 +77,6 @@ namespace LightExcel.OpenXml
             {
                 if (disposing)
                 {
-                    archive?.Dispose();
-                    archive = null;
                     reader?.Dispose();
                     reader = null;
                 }

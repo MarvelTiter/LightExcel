@@ -8,7 +8,7 @@ internal abstract class NodeCollectionXmlPart<T>(ZipArchive archive, string path
 {
     public List<T> Children { get; } = new List<T>();
 
-    public int Count => Children.Count;
+    public virtual int Count => Children.Count;
 
     public void AppendChild(T child) => Children.Add(child);
 
@@ -34,5 +34,11 @@ internal abstract class NodeCollectionXmlPart<T>(ZipArchive archive, string path
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+        Children.Clear();
     }
 }
