@@ -42,7 +42,7 @@ namespace TestProject1
             ExcelHelper excel = new ExcelHelper();
             excel.WriteExcel("entity-test.xlsx", Datas.GetEntities().ToList(), config: c =>
             {
-                c.AutoWidth = true;
+                //c.AutoWidth = true;
             });
             Process.Start("powershell", $"start {AppDomain.CurrentDomain.BaseDirectory}");
         }

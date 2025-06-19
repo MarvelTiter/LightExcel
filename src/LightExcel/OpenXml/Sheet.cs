@@ -231,9 +231,12 @@ namespace LightExcel.OpenXml
             {
                 return;
             }
-            var cols = sheet.Columns.Where(c => c.Width.HasValue).Select(c =>
-                $"""<col min="{c.ColumnIndex}" max="{c.ColumnIndex}" width="{c.Width}" customWidth="1"/>""");
-            sheet.ColInfos = $"<cols>{string.Join("", cols)}</cols>";
+            string[] cols = [..sheet.Columns.Where(c => c.Width.HasValue).Select(c =>
+                $"""<col min="{c.ColumnIndex}" max="{c.ColumnIndex}" width="{c.Width}" customWidth="1"/>""")];
+            if (cols.Length > 0)
+            {
+                sheet.ColInfos = $"<cols>{string.Join("", cols)}</cols>";
+            }
         }
 
         private static int ReserveColsSpace(Sheet sheet)
