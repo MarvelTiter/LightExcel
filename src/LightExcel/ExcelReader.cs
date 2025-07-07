@@ -181,7 +181,7 @@ namespace LightExcel
                     fixedColumn = startColumn - 1;
                 }
                 cells = rowEnumerator!.Current!.Children;
-                //System.Diagnostics.Debug.WriteLine($"{RowIndex}: Read, Cells {cells.Count}");
+                System.Diagnostics.Debug.WriteLine($"{RowIndex}: Read, Cells {cells.Count}");
                 return true;
             }
             return false;

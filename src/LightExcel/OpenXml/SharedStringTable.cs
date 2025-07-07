@@ -46,6 +46,7 @@ namespace LightExcel.OpenXml
             int index = 0;
             foreach (var s in GetChildren())
             {
+                System.Diagnostics.Debug.WriteLine($"{index} - {s.Content}");
                 diskCache.Add(index++, s.Content);
             }
         }
@@ -105,7 +106,7 @@ namespace LightExcel.OpenXml
         private readonly FileStream _valueFs;
         private bool _disposedValue;
         private readonly static Encoding _encoding = new UTF8Encoding(true);
-        public int Count => checked((int)_maxIndx);
+        public int Count => checked((int)_maxIndx + 1);
         public string this[int key] { get => GetValue(key); }
         private long _maxIndx = -1;
 
