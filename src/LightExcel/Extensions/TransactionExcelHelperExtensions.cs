@@ -1,6 +1,7 @@
 ﻿using LightExcel.Renders;
 using LightExcel.Utils;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 #pragma warning disable IDE0130
 namespace LightExcel;
 
@@ -26,7 +27,11 @@ public static partial class TransactionExcelHelperExtensions
     /// <param name="datas"></param>
     /// <param name="sheetName"></param>
     /// <param name="config"></param>
-    public static void WriteExcel<T>(this ITransactionExcelHelper helper, IEnumerable<T> datas, string sheetName = "Sheet1", Action<TransConfiguration>? config = null)
+    public static void WriteExcel<
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
+#endif
+    T>(this ITransactionExcelHelper helper, IEnumerable<T> datas, string sheetName = "Sheet1", Action<TransConfiguration>? config = null)
     {
         WriteExcel<EnumerableEntityRender<T>>(helper, datas, sheetName, config);
     }
@@ -83,7 +88,11 @@ public static partial class TransactionExcelHelperExtensions
 
 #if NET6_0_OR_GREATER
 
-    public static async Task WriteExcelAsync<T>(this ITransactionExcelHelper helper, IAsyncEnumerable<T> datas, string sheetName = "Sheet1", Action<TransConfiguration>? config = null, CancellationToken cancellationToken = default)
+    public static async Task WriteExcelAsync<
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
+#endif
+    T>(this ITransactionExcelHelper helper, IAsyncEnumerable<T> datas, string sheetName = "Sheet1", Action<TransConfiguration>? config = null, CancellationToken cancellationToken = default)
     {
         await helper.WriteExcelAsync<AsyncEnumerableEntityRender<T>>(datas, sheetName, config, cancellationToken);
     }

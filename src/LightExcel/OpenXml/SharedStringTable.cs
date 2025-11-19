@@ -133,14 +133,26 @@ namespace LightExcel.OpenXml
         {
             _positionFs.Position = index * 4;
             var bytes = new byte[4];
+#if NET8_0_OR_GREATER
+            _positionFs.ReadExactly(bytes, 0, 4);
+#else
             _positionFs.Read(bytes, 0, 4);
+#endif
             var position = BitConverter.ToInt32(bytes, 0);
             _lengthFs.Position = index * 4;
+#if NET8_0_OR_GREATER
+            _lengthFs.ReadExactly(bytes, 0, 4);
+#else
             _lengthFs.Read(bytes, 0, 4);
+#endif
             var length = BitConverter.ToInt32(bytes, 0);
             _valueFs.Position = position;
             bytes = new byte[length];
+#if NET8_0_OR_GREATER
+            _valueFs.ReadExactly(bytes, 0, length);
+#else
             _valueFs.Read(bytes, 0, length);
+#endif
             var v = _encoding.GetString(bytes);
             return v;
         }

@@ -1,6 +1,7 @@
 ﻿using LightExcel.Attributes;
 using LightExcel.OpenXml;
 using LightExcel.Utils;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -8,8 +9,15 @@ using System.Threading.Tasks;
 #if NET6_0_OR_GREATER
 namespace LightExcel.Renders
 {
-    internal class AsyncEnumerableEntityRender<T>(ExcelConfiguration configuration) : AsyncEnumerableRenderBase<T>(configuration)
+    internal class AsyncEnumerableEntityRender<
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
+#endif
+    T>(ExcelConfiguration configuration) : AsyncEnumerableRenderBase<T>(configuration)
     {
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
+#endif
         private readonly Type elementType = typeof(T);
 
         public override IEnumerable<ExcelColumnInfo> CollectExcelColumnInfo(T data)

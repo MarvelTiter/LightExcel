@@ -2,12 +2,20 @@
 using LightExcel.OpenXml;
 using LightExcel.Utils;
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace LightExcel.Renders
 {
-    internal class EnumerableEntityRender<T> : SyncRenderBase<IEnumerable<T>, T>//, IDataRender
+    internal class EnumerableEntityRender<
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
+#endif
+    T> : SyncRenderBase<IEnumerable<T>, T>//, IDataRender
     {
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
+#endif
         private readonly Type elementType;
 
         public EnumerableEntityRender(ExcelConfiguration configuration) : base(configuration)

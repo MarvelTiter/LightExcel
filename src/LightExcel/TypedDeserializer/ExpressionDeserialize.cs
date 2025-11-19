@@ -3,6 +3,7 @@ using LightExcel.Attributes;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -16,7 +17,11 @@ namespace LightExcel.TypedDeserializer
     /// <summary>
     /// 从LightOrm中移植修改
     /// </summary>
-    internal static class ExpressionDeserialize<T>
+    internal static class ExpressionDeserialize<
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+#endif
+    T>
     {
         private static readonly MethodInfo DataRecord_GetInt16 = typeof(IExcelDataReader).GetMethod("GetInt16", [typeof(int)])!;
         private static readonly MethodInfo DataRecord_GetInt32 = typeof(IExcelDataReader).GetMethod("GetInt32", [typeof(int)])!;
@@ -66,9 +71,14 @@ namespace LightExcel.TypedDeserializer
         /// <param name="Culture"></param>
         /// <param name="MustMapAllProperties"></param>
         /// <returns></returns>
-        private static Func<IExcelDataReader, object> BuildFunc<Target>(IExcelDataReader RecordInstance, CultureInfo Culture, bool MustMapAllProperties)
+        private static Func<IExcelDataReader, object> BuildFunc<
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+#endif
+        Target>(IExcelDataReader RecordInstance, CultureInfo Culture, bool MustMapAllProperties)
         {
             ParameterExpression recordInstanceExp = Expression.Parameter(typeof(IExcelDataReader), "Record");
+
             Type TargetType = typeof(Target);
             Expression? Body = default;
 
@@ -224,6 +234,9 @@ namespace LightExcel.TypedDeserializer
             CultureInfo Culture,
             ParameterExpression recordInstanceExp,
             int Ordinal,
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+#endif
             Type TargetMemberType)
         {
             var needConvert = GetRecordFieldExpression(recordInstanceExp, Ordinal, TargetMemberType, out var RecordFieldExpression);
@@ -258,7 +271,15 @@ namespace LightExcel.TypedDeserializer
             return NullCheckExpression;
         }
 
-        private static Expression GetConversionExpression(Type SourceType, Expression SourceExpression, Type TargetType, CultureInfo Culture)
+        private static Expression GetConversionExpression(
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+#endif
+            Type SourceType, Expression SourceExpression,
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+#endif
+        Type TargetType, CultureInfo Culture)
         {
             Expression TargetExpression;
             if (ReferenceEquals(TargetType, SourceType))
@@ -290,7 +311,11 @@ namespace LightExcel.TypedDeserializer
         }
 
 
-        private static Expression GetParseExpression(Expression SourceExpression, Type TargetType, CultureInfo Culture)
+        private static Expression GetParseExpression(Expression SourceExpression,
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+#endif
+            Type TargetType, CultureInfo Culture)
         {
             Type UnderlyingType = GetUnderlyingType(TargetType);
             if (UnderlyingType.IsEnum)
@@ -336,13 +361,21 @@ namespace LightExcel.TypedDeserializer
                     return Expression.Convert(ParseExpression, TargetType);
                 }
             }
-            Expression GetGenericParseExpression(Expression sourceExpression, Type type)
+            Expression GetGenericParseExpression(Expression sourceExpression,
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+#endif
+                Type type)
             {
                 MethodInfo ParseMetod = type.GetMethod("Parse", [typeof(string)])!;
                 MethodCallExpression CallExpression = Expression.Call(ParseMetod, [sourceExpression]);
                 return CallExpression;
             }
-            Expression GetDateTimeParseExpression(Expression sourceExpression, Type type, CultureInfo culture)
+            Expression GetDateTimeParseExpression(Expression sourceExpression,
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+#endif
+                Type type, CultureInfo culture)
             {
                 MethodInfo ParseMetod = type.GetMethod("Parse", [typeof(string), typeof(DateTimeFormatInfo)])!;
                 ConstantExpression ProviderExpression = Expression.Constant(culture.DateTimeFormat, typeof(DateTimeFormatInfo));
@@ -361,7 +394,11 @@ namespace LightExcel.TypedDeserializer
                 return CallExpression;
             }
 
-            MethodCallExpression GetNumberParseExpression(Expression sourceExpression, Type type, CultureInfo culture)
+            MethodCallExpression GetNumberParseExpression(Expression sourceExpression,
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+#endif
+                Type type, CultureInfo culture)
             {
                 MethodInfo ParseMetod = type.GetMethod("Parse", [typeof(string), typeof(NumberFormatInfo)])!;
                 ConstantExpression ProviderExpression = Expression.Constant(culture.NumberFormat, typeof(NumberFormatInfo));
@@ -369,8 +406,14 @@ namespace LightExcel.TypedDeserializer
                 return CallExpression;
             }
         }
-
-        private static Type GetUnderlyingType(Type targetType)
+#if NET8_0_OR_GREATER
+        [return: DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+#endif
+        private static Type GetUnderlyingType(
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+#endif
+            Type targetType)
         {
             return Nullable.GetUnderlyingType(targetType) ?? targetType;
         }

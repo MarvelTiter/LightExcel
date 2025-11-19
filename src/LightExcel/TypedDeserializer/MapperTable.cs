@@ -98,14 +98,14 @@ namespace LightExcel.TypedDeserializer
         {
             if (index < 0)
             { // doesn't exist
-                value = null;
+                value = default!;
                 return false;
             }
             // exists, **even if** we don't have a value; consider table rows heterogeneous
-            value = index < values.Length ? values[index] : null;
+            value = index < values.Length ? values[index] : default!;
             if (value is DeadValue)
             { // pretend it isn't here
-                value = null;
+                value = default!;
                 return false;
             }
             return true;
@@ -136,8 +136,8 @@ namespace LightExcel.TypedDeserializer
             var names = table.FieldNames;
             for (var i = 0; i < names.Length; i++)
             {
-                object value = i < values.Length ? values[i] : null;
-                if (!(value is DeadValue))
+                object value = i < values.Length ? values[i] : default!;
+                if (value is not DeadValue)
                 {
                     yield return new KeyValuePair<string, object>(names[i], value);
                 }
@@ -266,8 +266,8 @@ namespace LightExcel.TypedDeserializer
 
     internal class MapperRowMetaObject : DynamicMetaObject
     {
-        private static readonly MethodInfo getValueMethod = typeof(IDictionary<string, object>).GetProperty("Item").GetGetMethod();
-        private static readonly MethodInfo setValueMethod = typeof(MapperRow).GetMethod("SetValue", new Type[] { typeof(string), typeof(object) });
+        private static readonly MethodInfo getValueMethod = typeof(IDictionary<string, object>).GetProperty("Item")!.GetGetMethod()!;
+        private static readonly MethodInfo setValueMethod = typeof(MapperRow).GetMethod("SetValue", [typeof(string), typeof(object)])!;
 
         public MapperRowMetaObject(Expression expression, BindingRestrictions restrictions)
             : base(expression, restrictions)
@@ -341,6 +341,6 @@ namespace LightExcel.TypedDeserializer
     /// <typeparam name="T"></typeparam>
     internal static class EmptyArray<T>
     {
-        internal readonly static T[] Value = new T[0];
+        internal readonly static T[] Value = [];
     }
 }

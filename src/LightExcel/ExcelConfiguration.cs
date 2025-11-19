@@ -105,7 +105,8 @@ namespace LightExcel
             }
             else
             {
-                return NeedToFormatNumberSheet.Contains(name) || NeedToFormatNumberSheet.Contains(sheetName);
+                return NeedToFormatNumberSheet.Contains(name)
+                    || (sheetName is not null && NeedToFormatNumberSheet.Contains(sheetName));
             }
         }
 
