@@ -239,9 +239,9 @@ namespace LightExcel.TypedDeserializer
 #endif
             Type TargetMemberType)
         {
-            var needConvert = GetRecordFieldExpression(recordInstanceExp, Ordinal, TargetMemberType, out var RecordFieldExpression);
+            var (needConvert, isNullable) = GetRecordFieldExpression(recordInstanceExp, Ordinal, TargetMemberType, out var RecordFieldExpression);
             Expression ConvertedRecordFieldExpression = needConvert ? GetConversionExpression(typeof(string), RecordFieldExpression, TargetMemberType, Culture)
-                : RecordFieldExpression;
+                : (isNullable ? Expression.Convert(RecordFieldExpression, TargetMemberType) : RecordFieldExpression);
             MethodCallExpression NullCheckExpression = GetNullCheckExpression(recordInstanceExp, Ordinal);
 
             Expression TargetValueExpression = Expression.Condition(
@@ -253,16 +253,18 @@ namespace LightExcel.TypedDeserializer
             return TargetValueExpression;
         }
 
-        private static bool GetRecordFieldExpression(ParameterExpression recordInstanceExp, int Ordinal, Type RecordFieldType, out Expression expression)
+        private static (bool CustomParse, bool IsNullable) GetRecordFieldExpression(ParameterExpression recordInstanceExp, int Ordinal, Type RecordFieldType, out Expression expression)
         {
             //MethodInfo GetValueMethod = default(MethodInfo);
-            var has = typeMapMethod.TryGetValue(RecordFieldType, out var GetValueMethod);
+            var isnullable = GetUnderlyingType(RecordFieldType, out var underlyingType);
+
+            var has = typeMapMethod.TryGetValue(underlyingType, out var GetValueMethod);
             if (GetValueMethod == null)
                 GetValueMethod = DataRecord_GetValue;
 
             expression = Expression.Call(recordInstanceExp, GetValueMethod, Expression.Constant(Ordinal, typeof(int)));
 
-            return !has;
+            return (!has, isnullable);
         }
 
         private static MethodCallExpression GetNullCheckExpression(ParameterExpression RecordInstance, int Ordinal)
@@ -282,7 +284,9 @@ namespace LightExcel.TypedDeserializer
         Type TargetType, CultureInfo Culture)
         {
             Expression TargetExpression;
-            if (ReferenceEquals(TargetType, SourceType))
+            var isnullable = GetUnderlyingType(TargetType, out var underlying);
+            var converted = false;
+            if (TargetType == SourceType || underlying == SourceType)
             {
                 TargetExpression = SourceExpression;
             }
@@ -294,7 +298,7 @@ namespace LightExcel.TypedDeserializer
             {
                 TargetExpression = Expression.Call(SourceExpression, SourceType.GetMethod("ToString", Type.EmptyTypes)!);
             }
-            else if (ReferenceEquals(TargetType, typeof(bool)))
+            else if (TargetType == typeof(bool) || underlying == typeof(bool))
             {
                 MethodInfo ToBooleanMethod = typeof(Convert).GetMethod("ToBoolean", [SourceType])!;
                 TargetExpression = Expression.Call(ToBooleanMethod, SourceExpression);
@@ -306,6 +310,11 @@ namespace LightExcel.TypedDeserializer
             else
             {
                 TargetExpression = Expression.Convert(SourceExpression, TargetType);
+                converted = true;
+            }
+            if (isnullable && !converted)
+            {
+                TargetExpression = Expression.Convert(TargetExpression, TargetType);
             }
             return TargetExpression;
         }
@@ -317,7 +326,7 @@ namespace LightExcel.TypedDeserializer
 #endif
             Type TargetType, CultureInfo Culture)
         {
-            Type UnderlyingType = GetUnderlyingType(TargetType);
+            var isnullable = GetUnderlyingType(TargetType, out var UnderlyingType);
             if (UnderlyingType.IsEnum)
             {
                 MethodCallExpression ParsedEnumExpression = GetEnumParseExpression(SourceExpression, UnderlyingType);
@@ -406,16 +415,20 @@ namespace LightExcel.TypedDeserializer
                 return CallExpression;
             }
         }
-#if NET8_0_OR_GREATER
-        [return: DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
-#endif
-        private static Type GetUnderlyingType(
+
+        private static bool GetUnderlyingType(
 #if NET8_0_OR_GREATER
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
 #endif
-            Type targetType)
+            Type targetType,
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+#endif
+        out Type underlyingType)
         {
-            return Nullable.GetUnderlyingType(targetType) ?? targetType;
+            var ut = Nullable.GetUnderlyingType(targetType);
+            underlyingType = ut ?? targetType;
+            return ut is not null;
         }
     }
     public static class Ex
