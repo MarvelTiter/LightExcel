@@ -41,8 +41,8 @@ namespace LightExcel
         IEnumerable<dynamic> QueryExcel(string path, string? sheetName = null, Action<ExcelConfiguration>? config = null);
 
         IExcelDataReader ReadExcel(Stream stream, string? sheetName = null, Action<ExcelConfiguration>? config = null);
-        IEnumerable<T> QueryExcel<T>(Stream stream, string? sheetName, Action<ExcelConfiguration>? config = null);
-        IEnumerable<dynamic> QueryExcel(Stream stream, string? sheetName, Action<ExcelConfiguration>? config = null);
+        IEnumerable<T> QueryExcel<T>(Stream stream, string? sheetName = null, Action<ExcelConfiguration>? config = null);
+        IEnumerable<dynamic> QueryExcel(Stream stream, string? sheetName = null, Action<ExcelConfiguration>? config = null);
         #endregion
     }
 }
