@@ -140,12 +140,17 @@ namespace LightExcel
                 rowEnumerator = sheetEnumerator.Current.GetEnumerator();
                 if (configuration.UseHeader && rowEnumerator.MoveNext())
                 {
-                    heads = [.. rowEnumerator.Current.Children.Select(c => c.GetCellValue(Sst) ?? "")];
+                    Func<Cell, string> action = configuration.TrimHeader ? WithTrim : Original;
+                    heads = [.. rowEnumerator.Current.Children.Select(action)];
                     startRow += 1;
                 }
                 return true;
             }
             return false;
+
+            string Original(Cell cell) => cell.GetCellValue(Sst) ?? "";
+            string WithTrim(Cell cell) => cell.GetCellValue(Sst)?.Trim() ?? "";
+
         }
 
         bool HasRows

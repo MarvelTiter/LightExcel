@@ -214,13 +214,13 @@ namespace LightExcel.TypedDeserializer
 
             string GetColumnNameAttribute()
             {
-                if (Member.GetCustomAttributes(typeof(ExcelColumnAttribute), true).Count() > 0)
+                if (Member.GetCustomAttributes(typeof(ExcelColumnAttribute), true).Length > 0)
                 {
                     return ((ExcelColumnAttribute)Member.GetCustomAttributes(typeof(ExcelColumnAttribute), true)[0]).Name ?? string.Empty;
                 }
                 else if (Member.IsDefined(typeof(ExcelColumnAttribute), true))
                 {
-                    return (Member.GetCustomAttribute(typeof(ExcelColumnAttribute), true) as ExcelColumnAttribute)?.Name ?? string.Empty;
+                    return Member.GetCustomAttribute<ExcelColumnAttribute>(true)?.Name ?? string.Empty;
                 }
                 else
                 {

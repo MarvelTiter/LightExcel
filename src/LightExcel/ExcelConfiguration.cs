@@ -17,9 +17,13 @@ namespace LightExcel
     }
     public class ExcelConfiguration
     {
-        List<string> NeedToFormatNumberColumns = new();
-        List<string> NeedToFormatNumberSheet = new();
+        readonly List<string> NeedToFormatNumberColumns = [];
+        readonly List<string> NeedToFormatNumberSheet = [];
         public bool UseHeader { get; set; } = true;
+        /// <summary>
+        /// 去除标题单元格中的空格，默认是true
+        /// </summary>
+        public bool TrimHeader { get; set; } = true;
         public string? StartCell { get; set; }
         internal bool Readonly { get; set; }
         internal bool FillByTemplate { get; set; }
