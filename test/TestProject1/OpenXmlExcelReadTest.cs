@@ -175,7 +175,7 @@ namespace TestProject1
             });
             foreach (var item in result)
             {
-                Console.WriteLine($"{item.Name} - {item.Birthday} - {item.Birthday2}");
+                Console.WriteLine($"{item.Index} - {item.Name} - {item.Birthday} - {item.Birthday2}");
             }
         }
         [TestMethod]
