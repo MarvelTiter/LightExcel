@@ -4,7 +4,6 @@ using LightExcel.Utils;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 
 #if NET6_0_OR_GREATER
 namespace LightExcel.Renders

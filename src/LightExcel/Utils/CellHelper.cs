@@ -1,5 +1,6 @@
 ﻿using LightExcel.OpenXml;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
@@ -137,7 +138,11 @@ internal static class CellHelper
             };
         }
 
-        static (string value, string? type, string? style) FormatEnum(object value, Type enumType)
+        static (string value, string? type, string? style) FormatEnum(object value,
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+#endif
+            Type enumType)
         {
             var field = enumType.GetField(value.ToString()!);
             if (field == null)

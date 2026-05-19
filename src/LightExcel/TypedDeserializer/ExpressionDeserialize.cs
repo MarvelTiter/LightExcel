@@ -1,16 +1,10 @@
-﻿using LightExcel;
-using LightExcel.Attributes;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
+﻿using LightExcel.Attributes;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+
+#pragma warning disable IL2072 // 都是基础类型，没什么问题
 
 namespace LightExcel.TypedDeserializer
 {
@@ -253,7 +247,11 @@ namespace LightExcel.TypedDeserializer
             return TargetValueExpression;
         }
 
-        private static (bool CustomParse, bool IsNullable) GetRecordFieldExpression(ParameterExpression recordInstanceExp, int Ordinal, Type RecordFieldType, out Expression expression)
+        private static (bool CustomParse, bool IsNullable) GetRecordFieldExpression(ParameterExpression recordInstanceExp, int Ordinal,
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+#endif
+            Type RecordFieldType, out Expression expression)
         {
             //MethodInfo GetValueMethod = default(MethodInfo);
             var isnullable = GetUnderlyingType(RecordFieldType, out var underlyingType);

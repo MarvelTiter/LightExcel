@@ -12,6 +12,7 @@
 		<RepositoryUrl>https://github.com/MarvelTiter/LightExcel.git</RepositoryUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageReadmeFile>Nuget.md</PackageReadmeFile>
+		<IsAotCompatible>true</IsAotCompatible>
 	</PropertyGroup>
 	<Import Project="Versions.props"/>
 	<ItemGroup>

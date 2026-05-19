@@ -25,6 +25,10 @@ namespace LightExcel
         string CurrentSheetName { get; }
         int RowIndex { get; }
         IEnumerable<dynamic> AsDynamic();
-        IEnumerable<TData> AsTyped<TData>();
+        IEnumerable<TData> AsTyped<
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+#endif
+        TData>();
     }
 }

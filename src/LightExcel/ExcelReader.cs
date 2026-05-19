@@ -231,7 +231,11 @@ namespace LightExcel
             }
         }
 
-        public IEnumerable<TData> AsTyped<TData>()
+        public IEnumerable<TData> AsTyped<
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+#endif
+        TData>()
         {
             while (Read())
             {

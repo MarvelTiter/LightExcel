@@ -1,8 +1,13 @@
-﻿using System.Linq.Expressions;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Linq.Expressions;
 
 namespace LightExcel.Utils;
 
-internal static class RenderCreator<T> where T : IDataRender
+internal static class RenderCreator<
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+#endif
+T> where T : IDataRender
 {
     static readonly Func<ExcelConfiguration, IDataRender> function;
     static RenderCreator()
@@ -17,7 +22,11 @@ internal static class RenderCreator<T> where T : IDataRender
     public static IDataRender Create(ExcelConfiguration config) => function.Invoke(config);
 }
 #if NET6_0_OR_GREATER
-internal static class AsyncRenderCreator<TRender> where TRender : IAsyncDataRender
+internal static class AsyncRenderCreator<
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+#endif
+TRender> where TRender : IAsyncDataRender
 {
     static readonly Func<ExcelConfiguration, TRender> function;
     static AsyncRenderCreator()

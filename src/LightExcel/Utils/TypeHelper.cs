@@ -1,4 +1,5 @@
 ﻿using LightExcel.Attributes;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace LightExcel.Utils
@@ -16,7 +17,11 @@ namespace LightExcel.Utils
             };
         }
 
-        public static IEnumerable<ExcelColumnInfo> CollectEntityInfo(this Type type, Action<ExcelColumnInfo>? callback = null)
+        public static IEnumerable<ExcelColumnInfo> CollectEntityInfo(
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+#endif
+            this Type type, Action<ExcelColumnInfo>? callback = null)
         {
             var properties = type.GetProperties();
             int index = 1;

@@ -1,9 +1,10 @@
-﻿using System.Data;
-using System.IO;
-using System.Text.RegularExpressions;
-using LightExcel.OpenXml;
+﻿using LightExcel.OpenXml;
 using LightExcel.TypedDeserializer;
 using LightExcel.Utils;
+using System.Data;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Text.RegularExpressions;
 
 namespace LightExcel
 {
@@ -19,7 +20,11 @@ namespace LightExcel
             return new ExcelReader(archive, configuration, sheetName);
         }
 
-        public IEnumerable<T> QueryExcel<T>(string path, string? sheetName = null, Action<ExcelConfiguration>? config = null)
+        public IEnumerable<T> QueryExcel<
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+#endif
+        T>(string path, string? sheetName = null, Action<ExcelConfiguration>? config = null)
         {
             IExcelDataReader? reader = null;
             try
@@ -54,10 +59,6 @@ namespace LightExcel
 
         public IEnumerable<dynamic> QueryExcel(string path, string? sheetName = null, Action<ExcelConfiguration>? config = null)
         {
-            if (string.IsNullOrEmpty(sheetName))
-            {
-                throw new ArgumentNullException(nameof(sheetName));
-            }
             using var reader = ReadExcel(path, sheetName, config);
             while (reader.NextResult())
             {

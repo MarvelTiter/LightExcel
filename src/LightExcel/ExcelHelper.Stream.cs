@@ -3,6 +3,7 @@ using LightExcel.TypedDeserializer;
 using LightExcel.Utils;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -34,7 +35,11 @@ namespace LightExcel
             return new ExcelReader(archive, configuration, sheetName);
         }
 
-        public IEnumerable<T> QueryExcel<T>(Stream stream, string? sheetName = null, Action<ExcelConfiguration>? config = null)
+        public IEnumerable<T> QueryExcel<
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+#endif
+        T>(Stream stream, string? sheetName = null, Action<ExcelConfiguration>? config = null)
         {
             using var reader = ReadExcel(stream, sheetName, config);
             while (reader.NextResult())
