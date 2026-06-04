@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace LightExcel
 {
-    public interface IExcelDataReader :  IDisposable
+    public interface IExcelDataReader : IDisposable
     {
         bool Read();
         bool NextResult();
@@ -16,7 +16,9 @@ namespace LightExcel
         DateTime GetDateTime(int i);
         decimal GetDecimal(int i);
         double GetDouble(int i);
+        short GetInt16(int i);
         int GetInt32(int i);
+        long GetInt64(int i);
         string GetName(int i);
         int GetOrdinal(string name);
         string GetValue(int i);

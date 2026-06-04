@@ -80,6 +80,12 @@ namespace LightExcel
             return ret;
         }
 
+        public short GetInt16(int i)
+        {
+            short ret = default;
+            CellAt(i)?.TryGetShort(Sst, i, configuration, out ret);
+            return ret;
+        }
 
         public int GetInt32(int i)
         {
@@ -88,11 +94,17 @@ namespace LightExcel
             return ret;
         }
 
+        public long GetInt64(int i)
+        {
+            long ret = default;
+            CellAt(i)?.TryGetLong(Sst, i, configuration, out ret);
+            return ret;
+        }
+
         public bool IsNullOrEmpty(int i)
         {
             return string.IsNullOrEmpty(CellAt(i)?.Value);
         }
-
 
         public string GetName(int i)
         {
@@ -306,15 +318,7 @@ namespace LightExcel
             throw new NotImplementedException();
         }
 
-        public short GetInt16(int i)
-        {
-            throw new NotImplementedException();
-        }
 
-        public long GetInt64(int i)
-        {
-            throw new NotImplementedException();
-        }
 
         public System.Data.DataTable? GetSchemaTable()
         {

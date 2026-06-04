@@ -17,15 +17,15 @@ namespace LightExcel.TypedDeserializer
 #endif
     T>
     {
-        private static readonly MethodInfo DataRecord_GetInt16 = typeof(IExcelDataReader).GetMethod("GetInt16", [typeof(int)])!;
-        private static readonly MethodInfo DataRecord_GetInt32 = typeof(IExcelDataReader).GetMethod("GetInt32", [typeof(int)])!;
-        private static readonly MethodInfo DataRecord_GetInt64 = typeof(IExcelDataReader).GetMethod("GetInt64", [typeof(int)])!;
-        private static readonly MethodInfo DataRecord_GetDouble = typeof(IExcelDataReader).GetMethod("GetDouble", [typeof(int)])!;
-        private static readonly MethodInfo DataRecord_GetDecimal = typeof(IExcelDataReader).GetMethod("GetDecimal", [typeof(int)])!;
-        private static readonly MethodInfo DataRecord_GetBoolean = typeof(IExcelDataReader).GetMethod("GetBoolean", [typeof(int)])!;
-        private static readonly MethodInfo DataRecord_GetDateTime = typeof(IExcelDataReader).GetMethod("GetDateTime", [typeof(int)])!;
-        private static readonly MethodInfo DataRecord_GetValue = typeof(IExcelDataReader).GetMethod("GetValue", [typeof(int)])!;
-        private static readonly MethodInfo IsNullOrEmpty = typeof(IExcelDataReader).GetMethod("IsNullOrEmpty", [typeof(int)])!;
+        private static readonly MethodInfo DataRecord_GetInt16 = typeof(IExcelDataReader).GetMethod(nameof(IExcelDataReader.GetInt16), [typeof(int)])!;
+        private static readonly MethodInfo DataRecord_GetInt32 = typeof(IExcelDataReader).GetMethod(nameof(IExcelDataReader.GetInt32), [typeof(int)])!;
+        private static readonly MethodInfo DataRecord_GetInt64 = typeof(IExcelDataReader).GetMethod(nameof(IExcelDataReader.GetInt64), [typeof(int)])!;
+        private static readonly MethodInfo DataRecord_GetDouble = typeof(IExcelDataReader).GetMethod(nameof(IExcelDataReader.GetDouble), [typeof(int)])!;
+        private static readonly MethodInfo DataRecord_GetDecimal = typeof(IExcelDataReader).GetMethod(nameof(IExcelDataReader.GetDecimal), [typeof(int)])!;
+        private static readonly MethodInfo DataRecord_GetBoolean = typeof(IExcelDataReader).GetMethod(nameof(IExcelDataReader.GetBoolean), [typeof(int)])!;
+        private static readonly MethodInfo DataRecord_GetDateTime = typeof(IExcelDataReader).GetMethod(nameof(IExcelDataReader.GetDateTime), [typeof(int)])!;
+        private static readonly MethodInfo DataRecord_GetValue = typeof(IExcelDataReader).GetMethod(nameof(IExcelDataReader.GetValue), [typeof(int)])!;
+        private static readonly MethodInfo IsNullOrEmpty = typeof(IExcelDataReader).GetMethod(nameof(IExcelDataReader.IsNullOrEmpty), [typeof(int)])!;
         readonly static Dictionary<Type, MethodInfo> typeMapMethod = new Dictionary<Type, MethodInfo>(37)
         {
             [typeof(short)] = DataRecord_GetInt16,

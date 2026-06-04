@@ -18,6 +18,7 @@ namespace LightExcel.OpenXml
             this.archive = archive;
             Path = path;
         }
+
         protected virtual void SetXmlReader()
         {
             reader ??= archive!.GetXmlReader(Path);

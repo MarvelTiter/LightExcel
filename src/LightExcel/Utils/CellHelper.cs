@@ -313,6 +313,17 @@ internal static class CellHelper
         var val = GetCellValue(cell, table);
         _ = double.TryParse(val, out value);
     }
+
+    internal static void TryGetShort(this Cell cell
+        , SharedStringTable? table
+        , int index
+        , ExcelConfiguration configuration
+        , out short value)
+    {
+        var val = GetCellValue(cell, table);
+        _ = short.TryParse(val, out value);
+    }
+
     internal static void TryGetInt(this Cell cell
         , SharedStringTable? table
         , int index
@@ -321,5 +332,15 @@ internal static class CellHelper
     {
         var val = GetCellValue(cell, table);
         _ = int.TryParse(val, out value);
+    }
+
+    internal static void TryGetLong(this Cell cell
+        , SharedStringTable? table
+        , int index
+        , ExcelConfiguration configuration
+        , out long value)
+    {
+        var val = GetCellValue(cell, table);
+        _ = long.TryParse(val, out value);
     }
 }
