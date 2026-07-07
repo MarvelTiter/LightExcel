@@ -25,6 +25,7 @@ namespace LightExcel
         /// </summary>
         public bool TrimHeader { get; set; } = true;
         public string? StartCell { get; set; }
+        public int? StartHeaderRow { get; set; }
         internal bool Readonly { get; set; }
         internal bool FillByTemplate { get; set; }
         internal int StartRowIndex { get; set; }

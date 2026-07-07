@@ -164,7 +164,7 @@ namespace LightExcel.TypedDeserializer
                     if (TargetMember.CanWrite)
                     {
                         Action work = delegate
-                        {
+                        { 
                             for (int Ordinal = 0; Ordinal < RecordInstance.FieldCount; Ordinal++)
                             {
                                 //Check if the RecordFieldName matches the TargetMember

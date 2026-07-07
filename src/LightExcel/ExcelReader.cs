@@ -31,6 +31,7 @@ namespace LightExcel
         int startColumn = 1;
         int startRow = 1;
         int fixedColumn = 0;
+        int headerRowIndex = 1;
         public ExcelReader(ExcelArchiveEntry document, ExcelConfiguration configuration, string? targetSheet = null)
         {
             this.document = document;
@@ -40,6 +41,7 @@ namespace LightExcel
             var (X, Y) = ReferenceHelper.ConvertCellReferenceToXY(configuration.StartCell);
             startColumn = X ?? 1;
             startRow = Y ?? 1;
+            headerRowIndex = configuration.StartHeaderRow ?? 1;
         }
 
 
@@ -153,8 +155,16 @@ namespace LightExcel
                 if (configuration.UseHeader && rowEnumerator.MoveNext())
                 {
                     Func<Cell, string> action = configuration.TrimHeader ? WithTrim : Original;
+                    while (rowEnumerator.Current.RowIndex < headerRowIndex)
+                    {
+                        if (rowEnumerator.MoveNext())
+                            continue;
+                        else
+                            break;
+                    }
                     heads = [.. rowEnumerator.Current.Children.Select(action)];
-                    startRow += 1;
+                    if (startRow == 1)
+                        startRow += headerRowIndex;
                 }
                 return true;
             }
