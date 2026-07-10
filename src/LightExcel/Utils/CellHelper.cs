@@ -122,6 +122,10 @@ internal static class CellHelper
             return true;
         }
 
+        //TODO 优化
+#if NET8_0_OR_GREATER
+        [UnconditionalSuppressMessage("AOT", "IL2072", Justification = "格式化枚举时，通过反射获取自定义的枚举说明(System.ComponentModel.DataAnnotations.DisplayAttribute.Name ?? System.ComponentModel.DescriptionAttribute.Description)")]
+#endif
         static (string value, string? type, string? style) FormatByType(object value, ExcelColumnInfo info, ExcelConfiguration config)
         {
             var type = info.Type ?? value.GetType();
@@ -140,22 +144,22 @@ internal static class CellHelper
 
         static (string value, string? type, string? style) FormatEnum(object value,
 #if NET8_0_OR_GREATER
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)]
 #endif
             Type enumType)
         {
             var field = enumType.GetField(value.ToString()!);
             if (field == null)
                 return (value.ToString()!, "str", null);
-
+            string? displayName = null;
 #if NET6_0_OR_GREATER
-            var displayName = field.GetCustomAttribute<System.ComponentModel.DataAnnotations.DisplayAttribute>()?.Name;
-            if (!string.IsNullOrEmpty(displayName))
-                return (displayName, "str", null);
+            displayName = field.GetCustomAttribute<System.ComponentModel.DataAnnotations.DisplayAttribute>()?.Name
+               ?? field.GetCustomAttribute<DescriptionAttribute>()?.Description;
+#else
+            displayName = field.GetCustomAttribute<DescriptionAttribute>()?.Description;
 #endif
 
-            var description = field.GetCustomAttribute<DescriptionAttribute>()?.Description;
-            return (description ?? value.ToString()!, "str", null);
+            return (displayName ?? value.ToString()!, "str", null);
         }
         static (string value, string? type, string? style) FormatNumber(object value, Type numberType, ExcelConfiguration config)
         {

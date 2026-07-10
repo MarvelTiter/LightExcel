@@ -15,7 +15,11 @@ namespace LightExcel
         internal ExcelConfiguration Configuration { get; }
         void WriteExcel(IDataRender render, object data, string? sheetName = null, TransConfiguration? config = null);
 #if NET6_0_OR_GREATER
-        internal Task WriteExcelAsync<TRender>(object datas, string? sheetName = null, Action<TransConfiguration>? config = null, CancellationToken cancellationToken = default)
+        internal Task WriteExcelAsync<
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+#endif
+        TRender>(object datas, string? sheetName = null, Action<TransConfiguration>? config = null, CancellationToken cancellationToken = default)
                 where TRender : IAsyncDataRender;
 
         //internal Task WriteByTemplateAsync<T, TRender>(ExcelArchiveEntry doc, IAsyncEnumerable<T> data, string sheetName, ExcelConfiguration configuration, CancellationToken cancellationToken = default)

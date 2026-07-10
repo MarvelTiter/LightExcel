@@ -14,14 +14,9 @@ namespace LightExcel.Renders
 #endif
     T>(ExcelConfiguration configuration) : AsyncEnumerableRenderBase<T>(configuration)
     {
-#if NET8_0_OR_GREATER
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
-#endif
-        private readonly Type elementType = typeof(T);
-
         public override IEnumerable<ExcelColumnInfo> CollectExcelColumnInfo(T data)
         {
-            var properties = elementType.GetProperties();
+            var properties = typeof(T).GetProperties();
             int index = 1;
             foreach (var prop in properties)
             {
@@ -61,7 +56,7 @@ namespace LightExcel.Renders
                 {
                     if (col.Property == null)
                     {
-                        var p = elementType.GetProperty(col.Name);
+                        var p = typeof(T).GetProperty(col.Name);
                         if (p == null) continue;
                         col.Property = new Property(p);
                     }

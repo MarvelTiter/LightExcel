@@ -2,12 +2,17 @@
 using LightExcel.Renders;
 using LightExcel.Utils;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 #pragma warning disable IDE0130
 namespace LightExcel;
 public static partial class ExcelHeperExtensions
 {
     // 文件路径
-    internal static void InternalWriteExcel<TRender>(IExcelHelper helper, string path, object datas, string sheetName = "Sheet1", Action<ExcelConfiguration>? config = null)
+    internal static void InternalWriteExcel<
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+#endif
+    TRender>(IExcelHelper helper, string path, object datas, string sheetName = "Sheet1", Action<ExcelConfiguration>? config = null)
         where TRender : IDataRender
     {
         ExcelConfiguration configuration = new();
@@ -16,7 +21,11 @@ public static partial class ExcelHeperExtensions
         helper.WriteExcel(render, path, datas, sheetName, configuration);
     }
     // 文件流
-    internal static void InternalWriteExcel<TRender>(IExcelHelper helper, Stream stream, object datas, string sheetName = "Sheet1", Action<ExcelConfiguration>? config = null)
+    internal static void InternalWriteExcel<
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+#endif
+    TRender>(IExcelHelper helper, Stream stream, object datas, string sheetName = "Sheet1", Action<ExcelConfiguration>? config = null)
         where TRender : IDataRender
     {
         ExcelConfiguration configuration = new();
@@ -25,7 +34,11 @@ public static partial class ExcelHeperExtensions
         helper.WriteExcel(render, stream, datas, sheetName, configuration);
     }
     // 文件路径+模板文件
-    internal static void InternalWriteExcelByTemplate<TRender>(IExcelHelper helper, string path, string template, object datas, string sheetName = "Sheet1", Action<ExcelConfiguration>? config = null)
+    internal static void InternalWriteExcelByTemplate<
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+#endif
+    TRender>(IExcelHelper helper, string path, string template, object datas, string sheetName = "Sheet1", Action<ExcelConfiguration>? config = null)
             where TRender : IDataRender
     {
         ExcelConfiguration configuration = new();
@@ -35,7 +48,11 @@ public static partial class ExcelHeperExtensions
         helper.WriteExcelByTemplate(render, doc, datas, sheetName, configuration);
     }
     // 文件流+模板文件
-    internal static void InternalWriteExcelByTemplate<TRender>(IExcelHelper helper, Stream stream, string template, object datas, string sheetName = "Sheet1", Action<ExcelConfiguration>? config = null)
+    internal static void InternalWriteExcelByTemplate<
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+#endif
+    TRender>(IExcelHelper helper, Stream stream, string template, object datas, string sheetName = "Sheet1", Action<ExcelConfiguration>? config = null)
         where TRender : IDataRender
     {
         ExcelConfiguration configuration = new();
@@ -45,7 +62,11 @@ public static partial class ExcelHeperExtensions
         helper.WriteExcelByTemplate(render, doc, datas, sheetName, configuration);
     }
     // 文件路径+模板文件流
-    internal static void InternalWriteExcelByTemplate<TRender>(IExcelHelper helper, string path, Stream templateStream, object datas, string sheetName = "Sheet1", Action<ExcelConfiguration>? config = null)
+    internal static void InternalWriteExcelByTemplate<
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+#endif
+    TRender>(IExcelHelper helper, string path, Stream templateStream, object datas, string sheetName = "Sheet1", Action<ExcelConfiguration>? config = null)
         where TRender : IDataRender
     {
         ExcelConfiguration configuration = new();
@@ -56,7 +77,11 @@ public static partial class ExcelHeperExtensions
         helper.WriteExcelByTemplate(render, doc, datas, sheetName, configuration);
     }
     // 文件流+模板文件流
-    internal static void InternalWriteExcelByTemplate<TRender>(IExcelHelper helper, Stream stream, Stream templateStream, object datas, string sheetName = "Sheet1", Action<ExcelConfiguration>? config = null)
+    internal static void InternalWriteExcelByTemplate<
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+#endif
+    TRender>(IExcelHelper helper, Stream stream, Stream templateStream, object datas, string sheetName = "Sheet1", Action<ExcelConfiguration>? config = null)
         where TRender : IDataRender
     {
         ExcelConfiguration configuration = new();

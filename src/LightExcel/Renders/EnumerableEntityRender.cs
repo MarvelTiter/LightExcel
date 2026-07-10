@@ -11,18 +11,8 @@ namespace LightExcel.Renders
 #if NET8_0_OR_GREATER
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
 #endif
-    T> : SyncRenderBase<IEnumerable<T>, T>//, IDataRender
+    T>(ExcelConfiguration configuration) : SyncRenderBase<IEnumerable<T>, T>(configuration)//, IDataRender
     {
-#if NET8_0_OR_GREATER
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
-#endif
-        private readonly Type elementType;
-
-        public EnumerableEntityRender(ExcelConfiguration configuration) : base(configuration)
-        {
-            this.elementType = typeof(T);
-        }
-
         public override IEnumerable<ExcelColumnInfo> CollectExcelColumnInfo(T data)
         {
             //            var properties = elementType.GetProperties();
@@ -49,7 +39,7 @@ namespace LightExcel.Renders
             //                AssignDynamicInfo(col);
             //                yield return col;
             //            }
-            return elementType.CollectEntityInfo(AssignDynamicInfo);
+            return typeof(T).CollectEntityInfo(AssignDynamicInfo);
         }
 
         public override T GetFirstElement(IEnumerable<T> data) => data.First();
@@ -69,7 +59,7 @@ namespace LightExcel.Renders
                 {
                     if (col.Property == null)
                     {
-                        var p = elementType.GetProperty(col.Name);
+                        var p = typeof(T).GetProperty(col.Name);
                         if (p == null) continue;
                         col.Property = new Property(p);
                     }

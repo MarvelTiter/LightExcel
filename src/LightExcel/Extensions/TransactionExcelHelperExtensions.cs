@@ -8,7 +8,11 @@ namespace LightExcel;
 public static partial class TransactionExcelHelperExtensions
 {
 
-    private static void WriteExcel<TRender>(ITransactionExcelHelper helper, object datas, string sheetName = "Sheet1", Action<TransConfiguration>? config = null)
+    private static void WriteExcel<
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+#endif
+    TRender>(ITransactionExcelHelper helper, object datas, string sheetName = "Sheet1", Action<TransConfiguration>? config = null)
         where TRender : IDataRender
     {
         var render = RenderCreator<TRender>.Create(helper.Configuration);

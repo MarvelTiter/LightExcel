@@ -14,9 +14,9 @@ namespace LightExcel
         public bool Ignore { get; set; }
         public Property? Property { get; set; }
         public string? Format { get; set; }
-#if NET8_0_OR_GREATER
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)]
-#endif
+//#if NET8_0_OR_GREATER
+//        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)]
+//#endif
         public Type? Type { get; set; }
         public bool NumberFormat { get; set; }
         internal int ColumnIndex { get; set; }

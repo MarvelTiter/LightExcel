@@ -19,7 +19,7 @@ namespace LightExcel.Utils
 
         public static IEnumerable<ExcelColumnInfo> CollectEntityInfo(
 #if NET8_0_OR_GREATER
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
 #endif
             this Type type, Action<ExcelColumnInfo>? callback = null)
         {

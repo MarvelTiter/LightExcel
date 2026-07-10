@@ -3,6 +3,7 @@ using LightExcel.Renders;
 using LightExcel.Utils;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -100,7 +101,11 @@ namespace LightExcel
 
 #if NET6_0_OR_GREATER
 
-        public async Task WriteExcelAsync<TRender>(object data, string? sheetName = null, Action<TransConfiguration>? config = null, CancellationToken cancellationToken = default)
+        public async Task WriteExcelAsync<
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+#endif
+        TRender>(object data, string? sheetName = null, Action<TransConfiguration>? config = null, CancellationToken cancellationToken = default)
             where TRender : IAsyncDataRender
         {
             var render = AsyncRenderCreator<TRender>.Create(Configuration);
@@ -110,7 +115,11 @@ namespace LightExcel
             await render.RenderAsync(data, sheet, cfg, cancellationToken);
         }
 
-        internal static async Task WriteByTemplateAsync<TRender>(ExcelArchiveEntry doc, object data, string sheetName, ExcelConfiguration configuration, CancellationToken cancellationToken = default)
+        internal static async Task WriteByTemplateAsync<
+#if NET8_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+#endif
+        TRender>(ExcelArchiveEntry doc, object data, string sheetName, ExcelConfiguration configuration, CancellationToken cancellationToken = default)
             where TRender : IAsyncDataRender
         {
             var render = AsyncRenderCreator<TRender>.Create(configuration);
