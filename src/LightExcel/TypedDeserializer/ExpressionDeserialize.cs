@@ -11,7 +11,7 @@ namespace LightExcel.TypedDeserializer
     /// <summary>
     /// 从LightOrm中移植修改
     /// </summary>
-    internal static class ExpressionDeserialize<
+    internal static partial class ExpressionDeserialize<
 #if NET8_0_OR_GREATER
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
 #endif
@@ -199,28 +199,6 @@ namespace LightExcel.TypedDeserializer
             //Compile as Delegate
             var lambdaExp = Expression.Lambda<Func<IExcelDataReader, object>>(Body, recordInstanceExp);
             return lambdaExp.Compile();
-        }
-
-        private static bool MemberMatchesName(MemberInfo Member, string Name)
-        {
-            string FieldnameAttribute = GetColumnNameAttribute();
-            return FieldnameAttribute.ToLower() == Name.ToLower() || Member.Name.ToLower() == Name.ToLower();
-
-            string GetColumnNameAttribute()
-            {
-                if (Member.GetCustomAttributes(typeof(ExcelColumnAttribute), true).Length > 0)
-                {
-                    return ((ExcelColumnAttribute)Member.GetCustomAttributes(typeof(ExcelColumnAttribute), true)[0]).Name ?? string.Empty;
-                }
-                else if (Member.IsDefined(typeof(ExcelColumnAttribute), true))
-                {
-                    return Member.GetCustomAttribute<ExcelColumnAttribute>(true)?.Name ?? string.Empty;
-                }
-                else
-                {
-                    return string.Empty;
-                }
-            }
         }
 
         private static Expression GetTargetValueExpression(

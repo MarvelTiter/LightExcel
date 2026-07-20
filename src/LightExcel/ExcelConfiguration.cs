@@ -23,6 +23,7 @@ namespace LightExcel
         /// <summary>
         /// 去除标题单元格中的空格，默认是true
         /// </summary>
+        [Obsolete]
         public bool TrimHeader { get; set; } = true;
         public string? StartCell { get; set; }
         public int? StartHeaderRow { get; set; }

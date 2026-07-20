@@ -154,7 +154,7 @@ namespace LightExcel
                 rowEnumerator = sheetEnumerator.Current.GetEnumerator();
                 if (configuration.UseHeader && rowEnumerator.MoveNext())
                 {
-                    Func<Cell, string> action = configuration.TrimHeader ? WithTrim : Original;
+                    //Func<Cell, string> action = configuration.TrimHeader ? WithTrim : Original;
                     while (rowEnumerator.Current.RowIndex < headerRowIndex)
                     {
                         if (rowEnumerator.MoveNext())
@@ -162,7 +162,7 @@ namespace LightExcel
                         else
                             break;
                     }
-                    heads = [.. rowEnumerator.Current.Children.Select(action)];
+                    heads = [.. rowEnumerator.Current.Children.Select(Original)];
                     if (startRow == 1)
                         startRow += headerRowIndex;
                 }
@@ -171,7 +171,7 @@ namespace LightExcel
             return false;
 
             string Original(Cell cell) => cell.GetCellValue(Sst) ?? "";
-            string WithTrim(Cell cell) => cell.GetCellValue(Sst)?.Trim() ?? "";
+            //string WithTrim(Cell cell) => cell.GetCellValue(Sst)?.Trim() ?? "";
 
         }
 

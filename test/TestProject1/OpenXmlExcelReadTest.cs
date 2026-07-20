@@ -4,12 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace TestProject1
 {
-    public class ExcelFile
-    {
-        [NotNull]
-        [ExcelColumn(Name = "身份证号码")]
-        public string? IdNo { get; set; }
-    }
+    
 
     [TestClass]
     public class OpenXmlExcelReadTest
@@ -18,13 +13,13 @@ namespace TestProject1
         public void ExcelReaderTest2()
         {
             ExcelHelper excel = new ExcelHelper();
-            var reader = excel.QueryExcel<ExcelFile>("C:\\Users\\Marvel\\Desktop\\tttt\\档科\\相关人员户籍登记情况表_20260703_1140.xlsx", config: c =>
-            {
-                c.StartHeaderRow = 2;
-            }).ToList();
-            foreach (var item in reader)
-            {
-            }
+            //var reader = excel.QueryExcel<ExcelFile>("", config: c =>
+            //{
+            //    c.StartHeaderRow = 2;
+            //}).ToList();
+            //foreach (var item in reader)
+            //{
+            //}
         }
 
         [TestMethod]
@@ -80,7 +75,7 @@ namespace TestProject1
             //    Console.WriteLine($"D: {field.D}, E: {field.E}");
             //}
         }
-        // "C:\Users\Marvel\Desktop\驾驶人证件过期短信提醒\20250416模板\1驾驶人临近期满换证（期满日期前3个月）_结果.xlsx"
+
         [TestMethod]
         public void ExcelReaderTestDynamic2()
         {
@@ -88,7 +83,7 @@ namespace TestProject1
             int actionCount = 0;
             int totalRowCount = 0;
             int notMapCount = 0;
-            var reader = excel.ReadExcel("C:\\Users\\Marvel\\Desktop\\驾驶人证件过期短信提醒\\20250416模板\\1驾驶人临近期满换证（期满日期前3个月）_结果.xlsx");
+            var reader = excel.ReadExcel("");
             while (reader.NextResult())
             {
                 while (reader.Read())
