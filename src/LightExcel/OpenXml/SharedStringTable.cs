@@ -109,13 +109,19 @@ namespace LightExcel.OpenXml
         public int Count => checked((int)_maxIndx + 1);
         public string this[int key] { get => GetValue(key); }
         private long _maxIndx = -1;
-
+        private readonly string _pfile;
+        private readonly string _lfile;
+        private readonly string _vfile;
         public SharedStringsDiskCache()
         {
-            var path = $"{Guid.NewGuid().ToString()}_lightexcelcache";
-            _positionFs = new FileStream($"{path}_position", FileMode.OpenOrCreate);
-            _lengthFs = new FileStream($"{path}_length", FileMode.OpenOrCreate);
-            _valueFs = new FileStream($"{path}_data", FileMode.OpenOrCreate);
+            var dir = AppDomain.CurrentDomain.BaseDirectory;
+            var path = $"{Guid.NewGuid():N}_lightexcelcache";
+            _pfile = Path.Combine(dir, $"{path}_position");
+            _lfile = Path.Combine(dir, $"{path}_length");
+            _vfile = Path.Combine(dir, $"{path}_data");
+            _positionFs = new FileStream(_pfile, FileMode.OpenOrCreate);
+            _lengthFs = new FileStream(_lfile, FileMode.OpenOrCreate);
+            _valueFs = new FileStream(_vfile, FileMode.OpenOrCreate);
         }
 
         // index must start with 0-N
@@ -166,14 +172,14 @@ namespace LightExcel.OpenXml
                     // TODO: dispose managed state (managed objects)
                 }
                 _positionFs.Dispose();
-                if (File.Exists(_positionFs.Name))
-                    File.Delete(_positionFs.Name);
+                if (File.Exists(_pfile))
+                    File.Delete(_pfile);
                 _lengthFs.Dispose();
-                if (File.Exists(_lengthFs.Name))
-                    File.Delete(_lengthFs.Name);
+                if (File.Exists(_lfile))
+                    File.Delete(_lfile);
                 _valueFs.Dispose();
-                if (File.Exists(_valueFs.Name))
-                    File.Delete(_valueFs.Name);
+                if (File.Exists(_vfile))
+                    File.Delete(_vfile);
                 _disposedValue = true;
             }
         }
