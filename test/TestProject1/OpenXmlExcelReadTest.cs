@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace TestProject1
 {
-    
+
 
     [TestClass]
     public class OpenXmlExcelReadTest
@@ -56,7 +56,26 @@ namespace TestProject1
             {
                 Console.WriteLine($"{item.Index} - {item.Name} - {item.Birthday} - {item.Birthday2}");
             }
+            var ds = excel.Fill("entity-test.xlsx");
         }
+
+        [TestMethod]
+        public async Task ExcelReaderTestEntityAsync()
+        {
+            ExcelHelper excel = new ExcelHelper();
+            var result = excel.QueryExcelAsync<Model>("entity-test.xlsx", config: config =>
+            {
+
+            });
+            await foreach (var item in result)
+            {
+                Console.WriteLine($"{item.Index} - {item.Name} - {item.Birthday} - {item.Birthday2}");
+            }
+            var ds = await excel.FillAsync("entity-test.xlsx");
+
+            var dt = ds.Tables;
+        }
+
         [TestMethod]
         public void ExcelReaderTestDynamic()
         {

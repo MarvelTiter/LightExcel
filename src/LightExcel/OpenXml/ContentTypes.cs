@@ -2,6 +2,7 @@
 using LightExcel.OpenXml.Interfaces;
 using LightExcel.Utils;
 using System.IO.Compression;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Xml;
 
@@ -10,14 +11,9 @@ namespace LightExcel.OpenXml
     /// <summary>
     /// [Content_Types].xml
     /// </summary>
-    internal class ContentTypes : NodeCollectionXmlPart<INode>
+    internal class ContentTypes(ZipArchive archive, ExcelConfiguration configuration)
+        : NodeCollectionXmlPart<INode>(archive, "[Content_Types].xml", configuration)
     {
-        public ContentTypes(ZipArchive archive) : base(archive, "[Content_Types].xml")
-        {
-
-        }
-
-
         protected override IEnumerable<INode> GetChildrenImpl()
         {
             if (reader is null) yield break;
@@ -37,7 +33,27 @@ namespace LightExcel.OpenXml
                     yield break;
             }
         }
-
+#if NET8_0_OR_GREATER
+        protected override async IAsyncEnumerable<INode> GetChildrenImplAsync([EnumeratorCancellation] CancellationToken cancellationToken)
+        {
+            if (reader is null) yield break;
+            if (!reader.IsStartWith("Types", XmlHelper.ContentTypesXmlns))
+                yield break;
+            if (!await reader.ReadFirstContentAsync()) yield break;
+            while (!reader.EOF)
+            {
+                if (reader.IsStartWith("Override", XmlHelper.ContentTypesXmlns))
+                {
+                    var pn = reader.GetAttribute("PartName");
+                    var ct = reader.GetAttribute("ContentType");
+                    var ov = new Override(pn, ct);
+                    yield return ov;
+                }
+                else if (!await reader.SkipContentAsync())
+                    yield break;
+            }
+        }
+#endif
         protected override void WriteImpl<TNode>(LightExcelStreamWriter writer, IEnumerable<TNode> children)
         {
             writer.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");

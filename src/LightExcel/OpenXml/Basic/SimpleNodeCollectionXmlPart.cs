@@ -15,6 +15,18 @@ internal abstract class SimpleNodeCollectionXmlPart<T> : INodeCollection<T>, INo
     public int Count => Children.Count;
     public virtual void WriteToXml(LightExcelStreamWriter writer)
     {
-        
+
     }
+#if NET8_0_OR_GREATER
+    public async IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
+    {
+        foreach (var item in Children)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                yield return item;
+            }
+        }
+    }
+#endif
 }

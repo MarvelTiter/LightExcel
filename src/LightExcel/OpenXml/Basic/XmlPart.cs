@@ -7,21 +7,16 @@ using LightExcel.Utils;
 
 namespace LightExcel.OpenXml
 {
-    internal abstract partial class XmlPart<T> : IXmlPart<T> where T : INode
+    internal abstract partial class XmlPart<T>(ZipArchive archive, string path, ExcelConfiguration configuration) : IXmlPart<T> where T : INode
     {
         private bool disposedValue;
-        protected ZipArchive? archive;
+        protected ZipArchive? archive = archive;
         protected LightExcelXmlReader? reader = null;
-        internal virtual string Path { get; }
-        public XmlPart(ZipArchive archive, string path)
-        {
-            this.archive = archive;
-            Path = path;
-        }
+        internal virtual string Path { get; } = path;
 
         protected virtual void SetXmlReader()
         {
-            reader ??= archive!.GetXmlReader(Path);
+            reader ??= archive!.GetXmlReader(Path, configuration);
         }
 
         public virtual void Write()
@@ -29,7 +24,7 @@ namespace LightExcel.OpenXml
 
         }
 
-        public void Write<TNode>(IEnumerable<TNode> children) 
+        public void Write<TNode>(IEnumerable<TNode> children)
             where TNode : INode
         {
             using var writer = archive!.GetWriter(Path);
@@ -70,7 +65,7 @@ namespace LightExcel.OpenXml
 
         protected abstract void WriteImpl<TNode>(LightExcelStreamWriter writer, IEnumerable<TNode> children) where TNode : INode;
 
-        
+
 
         protected virtual void Dispose(bool disposing)
         {

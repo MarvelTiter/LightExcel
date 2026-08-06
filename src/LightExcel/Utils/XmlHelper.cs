@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO.Compression;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -12,13 +13,13 @@ namespace LightExcel.Utils
 {
     internal static class XmlHelper
     {
-        public static LightExcelXmlReader? GetXmlReader(this ZipArchive archive, string path)
+        public static LightExcelXmlReader? GetXmlReader(this ZipArchive archive, string path, ExcelConfiguration configuration)
         {
             System.Diagnostics.Debug.WriteLine($"opening {path}");
             var stream = archive.GetEntry(path)?.Open();
             System.Diagnostics.Debug.WriteLine($"opened {path}");
             if (stream == null) return null;
-            return new LightExcelXmlReader(stream, path);
+            return new LightExcelXmlReader(stream, path, configuration);
         }
 
         public static LightExcelStreamWriter GetWriter(this ZipArchive archive, string path)
@@ -64,6 +65,36 @@ namespace LightExcel.Utils
 
             return result.ToString();
         }
+#if NET8_0_OR_GREATER
+        public static async Task<string> ReadStringContentAsync(this LightExcelXmlReader reader, CancellationToken cancellationToken)
+        {
+            var result = new StringBuilder();
+            if (!await reader.ReadFirstContentAsync())
+                return string.Empty;
+
+            while (!reader.EOF)
+            {
+                if (reader.IsStartWith("t", XmlHelper.MainNs))
+                {
+                    result.Append(await reader.ReadElementContentAsStringAsync());
+                }
+                else if (reader.IsStartWith("r", XmlHelper.MainNs))
+                {
+                    var runs = ReadRichTextRunAsync(reader, cancellationToken);
+                    await foreach (var r in runs)
+                    {
+                        result.Append(r);
+                    }
+                }
+                else if (!await reader.SkipContentAsync())
+                {
+                    break;
+                }
+            }
+
+            return result.ToString();
+        }
+#endif
         private static IEnumerable<string> ReadRichTextRun(LightExcelXmlReader reader)
         {
             if (!reader.ReadFirstContent())
@@ -81,5 +112,28 @@ namespace LightExcel.Utils
                 }
             }
         }
+#if NET8_0_OR_GREATER
+        private static async IAsyncEnumerable<string> ReadRichTextRunAsync(LightExcelXmlReader reader, [EnumeratorCancellation] CancellationToken cancellationToken)
+        {
+            if (!await reader.ReadFirstContentAsync())
+                yield break;
+
+            while (!reader.EOF)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    yield break;
+                }
+                if (reader.IsStartWith("t", XmlHelper.MainNs))
+                {
+                    yield return await reader.ReadElementContentAsStringAsync();
+                }
+                else if (!await reader.SkipContentAsync())
+                {
+                    yield break;
+                }
+            }
+        }
+#endif
     }
 }

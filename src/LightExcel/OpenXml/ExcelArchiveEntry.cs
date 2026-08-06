@@ -17,7 +17,7 @@ namespace LightExcel.OpenXml
 			this.configuration = configuration;
 			archive = new ZipArchive(stream, ZipArchiveMode.Update, true, Utf8WithBom);
 			WorkBook = new WorkBook(archive, this, configuration);
-			ContentTypes = new ContentTypes(archive);
+			ContentTypes = new ContentTypes(archive, configuration);
 		}
 		internal WorkBook WorkBook { get; set; }
 		//internal RelationshipCollection Relationship { get; set; } = new RelationshipCollection();

@@ -2,6 +2,7 @@
 using LightExcel.OpenXml.Interfaces;
 using LightExcel.Utils;
 using System.IO.Compression;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Xml;
 
@@ -17,7 +18,8 @@ namespace LightExcel.OpenXml
         //private readonly IDictionary<int, string> values = new Dictionary<int, string>();
         private readonly SharedStringsDiskCache diskCache;
         public override int Count => diskCache.Count;
-        public SharedStringTable(ZipArchive archive) : base(archive, "xl/sharedStrings.xml")
+        public SharedStringTable(ZipArchive archive, ExcelConfiguration configuration)
+            : base(archive, "xl/sharedStrings.xml", configuration)
         {
             diskCache = new SharedStringsDiskCache();
             Flush();
@@ -75,6 +77,33 @@ namespace LightExcel.OpenXml
                 }
             }
         }
+
+#if NET8_0_OR_GREATER
+        protected override async IAsyncEnumerable<SharedStringNode> GetChildrenImplAsync([EnumeratorCancellation] CancellationToken cancellationToken)
+        {
+            if (reader is null) yield break;
+            if (!reader.IsStartWith("sst", XmlHelper.MainNs)) yield break;
+            if (!await reader.ReadFirstContentAsync()) yield break;
+            _ = int.TryParse(reader["count"], out var count);
+            _ = int.TryParse(reader["uniqueCount"], out var uniqueCount);
+            RefCount = count;
+            UniqueCount = uniqueCount;
+            while (!reader.EOF)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                    yield break;
+                if (reader.IsStartWith("si", XmlHelper.MainNs))
+                {
+                    var content = await reader.ReadStringContentAsync(cancellationToken);
+                    yield return new SharedStringNode(content);
+                }
+                else if (!await reader.SkipContentAsync())
+                {
+                    break;
+                }
+            }
+        }
+#endif
 
         protected override void WriteImpl<TNode>(LightExcelStreamWriter writer, IEnumerable<TNode> children)
         {

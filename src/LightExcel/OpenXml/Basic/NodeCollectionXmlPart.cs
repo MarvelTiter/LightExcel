@@ -2,9 +2,11 @@
 using LightExcel.OpenXml.Interfaces;
 using LightExcel.Utils;
 using System.Collections;
+using System.Runtime.CompilerServices;
 namespace LightExcel.OpenXml.Basic;
 
-internal abstract class NodeCollectionXmlPart<T>(ZipArchive archive, string path) : XmlPart<T>(archive, path), INodeCollection<T> where T : INode
+internal abstract class NodeCollectionXmlPart<T>(ZipArchive archive, string path, ExcelConfiguration configuration)
+    : XmlPart<T>(archive, path, configuration), INodeCollection<T> where T : INode
 {
     public List<T> Children { get; } = new List<T>();
 
@@ -41,4 +43,18 @@ internal abstract class NodeCollectionXmlPart<T>(ZipArchive archive, string path
         base.Dispose(disposing);
         Children.Clear();
     }
+#if NET8_0_OR_GREATER
+    protected virtual async IAsyncEnumerable<T> GetChildrenAsync([EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        SetXmlReader();
+        if (reader == null) yield break;
+        await foreach (var item in GetChildrenImplAsync(cancellationToken))
+        {
+            yield return item;
+        }
+    }
+    protected abstract IAsyncEnumerable<T> GetChildrenImplAsync(CancellationToken cancellationToken);
+    public virtual IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default)
+        => GetChildrenAsync(cancellationToken).GetAsyncEnumerator(cancellationToken);
+#endif
 }

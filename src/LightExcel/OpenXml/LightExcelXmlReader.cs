@@ -12,11 +12,15 @@ namespace LightExcel.OpenXml;
 internal class LightExcelXmlReader : IDisposable
 {
 
-    public LightExcelXmlReader(Stream stream, string path)
+    public LightExcelXmlReader(Stream stream, string path, ExcelConfiguration configuration)
     {
         this.stream = stream;
         Path = path;
-        this.reader = XmlReader.Create(stream);
+        var setting = new XmlReaderSettings()
+        {
+            Async = configuration.EnableAsync
+        };
+        this.reader = XmlReader.Create(stream, setting);
     }
 
     private bool disposedValue;
@@ -31,8 +35,8 @@ internal class LightExcelXmlReader : IDisposable
     public string? GetAttribute(string name) => reader.GetAttribute(name);
     public string? GetAttribute(string name, string ns) => reader.GetAttribute(name, ns);
 
+    #region 同步API
     public string ReadElementContentAsString() => reader.ReadElementContentAsString();
-
     public bool IsStartWith(string elementName, params string[] xmlns)
     {
         return xmlns.Any(ns => reader.IsStartElement(elementName, ns));
@@ -70,6 +74,47 @@ internal class LightExcelXmlReader : IDisposable
         reader.Skip();
         return true;
     }
+    #endregion
+
+    #region 异步API
+
+    public Task<string> ReadElementContentAsStringAsync() => reader.ReadElementContentAsStringAsync();
+
+
+    public async Task<bool> ReadFirstContentAsync()
+    {
+        if (reader.IsEmptyElement)
+        {
+            await reader.ReadAsync();
+            return false;
+        }
+        await reader.MoveToContentAsync();
+        await reader.ReadAsync();
+        return true;
+    }
+
+    public async Task SkipNextSiblingAsync()
+    {
+        while (!reader.EOF)
+        {
+            if (!await SkipContentAsync())
+                break;
+        }
+    }
+
+    public async Task<bool> SkipContentAsync()
+    {
+        if (reader.NodeType == XmlNodeType.EndElement)
+        {
+            await reader.ReadAsync();
+            return false;
+        }
+        await reader.SkipAsync();
+        return true;
+    }
+
+    #endregion
+
 
     protected virtual void Dispose(bool disposing)
     {

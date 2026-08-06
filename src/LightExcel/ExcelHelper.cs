@@ -4,6 +4,7 @@ using LightExcel.Utils;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 namespace LightExcel
@@ -14,7 +15,7 @@ namespace LightExcel
         #region 读取
         public IExcelDataReader ReadExcel(string path, string? sheetName = null, Action<ExcelConfiguration>? config = null)
         {
-            ExcelConfiguration configuration = new ExcelConfiguration();
+            ExcelConfiguration configuration = new();
             config?.Invoke(configuration);
             var archive = ExcelDocument.Open(path, configuration);
             return new ExcelReader(archive, configuration, sheetName);
@@ -68,6 +69,65 @@ namespace LightExcel
                 }
             }
         }
+
+#if NET8_0_OR_GREATER
+        public async IAsyncEnumerable<T> QueryExcelAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] T>(string path, string? sheetName = null, Action<ExcelConfiguration>? config = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            IExcelDataReader? reader = null;
+            try
+            {
+                if (config is null)
+                {
+                    config = c =>
+                    {
+                        c.AddDynamicColumns(typeof(T).CollectEntityInfo());
+                        c.EnableAsync = true;
+                    };
+                    reader = ReadExcel(path, sheetName, config);
+                }
+                else
+                {
+                    reader = ReadExcel(path, sheetName, c =>
+                    {
+                        config.Invoke(c);
+                        c.EnableAsync = true;
+                        c.AddDynamicColumns(typeof(T).CollectEntityInfo());
+                    });
+                }
+                while (await reader.NextResultAsync())
+                {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        yield break;
+                    }
+                    while (await reader.ReadAsync())
+                    {
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            yield break;
+                        }
+                        yield return ExpressionDeserialize<T>.Deserialize(reader);
+                    }
+                }
+            }
+            finally
+            {
+                reader?.Dispose();
+            }
+        }
+        public async IAsyncEnumerable<dynamic> QueryExcelAsync(string path, string? sheetName = null, Action<ExcelConfiguration>? config = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            using var reader = ReadExcel(path, sheetName, config);
+            while (reader.NextResult())
+            {
+                await foreach (var item in reader.AsDynamicAsync(cancellationToken))
+                {
+                    yield return item;
+                }
+            }
+        }
+#endif
+
         #endregion
 
         #region 写入

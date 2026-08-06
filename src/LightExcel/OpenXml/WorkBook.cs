@@ -48,14 +48,14 @@ namespace LightExcel.OpenXml
         {
             get
             {
-                relationships ??= new RelationshipCollection(archive);
+                relationships ??= new RelationshipCollection(archive, configuration);
                 return relationships;
             }
             set => relationships = value;
         }
         internal void InitSharedStringTable()
         {
-            SharedStrings = new SharedStringTable(archive);
+            SharedStrings = new SharedStringTable(archive, configuration);
         }
         internal void AddSharedStringTable()
         {
@@ -66,7 +66,7 @@ namespace LightExcel.OpenXml
 
         internal void InitStyleSheet()
         {
-            StyleSheet = new StyleSheet(archive);
+            StyleSheet = new StyleSheet(archive, configuration);
         }
 
         internal void AddStyleSheet()
@@ -80,7 +80,7 @@ namespace LightExcel.OpenXml
         {
             var c = WorkSheets.Count;
             sheetName ??= $"sheet{c + 1}";
-            var sheet = new Sheet(archive!, sheetName, c + 1);
+            var sheet = new Sheet(archive!, sheetName, c + 1, configuration);
             WorkSheets.AppendChild(sheet);
             Relationships.AppendChild(new Relationship(sheet.Id, "worksheet", sheet.RelPath));
             doc.ContentTypes.AppendChild(new Override(sheet.Path, "application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"));

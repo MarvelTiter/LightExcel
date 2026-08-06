@@ -49,6 +49,11 @@ namespace LightExcel
         T>(string path, string? sheetName = null, Action<ExcelConfiguration>? config = null);
         IEnumerable<dynamic> QueryExcel(string path, string? sheetName = null, Action<ExcelConfiguration>? config = null);
 
+#if NET8_0_OR_GREATER
+        IAsyncEnumerable<T> QueryExcelAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] T>(string path, string? sheetName = null, Action<ExcelConfiguration>? config = null, CancellationToken cancellationToken = default);
+        IAsyncEnumerable<dynamic> QueryExcelAsync(string path, string? sheetName = null, Action<ExcelConfiguration>? config = null, CancellationToken cancellationToken = default);
+#endif
+
         IExcelDataReader ReadExcel(Stream stream, string? sheetName = null, Action<ExcelConfiguration>? config = null);
         IEnumerable<T> QueryExcel<
 #if NET8_0_OR_GREATER
@@ -56,6 +61,10 @@ namespace LightExcel
 #endif
         T>(Stream stream, string? sheetName = null, Action<ExcelConfiguration>? config = null);
         IEnumerable<dynamic> QueryExcel(Stream stream, string? sheetName = null, Action<ExcelConfiguration>? config = null);
+#if NET8_0_OR_GREATER
+        IAsyncEnumerable<T> QueryExcelAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] T>(Stream stream, string? sheetName = null, Action<ExcelConfiguration>? config = null, CancellationToken cancellationToken = default);
+        IAsyncEnumerable<dynamic> QueryExcelAsync(Stream stream, string? sheetName = null, Action<ExcelConfiguration>? config = null, CancellationToken cancellationToken = default);
+#endif
         #endregion
     }
 }

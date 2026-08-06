@@ -3,6 +3,7 @@ using LightExcel.OpenXml.Interfaces;
 using LightExcel.Utils;
 using System.IO.Compression;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Xml;
 
 namespace LightExcel.OpenXml
@@ -12,19 +13,25 @@ namespace LightExcel.OpenXml
     /// </summary>
     internal class Sheet : NodeCollectionXmlPart<Row>, INode, IRenderSheet
     {
-        public Sheet(ZipArchive archive, string id, string name, int sid) : base(archive, "")
+        private readonly ExcelConfiguration configuration;
+
+        public Sheet(ZipArchive archive, string id, string name, int sid, ExcelConfiguration configuration)
+            : base(archive, "", configuration)
         {
             // read
             Id = id;
             Name = name;
             SheetIdx = sid;
+            this.configuration = configuration;
         }
 
-        public Sheet(ZipArchive archive, string name, int index) : base(archive, "")
+        public Sheet(ZipArchive archive, string name, int index, ExcelConfiguration configuration)
+            : base(archive, "", configuration)
         {
             Id = $"R{Guid.NewGuid():N}";
             Name = name;
             SheetIdx = index;
+            this.configuration = configuration;
         }
 
         public string Id { get; set; }
@@ -42,7 +49,7 @@ namespace LightExcel.OpenXml
 
         protected override void SetXmlReader()
         {
-            reader ??= archive?.GetXmlReader($"xl/worksheets/sheet{Seq + 1}.xml");
+            reader ??= archive?.GetXmlReader($"xl/worksheets/sheet{Seq + 1}.xml", configuration);
         }
 
         public ExcelColumnInfo[] Columns { get; set; } = [];
@@ -201,6 +208,119 @@ namespace LightExcel.OpenXml
                 }
             }
         }
+
+#if NET8_0_OR_GREATER
+        protected override async IAsyncEnumerable<Row> GetChildrenImplAsync([EnumeratorCancellation] CancellationToken cancellationToken)
+        {
+            if (reader is null) yield break;
+            if (!reader.IsStartWith("worksheet", XmlHelper.MainNs))
+                yield break;
+            if (!await reader.ReadFirstContentAsync())
+                yield break;
+            while (!reader.EOF)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    yield break;
+                }
+                if (reader.IsStartWith("sheetData", XmlHelper.MainNs))
+                {
+                    if (!await reader.ReadFirstContentAsync())
+                        continue;
+                    while (!reader.EOF)
+                    {
+                        if (reader.IsStartWith("row", XmlHelper.MainNs))
+                        {
+                            var row = new Row();
+                            var rr = reader["r"];
+                            if (rr != null)
+                                row.RowIndex = int.Parse(rr);
+                            if (!await reader.ReadFirstContentAsync()) continue;
+                            while (!reader.EOF)
+                            {
+                                if (reader.IsStartWith("c", XmlHelper.MainNs))
+                                {
+                                    var r = reader.GetAttribute("r");
+                                    var t = reader.GetAttribute("t");
+                                    var s = reader.GetAttribute("s");
+                                    var v = await ReadCellValueAsync(reader, cancellationToken);
+                                    var cell = new Cell(v, r, t, s, null);
+                                    //{
+                                    //    Reference = reader.GetAttribute("r"),
+                                    //    Type = reader.GetAttribute("t"),
+                                    //    StyleIndex = reader.GetAttribute("s"),
+                                    //};
+                                    //cell.Value = ReadCellValue(reader);
+                                    row.AddAndFixed(cell);
+                                }
+                                else if (!await reader.SkipContentAsync())
+                                {
+                                    break;
+                                }
+                            }
+
+                            yield return row;
+                        }
+                        else if (!await reader.SkipContentAsync())
+                        {
+                            break;
+                        }
+                    }
+                }
+                else if (reader.IsStartWith("cols", XmlHelper.MainNs))
+                {
+                    ColInfos = reader.Reader.ReadOuterXml();
+                }
+                else if (reader.IsStartWith("mergeCells", XmlHelper.MainNs))
+                {
+                    if (!await reader.ReadFirstContentAsync()) break;
+                    MergeCells = new MergeCellCollection();
+                    while (!reader.EOF)
+                    {
+                        if (reader.IsStartWith("mergeCell", XmlHelper.MainNs))
+                        {
+                            var merRef = reader["ref"];
+                            if (merRef != null)
+                                MergeCells.AppendChild(new MergeCell(merRef));
+                            await reader.SkipContentAsync();
+                        }
+                        else if (!await reader.SkipContentAsync())
+                        {
+                            break;
+                        }
+                    }
+                }
+                else if (!await reader.SkipContentAsync())
+                {
+                    break;
+                }
+            }
+        }
+
+        private static async Task<string?> ReadCellValueAsync(LightExcelXmlReader reader, CancellationToken cancellationToken)
+        {
+            string? stringValue = null;
+            if (!await reader.ReadFirstContentAsync()) return stringValue;
+            while (!reader.EOF)
+            {
+                if (reader.IsStartWith("v", XmlHelper.MainNs))
+                {
+                    stringValue = await reader.ReadElementContentAsStringAsync();
+                }
+                else if (reader.IsStartWith("is", XmlHelper.MainNs))
+                {
+                    stringValue = await reader.ReadStringContentAsync(cancellationToken);
+                }
+                else if (!await reader.SkipContentAsync())
+                {
+                    break;
+                }
+            }
+
+            return stringValue;
+        }
+
+#endif
 
         private static string? ReadCellValue(LightExcelXmlReader reader)
         {

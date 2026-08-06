@@ -31,6 +31,7 @@ namespace LightExcel
         internal bool FillByTemplate { get; set; }
         internal int StartRowIndex { get; set; }
         public bool AutoWidth { get; set; }
+        public bool EnableAsync { get; set; }
         /// <summary>
         /// 例如字符串类型的数字
         /// </summary>

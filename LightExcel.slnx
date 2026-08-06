@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/doc/">
+    <File Path="doc/版本日志.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/LightExcel/LightExcel.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/TestProject1/TestProject1.csproj" />
+  </Folder>
+</Solution>

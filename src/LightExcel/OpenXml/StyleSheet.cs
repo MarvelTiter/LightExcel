@@ -5,12 +5,8 @@ using System.IO.Compression;
 
 namespace LightExcel.OpenXml
 {
-    internal class StyleSheet : NodeCollectionXmlPart<INode>
+    internal class StyleSheet(ZipArchive archive, ExcelConfiguration configuration) : NodeCollectionXmlPart<INode>(archive, "xl/styles.xml",configuration)
     {
-        public StyleSheet(ZipArchive archive) : base(archive, "xl/styles.xml")
-        {
-
-        }
         public FontCollection? Fonts { get; set; }
         public FillCollection? Fills { get; set; }
         public BorderCollection? Borders { get; set; }
@@ -21,7 +17,12 @@ namespace LightExcel.OpenXml
         {
             throw new NotImplementedException();
         }
-
+#if NET8_0_OR_GREATER
+        protected override IAsyncEnumerable<INode> GetChildrenImplAsync(CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+#endif
         protected override void WriteImpl<TNode>(LightExcelStreamWriter writer, IEnumerable<TNode> children)
         {
             /*

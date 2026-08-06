@@ -7,7 +7,10 @@ namespace LightExcel
     {
         bool Read();
         bool NextResult();
-
+#if NET8_0_OR_GREATER
+        Task<bool> ReadAsync();
+        Task<bool> NextResultAsync();
+#endif
         string? this[string name] { get; }
         string? this[int i] { get; }
         int FieldCount { get; }
@@ -32,5 +35,11 @@ namespace LightExcel
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
 #endif
         TData>();
+
+#if NET8_0_OR_GREATER
+        IAsyncEnumerable<dynamic> AsDynamicAsync(CancellationToken cancellationToken = default);
+        IAsyncEnumerable<TData> AsTypedAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
+        TData>(CancellationToken cancellationToken = default);
+#endif
     }
 }
