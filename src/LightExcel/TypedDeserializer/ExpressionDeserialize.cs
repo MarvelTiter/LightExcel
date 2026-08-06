@@ -224,8 +224,8 @@ namespace LightExcel.TypedDeserializer
             );
             return TargetValueExpression;
         }
-
-        private static (bool CustomParse, bool IsNullable) GetRecordFieldExpression(ParameterExpression recordInstanceExp, int Ordinal,
+        private readonly record struct RecordValueInfo(bool CustomParse, bool IsNullable);
+        private static RecordValueInfo GetRecordFieldExpression(ParameterExpression recordInstanceExp, int Ordinal,
 #if NET8_0_OR_GREATER
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
 #endif
@@ -240,7 +240,7 @@ namespace LightExcel.TypedDeserializer
 
             expression = Expression.Call(recordInstanceExp, GetValueMethod, Expression.Constant(Ordinal, typeof(int)));
 
-            return (!has, isnullable);
+            return new(!has, isnullable);
         }
 
         private static MethodCallExpression GetNullCheckExpression(ParameterExpression RecordInstance, int Ordinal)

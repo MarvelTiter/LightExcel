@@ -20,7 +20,6 @@
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>
-		<None Include="ExcelReader.Async.cs" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)' != 'net45'">
@@ -29,7 +28,6 @@
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net45'">
 		<Reference Include="System.IO.Compression" />
-		<PackageReference Include="System.ValueTuple" Version="4.5.0" />
 	</ItemGroup>
 
 </Project>

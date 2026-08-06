@@ -58,6 +58,9 @@ internal static class CellHelper
         CalcCellWidth(col, cell.Value);
         return cell;
     }
+
+    private readonly record struct CellFormatInfo(string Value, string? Type, string? Style);
+
     internal static Cell FormatCell(string r, object? value, TransConfiguration transConfig, ExcelColumnInfo info)
     {
         var v = string.Empty;
@@ -126,7 +129,7 @@ internal static class CellHelper
 #if NET8_0_OR_GREATER
         [UnconditionalSuppressMessage("AOT", "IL2072", Justification = "格式化枚举时，通过反射获取自定义的枚举说明(System.ComponentModel.DataAnnotations.DisplayAttribute.Name ?? System.ComponentModel.DescriptionAttribute.Description)")]
 #endif
-        static (string value, string? type, string? style) FormatByType(object value, ExcelColumnInfo info, ExcelConfiguration config)
+        static CellFormatInfo FormatByType(object value, ExcelColumnInfo info, ExcelConfiguration config)
         {
             var type = info.Type ?? value.GetType();
             type = Nullable.GetUnderlyingType(type) ?? type;
@@ -141,8 +144,8 @@ internal static class CellHelper
                 _ => FormatFallback(value, config, info)
             };
         }
-
-        static (string value, string? type, string? style) FormatEnum(object value,
+        
+        static CellFormatInfo FormatEnum(object value,
 #if NET8_0_OR_GREATER
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)]
 #endif
@@ -150,7 +153,7 @@ internal static class CellHelper
         {
             var field = enumType.GetField(value.ToString()!);
             if (field == null)
-                return (value.ToString()!, "str", null);
+                return new(value.ToString()!, "str", null);
             string? displayName = null;
 #if NET6_0_OR_GREATER
             displayName = field.GetCustomAttribute<System.ComponentModel.DataAnnotations.DisplayAttribute>()?.Name
@@ -159,46 +162,46 @@ internal static class CellHelper
             displayName = field.GetCustomAttribute<DescriptionAttribute>()?.Description;
 #endif
 
-            return (displayName ?? value.ToString()!, "str", null);
+            return new(displayName ?? value.ToString()!, "str", null);
         }
-        static (string value, string? type, string? style) FormatNumber(object value, Type numberType, ExcelConfiguration config)
+        static CellFormatInfo FormatNumber(object value, Type numberType, ExcelConfiguration config)
         {
             var useStringType = !Equals(config.CultureInfo, CultureInfo.InvariantCulture);
             var culture = config.CultureInfo;
 
             if (numberFormatters.TryGetValue(numberType, out var formatter))
             {
-                return (formatter(value, config.CultureInfo), useStringType ? "str" : "n", null);
+                return new(formatter(value, config.CultureInfo), useStringType ? "str" : "n", null);
             }
             // 回退处理
             var stringValue = value.ToString();
             if (decimal.TryParse(stringValue, out var decimalValue))
-                return (decimalValue.ToString(culture), useStringType ? "str" : "n", null);
+                return new(decimalValue.ToString(culture), useStringType ? "str" : "n", null);
 
-            return (stringValue ?? string.Empty, "str", null);
+            return new(stringValue ?? string.Empty, "str", null);
         }
-        static (string value, string? type, string? style) FormatBoolean(bool value) => (value ? "1" : "0", "b", null);
-        static (string value, string? type, string? style) FormatDateTime(DateTime value, ExcelColumnInfo info, ExcelConfiguration config)
+        static CellFormatInfo FormatBoolean(bool value) => new(value ? "1" : "0", "b", null);
+        static CellFormatInfo FormatDateTime(DateTime value, ExcelColumnInfo info, ExcelConfiguration config)
         {
             if (!Equals(config.CultureInfo, CultureInfo.InvariantCulture))
             {
-                return (value.ToString(config.CultureInfo), "str", null);
+                return new(value.ToString(config.CultureInfo), "str", null);
             }
 
             if (info.Format == null)
             {
-                return (value.ToOADate().ToString(CultureInfo.InvariantCulture), null, info.StyleIndex ?? "2");
+                return new(value.ToOADate().ToString(CultureInfo.InvariantCulture), null, info.StyleIndex ?? "2");
             }
 
-            return (value.ToString(info.Format, config.CultureInfo), "str", null);
+            return new(value.ToString(info.Format, config.CultureInfo), "str", null);
         }
-        static (string value, string? type, string? style) FormatFallback(object value, ExcelConfiguration config, ExcelColumnInfo info)
+        static CellFormatInfo FormatFallback(object value, ExcelConfiguration config, ExcelColumnInfo info)
         {
 
             if (IsNumberValue(value, config, out var s))
             {
                 var useStringType = !Equals(config.CultureInfo, CultureInfo.InvariantCulture);
-                return (s, useStringType ? "str" : "n", null);
+                return new(s, useStringType ? "str" : "n", null);
             }
 
             if (value is bool b)
@@ -207,7 +210,7 @@ internal static class CellHelper
             if (value is DateTime dt)
                 return FormatDateTime(dt, info, config);
 
-            return (value.ToString() ?? string.Empty, "str", null);
+            return new(value.ToString() ?? string.Empty, "str", null);
         }
     }
 

@@ -1,4 +1,5 @@
-﻿using LightExcel.OpenXml;
+﻿using LightExcel.Models;
+using LightExcel.OpenXml;
 using LightExcel.Renders;
 using LightExcel.Utils;
 using System;
@@ -52,8 +53,7 @@ namespace LightExcel
             Sheet sheet = excelArchive!.WorkBook.AddNewSheet(sheetName);
             render.Render(data, sheet, config);
         }
-
-        internal static (List<Row>, Sheet) HandleTemplateHeader(ExcelArchiveEntry doc, string sheetName, ExcelConfiguration configuration)
+        internal static TemplateHeader HandleTemplateHeader(ExcelArchiveEntry doc, string sheetName, ExcelConfiguration configuration)
         {
             configuration.FillByTemplate = true;
             // 获取sheet对象
@@ -77,7 +77,7 @@ namespace LightExcel
             {
                 configuration.StartRowIndex = templateRow.RowIndex;
             }
-            return (header, sheet);
+            return new(header, sheet);
         }
 
         /// <summary>

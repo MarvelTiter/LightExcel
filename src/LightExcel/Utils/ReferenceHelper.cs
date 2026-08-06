@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LightExcel.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -46,12 +47,12 @@ namespace LightExcel.Utils
             return xName;
         }
 
-        public static (int? X, int? Y) ConvertCellReferenceToXY(string? cellref)
+        public static CellCoord ConvertCellReferenceToXY(string? cellref)
         {
-            if (cellref == null) return (null, null);
+            if (cellref == null) return new(null, null);
             var x = GetColumnIndex(cellref);
             var y = GetRowIndex(cellref);
-            return (x, y);
+            return new(x, y);
         }
 
         public static int GetRowIndex(string cellref)
